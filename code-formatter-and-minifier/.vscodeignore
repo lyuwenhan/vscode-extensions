@@ -1,0 +1,14 @@
+**
+**/**
+!src/**
+!LICENSE
+!package.json
+!package-lock.json
+!README.md
+!media/**
+!node_modules/@jridgewell/**
+!node_modules/acorn/**
+!node_modules/js-beautify/**
+!node_modules/acorn/**
+!node_modules/jsonc-parser/**
+!node_modules/terser/**

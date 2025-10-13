@@ -1,0 +1,200 @@
+{
+	"name": "code-formatter-and-minifier",
+	"displayName": "Code Formatter & Minifier",
+	"private": false,
+	"version": "1.0.0",
+	"publisher": "lyuwenhan",
+	"description": "A VS Code extension to minify and beautify JavaScript, and sort JSON files with one click.",
+	"engines": {
+		"vscode": "^1.80.0"
+	},
+	"main": "./src/extension.js",
+	"activationEvents": [
+		"onLanguage:javascript",
+		"onLanguage:json",
+		"onLanguage:jsonc"
+	],
+	"contributes": {
+		"commands": [
+			{
+				"command": "minifier.minify",
+				"title": "Minify current file",
+				"category": "Minifier"
+			},
+			{
+				"command": "minifier.beautify",
+				"title": "Beautify current file",
+				"category": "Minifier"
+			},
+			{
+				"command": "minifier.mitify",
+				"title": "Mitify current file",
+				"category": "Minifier"
+			},
+			{
+				"command": "minifier.sort",
+				"title": "Sort current file",
+				"category": "Minifier"
+			},
+			{
+				"command": "minifier.generateUuid",
+				"title": "Generate an uuid",
+				"category": "Minifier"
+			},
+			{
+				"command": "minifier.flipCoin",
+				"title": "Flip a coin",
+				"icon": {
+					"light": "media/icon.svg",
+					"dark": "media/icon.svg"
+				},
+				"category": "Coin"
+			},
+			{
+				"command": "minifier.flipCoin.currentState",
+				"title": "Show current coin stats",
+				"category": "Coin"
+			},
+			{
+				"command": "minifier.flipCoin.reset",
+				"title": "Reset coin stats",
+				"category": "Coin"
+			}
+		],
+		"menus": {
+			"editor/context": [
+				{
+					"command": "minifier.generateUuid",
+					"group": "navigation@95",
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled')"
+				},
+				{
+					"command": "minifier.minify",
+					"group": "navigation@96",
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && (resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc)"
+				},
+				{
+					"command": "minifier.beautify",
+					"group": "navigation@97",
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && (resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc)"
+				},
+				{
+					"command": "minifier.mitify",
+					"group": "navigation@98",
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && resourceLangId == javascript"
+				},
+				{
+					"command": "minifier.sort",
+					"group": "navigation@99",
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && (resourceLangId == json || resourceLangId == jsonc)"
+				}
+			],
+			"commandPalette": [
+				{
+					"command": "minifier.generateUuid",
+					"when": "false"
+				},
+				{
+					"command": "minifier.minify",
+					"when": "resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc"
+				},
+				{
+					"command": "minifier.beautify",
+					"when": "resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc"
+				},
+				{
+					"command": "minifier.mitify",
+					"when": "resourceLangId == javascript"
+				},
+				{
+					"command": "minifier.sort",
+					"when": "resourceLangId == json || resourceLangId == jsonc"
+				},
+				{
+					"command": "minifier.flipCoin",
+					"when": "true"
+				},
+				{
+					"command": "minifier.flipCoin.currentState",
+					"when": "true"
+				},
+				{
+					"command": "minifier.flipCoin.reset",
+					"when": "true"
+				}
+			],
+			"explorer/context": [
+				{
+					"command": "minifier.minify",
+					"group": "navigation@96",
+					"when": "resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc"
+				},
+				{
+					"command": "minifier.beautify",
+					"group": "navigation@97",
+					"when": "resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc"
+				},
+				{
+					"command": "minifier.mitify",
+					"group": "navigation@98",
+					"when": "resourceLangId == javascript"
+				},
+				{
+					"command": "minifier.sort",
+					"group": "navigation@99",
+					"when": "resourceLangId == json || resourceLangId == jsonc"
+				}
+			],
+			"editor/title/context": [
+				{
+					"command": "minifier.minify",
+					"group": "navigation@96",
+					"when": "resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc"
+				},
+				{
+					"command": "minifier.beautify",
+					"group": "navigation@97",
+					"when": "resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc"
+				},
+				{
+					"command": "minifier.mitify",
+					"group": "navigation@98",
+					"when": "resourceLangId == javascript"
+				},
+				{
+					"command": "minifier.sort",
+					"group": "navigation@99",
+					"when": "resourceLangId == json || resourceLangId == jsonc"
+				}
+			],
+			"editor/title": [
+				{
+					"command": "minifier.flipCoin",
+					"group": "navigation"
+				}
+			]
+		}
+	},
+	"scripts": {
+		"package": "vsce package --allow-missing-repository"
+	},
+	"dependencies": {
+		"js-beautify": "^1.15.4",
+		"jsonc-parser": "^3.3.1",
+		"terser": "^5.44.0"
+	},
+	"devDependencies": {
+		"@vscode/vsce": "^3.0.0",
+		"esbuild": "^0.25.10"
+	},
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/lyuwenhan/vscode-extensions",
+		"directory": "code-formatter-and-minifier"
+	},
+	"bugs": {
+		"url": "https://github.com/lyuwenhan/vscode-extensions/issues"
+	},
+	"homepage": "https://lyuwenhan.github.io"
+}
