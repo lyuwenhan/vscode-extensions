@@ -2,14 +2,14 @@
 	"name": "coin-flipper",
 	"displayName": "Coin Flipper",
 	"private": false,
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"publisher": "lyuwenhan",
 	"description": "A VS Code extension to make a coin flip with one click.",
 	"engines": {
 		"vscode": "^1.80.0"
 	},
 	"main": "./out/extension.js",
-	"icon": "media/icon.png",
+	"icon": "./media/icon.png",
 	"activationEvents": [
 		"onStartupFinished"
 	],
@@ -19,8 +19,8 @@
 				"command": "minifier.flipCoin",
 				"title": "Flip a coin",
 				"icon": {
-					"light": "media/icon.svg",
-					"dark": "media/icon.svg"
+					"light": "./media/icon.svg",
+					"dark": "./media/icon.svg"
 				},
 				"category": "Coin"
 			},
