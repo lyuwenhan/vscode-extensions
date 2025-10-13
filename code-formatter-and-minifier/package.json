@@ -2,7 +2,7 @@
 	"name": "code-formatter-and-minifier",
 	"displayName": "Code Formatter & Minifier",
 	"private": false,
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"publisher": "lyuwenhan",
 	"description": "A VS Code extension to minify and beautify JavaScript, and sort JSON files with one click.",
 	"engines": {
@@ -40,25 +40,6 @@
 				"command": "minifier.generateUuid",
 				"title": "Generate an uuid",
 				"category": "Minifier"
-			},
-			{
-				"command": "minifier.flipCoin",
-				"title": "Flip a coin",
-				"icon": {
-					"light": "media/icon.svg",
-					"dark": "media/icon.svg"
-				},
-				"category": "Coin"
-			},
-			{
-				"command": "minifier.flipCoin.currentState",
-				"title": "Show current coin stats",
-				"category": "Coin"
-			},
-			{
-				"command": "minifier.flipCoin.reset",
-				"title": "Reset coin stats",
-				"category": "Coin"
 			}
 		],
 		"menus": {
@@ -109,18 +90,6 @@
 				{
 					"command": "minifier.sort",
 					"when": "resourceLangId == json || resourceLangId == jsonc"
-				},
-				{
-					"command": "minifier.flipCoin",
-					"when": "true"
-				},
-				{
-					"command": "minifier.flipCoin.currentState",
-					"when": "true"
-				},
-				{
-					"command": "minifier.flipCoin.reset",
-					"when": "true"
 				}
 			],
 			"explorer/context": [
@@ -166,17 +135,11 @@
 					"group": "navigation@99",
 					"when": "resourceLangId == json || resourceLangId == jsonc"
 				}
-			],
-			"editor/title": [
-				{
-					"command": "minifier.flipCoin",
-					"group": "navigation"
-				}
 			]
 		}
 	},
 	"scripts": {
-		"vscode:prepublish":"esbuild ./src/extension.js --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node --minify",
+		"vscode:prepublish": "esbuild ./src/extension.js --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node --minify",
 		"package": "vsce package --allow-missing-repository"
 	},
 	"dependencies": {

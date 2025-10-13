@@ -1,6 +1,6 @@
 # Code Formatter & Minifier
 
-A simple VS Code extension to **minify**, **beautify**, **mitify**, **sort JSON**, and provide **UUID generation** & **coin flipping** utilities.
+A simple VS Code extension to **minify**, **beautify**, **mitify**, **sort JSON**, and provide **UUID generation** utilities.
 
 ## Features
 
@@ -21,22 +21,10 @@ A simple VS Code extension to **minify**, **beautify**, **mitify**, **sort JSON*
 - Right-click to use `Generate UUID`
 - Inserts a freshly generated UUID at each selected cursor position in the active editor.
 
-### Coin Flip
-- A built-in daily counter for random coin flips to help make decisions.
-- Commands:
-  - `Coin: Flip a coin` -> Flips a coin (Heads/Tails).
-  - `Coin: Show current coin stats` -> Displays today's stats.
-  - `Coin: Reset coin stats` -> Resets the daily counter.
-- Stats reset automatically every midnight.
-
 ## Usage
 1. Open a `.js`, `.json`, or `.jsonc` file in VS Code.
 2. Right-click inside the editor.
 3. Choose the operation you want from the context menu.
-4. Use the Command Palette (`Ctrl+Shift+P`) and search for:
-- `Coin: Flip a coin`
-- `Coin: Show current coin stats`
-- `Coin: Reset coin stats`
 
 ## Notes
 - JavaScript minification uses [terser](https://github.com/terser/terser).
@@ -45,5 +33,4 @@ A simple VS Code extension to **minify**, **beautify**, **mitify**, **sort JSON*
 - JSON operations do not preserve comments when saving.
 
 ## Extra
-- Midnight reset logic for coin stats is handled internally (no manual cleanup needed).
 - All edit operations automatically save the document (unless untitled).
