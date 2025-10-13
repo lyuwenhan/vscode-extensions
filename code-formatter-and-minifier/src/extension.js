@@ -4,7 +4,7 @@ const {
 } = require("crypto");
 const terser = require("terser");
 const beautify = require("js-beautify");
-const jsonc = require("jsonc-parser");
+const jsonc = require("../node_modules/jsonc-parser/lib/esm/main.js");
 const opts = {
 	minify: {
 		compress: false,

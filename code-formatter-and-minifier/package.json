@@ -2,13 +2,13 @@
 	"name": "code-formatter-and-minifier",
 	"displayName": "Code Formatter & Minifier",
 	"private": false,
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"publisher": "lyuwenhan",
 	"description": "A VS Code extension to minify and beautify JavaScript, and sort JSON files with one click.",
 	"engines": {
 		"vscode": "^1.80.0"
 	},
-	"main": "./src/extension.js",
+	"main": "./out/extension.js",
 	"activationEvents": [
 		"onLanguage:javascript",
 		"onLanguage:json",
@@ -176,6 +176,7 @@
 		}
 	},
 	"scripts": {
+		"vscode:prepublish":"esbuild ./src/extension.js --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node --minify",
 		"package": "vsce package --allow-missing-repository"
 	},
 	"dependencies": {
