@@ -17,12 +17,19 @@ A simple VS Code extension to **minify**, **beautify**, **mitify**, **sort JSON*
   - **“Beautify this file”** -> Format JSON with indentation (using tabs).
 - **Note:** `.jsonc` files are automatically parsed as `.json` (comments are stripped).
 
+### JSONL
+- Right-click inside a **JSONL (.jsonl)** file:  
+  - **“Minify this file”** -> Compress each JSON object on every line into a single compact line.  
+  - **“Beautify this file”** -> Format each JSON object on every line with indentation and line breaks.  
+- Each line is parsed and processed independently without merging across lines.  
+- **Note:** The **“Sort this file”** action is not available for JSONL, since JSONL files are designed as collections of independent JSON records.
+
 ### UUID Generator
 - Right-click to use `Generate UUID`
 - Inserts a freshly generated UUID at each selected cursor position in the active editor.
 
 ## Usage
-1. Open a `.js`, `.json`, or `.jsonc` file in VS Code.
+1. Open a `.js`, `.json`, `.jsonc`, or `.jsonl` file in VS Code.
 2. Right-click inside the editor.
 3. Choose the operation you want from the context menu.
 

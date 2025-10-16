@@ -4,7 +4,8 @@ const {
 } = require("crypto");
 const terser = require("terser");
 const beautify = require("js-beautify");
-const jsonc = require("../node_modules/jsonc-parser/lib/esm/main.js");
+const JSONParse = require("jsonparse");
+const jsonc = require("jsonc-parser/lib/esm/main.js");
 const opts = {
 	minify: {
 		compress: false,
@@ -39,6 +40,43 @@ const opts = {
 		templating: ["auto"]
 	}
 };
+function jsonStringify1L(data) {
+	var seen = [];
+	return function stringify (node) {
+		if (node && node.toJSON && typeof node.toJSON === "function") {
+			node = node.toJSON()
+		}
+		if (node === undefined) return;
+		if (typeof node == "number") return isFinite(node) ? "" + node : "null";
+		if (typeof node !== "object") return JSON.stringify(node);
+		var i, out;
+		if (Array.isArray(node)) {
+			out = "[";
+			for (i = 0; i < node.length; i++) {
+				if (i) out += ", ";
+				out += stringify(node[i]) || "null"
+			}
+			return out + "]"
+		}
+		if (node === null) return "null";
+		if (seen.indexOf(node) !== -1) {
+			throw new TypeError("Converting circular structure to JSON")
+		}
+		var seenIndex = seen.push(node) - 1;
+		var keys = Object.keys(node);
+		out = "";
+		for (i = 0; i < keys.length; i++) {
+			var key = keys[i];
+			var value = stringify(node[key]);
+			if (!value) continue;
+			if (out) out += ", ";
+			out += JSON.stringify(key) + ": " + value
+		}
+		seen.splice(seenIndex, 1);
+		return "{" + out + "}"
+	}(data)
+};
+
 async function minifyFile (content) {
 	const e = await terser.minify(content, opts.minify);
 	return e.code
@@ -63,16 +101,38 @@ function sortObject (value) {
 	return value
 }
 
+function parseJsonL (text) {
+	const parser = new JSONParse;
+	const result = [];
+	parser.onValue = function (value) {
+		if (this.stack.length === 0) result.push(value)
+	};
+	parser.write(text);
+	return result
+}
+
+function jsonStringify (json) {
+	return JSON.stringify(json, null, "\t")
+}
+
 function minifyJson (content) {
 	return JSON.stringify(jsonc.parse(content))
 }
 
 function beautifyJson (content) {
-	return JSON.stringify(jsonc.parse(content), null, "\t")
+	return jsonStringify(jsonc.parse(content))
 }
 
 function sortJson (content) {
-	return JSON.stringify(sortObject(jsonc.parse(content)), null, "\t")
+	return jsonStringify(sortObject(jsonc.parse(content)))
+}
+
+function minifyJsonL (content) {
+	return parseJsonL(content).map(jsonStringify1L).join("\n")
+}
+
+function beautifyJsonL (content) {
+	return parseJsonL(content).map(jsonStringify).join("\n")
 }
 async function getDoc (uri) {
 	if (!uri || !uri.fsPath) {
@@ -108,11 +168,13 @@ async function saveDocContent (doc, content) {
 const actions = {
 	minify: {
 		javascript: minifyFile,
-		json: minifyJson
+		json: minifyJson,
+		jsonl: minifyJsonL
 	},
 	beautify: {
 		javascript: beautifyFile,
-		json: beautifyJson
+		json: beautifyJson,
+		jsonl: beautifyJsonL
 	},
 	mitify: {
 		javascript: mitifyFile
@@ -151,7 +213,7 @@ function activate (context) {
 			const doc = await getDoc(uri);
 			if (doc) {
 				const info = getDocInfo(doc);
-				let result = await actionByLang(action, info);
+				let result = (await actionByLang(action, info)).trim() + "\n";
 				if (info.content === result) {
 					vscode.window.showWarningMessage(`${ActionName}: Nothing changed.`);
 					return
