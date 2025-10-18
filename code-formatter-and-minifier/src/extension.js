@@ -219,7 +219,7 @@ function activate (context) {
 				const info = getDocInfo(doc);
 				let result = (await actionByLang(action, info)).trim() + "\n";
 				if (info.content === result) {
-					vscode.window.showWarningMessage(`${ActionName}: Nothing changed.`);
+					vscode.window.showWarningMessage(ActionName + ": Nothing changed.");
 					return
 				}
 				await saveDocContent(doc, result);
