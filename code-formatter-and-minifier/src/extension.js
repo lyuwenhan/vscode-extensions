@@ -40,7 +40,8 @@ const opts = {
 		templating: ["auto"]
 	}
 };
-function jsonStringify1L(data) {
+
+function jsonStringify1L (data) {
 	var seen = [];
 	return function stringify (node) {
 		if (node && node.toJSON && typeof node.toJSON === "function") {
@@ -75,8 +76,7 @@ function jsonStringify1L(data) {
 		seen.splice(seenIndex, 1);
 		return "{" + out + "}"
 	}(data)
-};
-
+}
 async function minifyFile (content) {
 	const e = await terser.minify(content, opts.minify);
 	return e.code
@@ -151,10 +151,14 @@ async function getDoc (uri) {
 	return found ?? await vscode.workspace.openTextDocument(uri)
 }
 
+function normEol (content) {
+	return content.replace(/\r\n/g, "\n").replace(/\r/g, "\n")
+}
+
 function getDocInfo (doc) {
 	return {
 		lang: doc.languageId.replace(/^jsonc$/, "json"),
-		content: doc.getText() ?? ""
+		content: normEol(doc.getText() ?? "")
 	}
 }
 async function saveDocContent (doc, content) {

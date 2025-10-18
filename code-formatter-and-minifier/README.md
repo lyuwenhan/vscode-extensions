@@ -41,3 +41,4 @@ A simple VS Code extension to **minify**, **beautify**, **mitify**, **sort JSON*
 
 ## Extra
 - All edit operations automatically save the document (unless untitled).
+- Both `LF (\n)` and `CRLF (\r\n)` line endings are supported.
