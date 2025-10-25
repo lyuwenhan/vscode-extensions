@@ -77,16 +77,17 @@ function jsonStringify1L (data) {
 		return "{" + out + "}"
 	}(data)
 }
-async function minifyFile (content) {
-	const e = await terser.minify(content, opts.minify);
-	return e.code
+
+function minifyFile (content) {
+	return terser.minify_sync(content, opts.minify).code
 }
 
 function beautifyFile (content) {
 	return beautify.js(content, opts.beautify)
 }
-async function mitifyFile (content) {
-	return beautifyFile(await minifyFile(content))
+
+function mitifyFile (content) {
+	return beautifyFile(minifyFile(content))
 }
 
 function sortObject (value) {
@@ -198,9 +199,10 @@ function actionByLang (action, {
 	}
 	const actByLang = act[lang];
 	if (!actByLang) {
-		throw new Error("Invalid file type.")
+		throw new Error("Invalid file type." + lang)
 	}
-	if (content.trim() === "") {
+	content = content.trim();
+	if (content === "") {
 		return ""
 	}
 	return actByLang(content)
@@ -217,12 +219,63 @@ function activate (context) {
 			const doc = await getDoc(uri);
 			if (doc) {
 				const info = getDocInfo(doc);
-				let result = (await actionByLang(action, info)).trim() + "\n";
+				let result = actionByLang(action, info).trim() + "\n";
 				if (info.content === result) {
 					vscode.window.showWarningMessage(ActionName + ": Nothing changed.");
 					return
 				}
 				await saveDocContent(doc, result);
+				vscode.window.showInformationMessage(sucMsg + " successfully.")
+			} else {
+				throw new Error(ActionName + ": No file selected.")
+			}
+		} catch (e) {
+			vscode.window.showErrorMessage(e.message || String(e))
+		}
+	})));
+	context.subscriptions.push(...[
+		["minify", "Minified", "Minifier"],
+		["beautify", "Beautified", "Beautifier"],
+		["mitify", "Mitified", "Mitifier"],
+		["sort", "Sorted", "Sorter"]
+	].map(([action, sucMsg, ActionName]) => vscode.commands.registerCommand("minifier." + action + "Sel", async uri => {
+		try {
+			const editor = vscode.window.activeTextEditor;
+			if (editor) {
+				const replacements = [];
+				let changed = false;
+				const sels = editor.selections.filter(e => !e.isEmpty);
+				if (!sels.length) {
+					vscode.window.showWarningMessage(ActionName + ": No text selected.");
+					return
+				}
+				const {
+					lang
+				} = getDocInfo(editor.document);
+				for (const sel of sels) {
+					const content = editor.document.getText(sel);
+					const result = actionByLang(action, {
+						content,
+						lang
+					}).trim();
+					if (content === result) {
+						continue
+					}
+					changed = true;
+					replacements.push({
+						sel,
+						result
+					})
+				}
+				await editor.edit(editBuilder => {
+					for (const item of replacements) {
+						editBuilder.replace(item.sel, item.result)
+					}
+				});
+				if (!changed) {
+					vscode.window.showWarningMessage(ActionName + ": Nothing changed.");
+					return
+				}
 				vscode.window.showInformationMessage(sucMsg + " successfully.")
 			} else {
 				throw new Error(ActionName + ": No file selected.")
