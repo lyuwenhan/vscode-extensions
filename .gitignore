@@ -2,3 +2,5 @@
 */node_modules/
 */PACK.bat
 */out/
+*/.ignore*
+*/.ignore/
