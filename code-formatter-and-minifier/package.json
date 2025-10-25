@@ -2,7 +2,7 @@
 	"name": "code-formatter-and-minifier",
 	"displayName": "Code Formatter & Minifier",
 	"private": false,
-	"version": "1.0.8",
+	"version": "1.0.9",
 	"publisher": "lyuwenhan",
 	"description": "A VS Code extension to minify and beautify JavaScript, and sort JSON files with one click.",
 	"engines": {
@@ -16,26 +16,47 @@
 		"onLanguage:jsonl"
 	],
 	"icon": "media/icon.png",
+	"scripts": {
+		"vscode:prepublish": "esbuild ./src/extension.js --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node --minify && node createContributes.js",
+		"package": "vsce package --allow-missing-repository"
+	},
+	"dependencies": {
+		"js-beautify": "^1.15.4",
+		"jsonc-parser": "^3.3.1",
+		"jsonparse": "^1.3.1",
+		"terser": "^5.44.0"
+	},
+	"devDependencies": {
+		"@vscode/vsce": "^3.0.0",
+		"esbuild": "^0.25.10"
+	},
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/lyuwenhan/vscode-extensions",
+		"directory": "code-formatter-and-minifier"
+	},
+	"bugs": {
+		"url": "https://github.com/lyuwenhan/vscode-extensions/issues"
+	},
+	"homepage": "https://lyuwenhan.github.io",
+	"categories": [
+		"Formatters"
+	],
+	"keywords": [
+		"formatter",
+		"minify",
+		"beautify",
+		"json",
+		"jsonc",
+		"jsonl",
+		"uuid"
+	],
 	"contributes": {
 		"commands": [
 			{
-				"command": "minifier.minify",
-				"title": "Minify current file",
-				"category": "Minifier"
-			},
-			{
-				"command": "minifier.beautify",
-				"title": "Beautify current file",
-				"category": "Minifier"
-			},
-			{
-				"command": "minifier.mitify",
-				"title": "Mitify current file",
-				"category": "Minifier"
-			},
-			{
-				"command": "minifier.sort",
-				"title": "Sort current file",
+				"command": "minifier.generateUuid",
+				"title": "Generate UUID",
 				"category": "Minifier"
 			},
 			{
@@ -59,8 +80,23 @@
 				"category": "Minifier"
 			},
 			{
-				"command": "minifier.generateUuid",
-				"title": "Generate UUID",
+				"command": "minifier.minify",
+				"title": "Minify current file",
+				"category": "Minifier"
+			},
+			{
+				"command": "minifier.beautify",
+				"title": "Beautify current file",
+				"category": "Minifier"
+			},
+			{
+				"command": "minifier.mitify",
+				"title": "Mitify current file",
+				"category": "Minifier"
+			},
+			{
+				"command": "minifier.sort",
+				"title": "Sort current file",
 				"category": "Minifier"
 			}
 		],
@@ -74,64 +110,48 @@
 				{
 					"command": "minifier.minifySel",
 					"group": "navigation@92",
-					"when": "editorTextFocus && editorHasSelection && (resourceScheme == 'file' || resourceScheme == 'untitled') && (resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
 				},
 				{
 					"command": "minifier.beautifySel",
 					"group": "navigation@93",
-					"when": "editorTextFocus && editorHasSelection && (resourceScheme == 'file' || resourceScheme == 'untitled') && (resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
 				},
 				{
 					"command": "minifier.mitifySel",
 					"group": "navigation@94",
-					"when": "editorTextFocus && editorHasSelection && (resourceScheme == 'file' || resourceScheme == 'untitled') && resourceLangId == javascript"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && resourceLangId == javascript"
 				},
 				{
 					"command": "minifier.sortSel",
 					"group": "navigation@95",
-					"when": "editorTextFocus && editorHasSelection && (resourceScheme == 'file' || resourceScheme == 'untitled') && (resourceLangId == json || resourceLangId == jsonc)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (resourceLangId == json || resourceLangId == jsonc)"
 				},
 				{
 					"command": "minifier.minify",
 					"group": "navigation@96",
-					"when": "editorTextFocus && !editorHasSelection && (resourceScheme == 'file' || resourceScheme == 'untitled') && (resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
 				},
 				{
 					"command": "minifier.beautify",
 					"group": "navigation@97",
-					"when": "editorTextFocus && !editorHasSelection && (resourceScheme == 'file' || resourceScheme == 'untitled') && (resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
 				},
 				{
 					"command": "minifier.mitify",
 					"group": "navigation@98",
-					"when": "editorTextFocus && !editorHasSelection && (resourceScheme == 'file' || resourceScheme == 'untitled') && resourceLangId == javascript"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && resourceLangId == javascript"
 				},
 				{
 					"command": "minifier.sort",
 					"group": "navigation@99",
-					"when": "editorTextFocus && !editorHasSelection && (resourceScheme == 'file' || resourceScheme == 'untitled') && (resourceLangId == json || resourceLangId == jsonc)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (resourceLangId == json || resourceLangId == jsonc)"
 				}
 			],
 			"commandPalette": [
 				{
 					"command": "minifier.generateUuid",
 					"when": "false"
-				},
-				{
-					"command": "minifier.minify",
-					"when": "resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
-				},
-				{
-					"command": "minifier.beautify",
-					"when": "resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
-				},
-				{
-					"command": "minifier.mitify",
-					"when": "resourceLangId == javascript"
-				},
-				{
-					"command": "minifier.sort",
-					"when": "resourceLangId == json || resourceLangId == jsonc"
 				},
 				{
 					"command": "minifier.minifySel",
@@ -147,6 +167,22 @@
 				},
 				{
 					"command": "minifier.sortSel",
+					"when": "resourceLangId == json || resourceLangId == jsonc"
+				},
+				{
+					"command": "minifier.minify",
+					"when": "resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
+				},
+				{
+					"command": "minifier.beautify",
+					"when": "resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
+				},
+				{
+					"command": "minifier.mitify",
+					"when": "resourceLangId == javascript"
+				},
+				{
+					"command": "minifier.sort",
 					"when": "resourceLangId == json || resourceLangId == jsonc"
 				}
 			],
@@ -195,41 +231,5 @@
 				}
 			]
 		}
-	},
-	"scripts": {
-		"vscode:prepublish": "esbuild ./src/extension.js --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node --minify",
-		"package": "vsce package --allow-missing-repository"
-	},
-	"dependencies": {
-		"js-beautify": "^1.15.4",
-		"jsonc-parser": "^3.3.1",
-		"jsonparse": "^1.3.1",
-		"terser": "^5.44.0"
-	},
-	"devDependencies": {
-		"@vscode/vsce": "^3.0.0",
-		"esbuild": "^0.25.10"
-	},
-	"license": "MIT",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/lyuwenhan/vscode-extensions",
-		"directory": "code-formatter-and-minifier"
-	},
-	"bugs": {
-		"url": "https://github.com/lyuwenhan/vscode-extensions/issues"
-	},
-	"homepage": "https://lyuwenhan.github.io",
-	"categories": [
-		"Formatters"
-	],
-	"keywords": [
-		"formatter",
-		"minify",
-		"beautify",
-		"json",
-		"jsonc",
-		"jsonl",
-		"uuid"
-	]
+	}
 }
