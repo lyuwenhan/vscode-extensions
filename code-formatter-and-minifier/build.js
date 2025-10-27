@@ -12,35 +12,35 @@ const rid = {
 const contr = [{
 	command: "minifySel",
 	title: "Minify current selection",
-	when: [false, true, ["js", "json", "jsonl"]]
+	when: [false, ["js", "json", "jsonl"]]
 }, {
 	command: "beautifySel",
 	title: "Beautify current selection",
-	when: [false, true, ["js", "json", "jsonl"]]
+	when: [false, ["js", "json", "jsonl"]]
 }, {
 	command: "mitifySel",
 	title: "Mitify current selection",
-	when: [false, true, ["js"]]
+	when: [false, ["js"]]
 }, {
 	command: "sortSel",
 	title: "Sort current selection",
-	when: [false, true, ["json"]]
+	when: [false, ["json"]]
 }, {
 	command: "minify",
 	title: "Minify current file",
-	when: [true, false, ["js", "json", "jsonl"]]
+	when: [true, ["js", "json", "jsonl"]]
 }, {
 	command: "beautify",
 	title: "Beautify current file",
-	when: [true, false, ["js", "json", "jsonl"]]
+	when: [true, ["js", "json", "jsonl"]]
 }, {
 	command: "mitify",
 	title: "Mitify current file",
-	when: [true, false, ["js"]]
+	when: [true, ["js"]]
 }, {
 	command: "sort",
 	title: "Sort current file",
-	when: [true, false, ["json"]]
+	when: [true, ["json"]]
 }];
 const ret = {
 	commands: [{
@@ -51,7 +51,6 @@ const ret = {
 	menus: {
 		"editor/context": [{
 			command: "minifier.generateUuid",
-			group: "navigation@91",
 			when: "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled')"
 		}],
 		commandPalette: [{
@@ -63,9 +62,8 @@ const ret = {
 	}
 };
 contr.forEach((e, i) => {
-	const group = "navigation@" + (100 - contr.length + i);
 	const command = "minifier." + e.command;
-	const when = e.when[2].map(e => rid[e]).join(" || ");
+	const when = e.when[1].map(e => rid[e]).join(" || ");
 	ret.commands.push({
 		command,
 		title: e.title,
@@ -73,8 +71,7 @@ contr.forEach((e, i) => {
 	});
 	ret.menus["editor/context"].push({
 		command,
-		group,
-		when: "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && " + (e.when[1] ? "" : "!") + "editorHasSelection && (" + when + ")"
+		when: "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && " + (e.when[0] ? "!" : "") + "editorHasSelection && (" + when + ")"
 	});
 	ret.menus.commandPalette.push({
 		command,
@@ -83,15 +80,22 @@ contr.forEach((e, i) => {
 	if (e.when[0]) {
 		ret.menus["explorer/context"].push({
 			command,
-			group,
 			when
 		});
 		ret.menus["editor/title/context"].push({
 			command,
-			group,
 			when
 		})
 	}
+});
+
+function addGroup (e, i, arr) {
+	return {
+		group: "navigation@" + (100 - arr.length + i),
+		...e
+	}
+} ["editor/context", "explorer/context", "editor/title/context"].forEach(e => {
+	ret.menus[e] = ret.menus[e].map(addGroup)
 });
 pkg.contributes = ret;
 fs.writeFileSync("package.json", JSON.stringify(pkg, null, "\t"));
