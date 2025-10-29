@@ -6,6 +6,9 @@ const terser = require("terser");
 const beautify = require("js-beautify");
 const JSONParse = require("jsonparse");
 const jsonc = require("jsonc-parser/lib/esm/main.js");
+const {
+	error
+} = require("console");
 const opts = {
 	minify: {
 		compress: false,
@@ -182,11 +185,17 @@ function sortJson (content) {
 	return jsonStringify(sortObject(jsonc.parse(content)))
 }
 
-function sortList (content) {
+function sortListJson (content) {
 	return jsonStringify(sortArray(jsonc.parse(content)))
 }
-
-function sortListByKey (content, key) {
+async function sortListByKeyJson (content) {
+	const key = await vscode.window.showInputBox({
+		prompt: "Enter the key name to sort by",
+		ignoreFocusOut: true
+	});
+	if (!key) {
+		throw new error("Sorter: Operation canceled.")
+	}
 	return jsonStringify(sortArrayByKey(jsonc.parse(content), key))
 }
 
@@ -248,10 +257,15 @@ const actions = {
 	},
 	sort: {
 		json: sortJson
+	},
+	sortList: {
+		json: sortListJson
+	},
+	sortListByKey: {
+		json: sortListByKeyJson
 	}
 };
-
-function actionByLang (action, {
+async function actionByLang (action, {
 	content,
 	lang
 }) {
@@ -267,21 +281,25 @@ function actionByLang (action, {
 	if (content === "") {
 		return ""
 	}
-	return actByLang(content)
+	return (await actByLang(content)).trim()
 }
 
 function activate (context) {
-	context.subscriptions.push(...[
+	const opers = [
 		["minify", "Minified", "Minifier"],
 		["beautify", "Beautified", "Beautifier"],
 		["mitify", "Mitified", "Mitifier"],
-		["sort", "Sorted", "Sorter"]
-	].map(([action, sucMsg, ActionName]) => vscode.commands.registerCommand("minifier." + action, async uri => {
+		["sort", "Sorted", "Sorter"],
+		["sortList", "Sorted", "Sorter"],
+		["sortListByKey", "Sorted", "Sorter"]
+	];
+	context.subscriptions.push(...opers.map(([action, sucMsg, ActionName]) => vscode.commands.registerCommand("minifier." + action, async uri => {
+		console.log("minifier." + action);
 		try {
 			const doc = await getDoc(uri);
 			if (doc) {
 				const info = getDocInfo(doc);
-				let result = actionByLang(action, info).trim() + "\n";
+				let result = await actionByLang(action, info) + "\n";
 				if (info.content === result) {
 					vscode.window.showWarningMessage(ActionName + ": Nothing changed.");
 					return
@@ -295,12 +313,7 @@ function activate (context) {
 			vscode.window.showErrorMessage(e.message || String(e))
 		}
 	})));
-	context.subscriptions.push(...[
-		["minify", "Minified", "Minifier"],
-		["beautify", "Beautified", "Beautifier"],
-		["mitify", "Mitified", "Mitifier"],
-		["sort", "Sorted", "Sorter"]
-	].map(([action, sucMsg, ActionName]) => vscode.commands.registerCommand("minifier." + action + "Sel", async () => {
+	context.subscriptions.push(...opers.map(([action, sucMsg, ActionName]) => vscode.commands.registerCommand("minifier." + action + "Sel", async () => {
 		try {
 			const editor = vscode.window.activeTextEditor;
 			if (editor) {
@@ -315,10 +328,10 @@ function activate (context) {
 				} = getDocInfo(editor.document);
 				for (const sel of sels) {
 					const content = editor.document.getText(sel);
-					const result = actionByLang(action, {
+					const result = await actionByLang(action, {
 						content,
 						lang
-					}).trim();
+					});
 					if (content !== result) {
 						replacements.push({
 							sel,
@@ -339,65 +352,6 @@ function activate (context) {
 				vscode.window.showInformationMessage(sucMsg + " successfully.")
 			} else {
 				throw new Error(ActionName + ": No file selected.")
-			}
-		} catch (e) {
-			vscode.window.showErrorMessage(e.message || String(e))
-		}
-	})));
-	context.subscriptions.push(...[true, false].map(useKey => vscode.commands.registerCommand("minifier.sortList" + (useKey ? "By" : ""), async () => {
-		try {
-			const editor = vscode.window.activeTextEditor;
-			if (editor) {
-				let key;
-				if (useKey) {
-					key = await vscode.window.showInputBox({
-						prompt: "Enter the key name to sort by",
-						ignoreFocusOut: true
-					});
-					if (!key) {
-						vscode.window.showWarningMessage("Sorter: Operation canceled.");
-						return
-					}
-				}
-				const sels = editor.selections.filter(e => !e.isEmpty);
-				if (sels.length) {
-					const replacements = [];
-					for (const sel of sels) {
-						const content = editor.document.getText(sel);
-						const result = (useKey ? sortListByKey(content, key) : sortList(content)).trim();
-						if (content !== result) {
-							replacements.push({
-								sel,
-								result
-							})
-						}
-					}
-					if (replacements.length) {
-						await editor.edit(editBuilder => {
-							for (const item of replacements) {
-								editBuilder.replace(item.sel, item.result)
-							}
-						})
-					} else {
-						vscode.window.showWarningMessage("Sorter: Nothing changed.");
-						return
-					}
-				} else {
-					const doc = editor.document;
-					const {
-						content
-					} = getDocInfo(doc);
-					const result = (useKey ? sortListByKey(content, key) : sortList(content)).trim();
-					if (content === result) {
-						vscode.window.showWarningMessage("Sorter: Nothing changed.");
-						return
-					}
-					await saveDocContent(doc, result);
-					vscode.window.showInformationMessage("Sorted successfully.")
-				}
-				vscode.window.showInformationMessage("Sorted successfully.")
-			} else {
-				throw new Error("Sorter: No file selected.")
 			}
 		} catch (e) {
 			vscode.window.showErrorMessage(e.message || String(e))

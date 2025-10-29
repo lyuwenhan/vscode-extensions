@@ -12,46 +12,56 @@ const rid = {
 const contr = [{
 	command: "minifySel",
 	title: "Minify current selection",
-	when: [false, ["js", "json", "jsonl"]]
+	when: [false, false, ["js", "json", "jsonl"]]
 }, {
 	command: "beautifySel",
 	title: "Beautify current selection",
-	when: [false, ["js", "json", "jsonl"]]
+	when: [false, false, ["js", "json", "jsonl"]]
 }, {
 	command: "mitifySel",
 	title: "Mitify current selection",
-	when: [false, ["js"]]
+	when: [false, false, ["js"]]
 }, {
 	command: "sortSel",
 	title: "Sort current selection",
-	when: [false, ["json"]]
+	when: [false, false, ["json"]]
+}, {
+	command: "sortListSel",
+	title: "Sort lists (selection)",
+	when: [false, false, ["json"]]
+}, {
+	command: "sortListByKeySel",
+	title: "Sort lists by keys (selection)",
+	when: [false, false, ["json"]]
 }, {
 	command: "minify",
 	title: "Minify current file",
-	when: [true, ["js", "json", "jsonl"]]
+	when: [true, true, ["js", "json", "jsonl"]]
 }, {
 	command: "beautify",
 	title: "Beautify current file",
-	when: [true, ["js", "json", "jsonl"]]
+	when: [true, true, ["js", "json", "jsonl"]]
 }, {
 	command: "mitify",
 	title: "Mitify current file",
-	when: [true, ["js"]]
+	when: [true, true, ["js"]]
 }, {
 	command: "sort",
 	title: "Sort current file",
-	when: [true, ["json"]]
+	when: [true, true, ["json"]]
+}, {
+	command: "sortList",
+	title: "Sort lists",
+	when: [false, true, ["json"]]
+}, {
+	command: "sortListByKey",
+	title: "Sort lists by keys",
+	when: [false, true, ["json"]]
 }];
 const ret = {
 	commands: [{
 		command: "minifier.generateUuid",
 		title: "Generate UUID"
-	}, {
-		command: "minifier.sortList",
-		title: "Sort lists"
-	}, {
-		command: "minifier.sortListBy",
-		title: "Sort lists by keys"
 	}],
 	menus: {
 		"editor/context": [{
@@ -61,12 +71,6 @@ const ret = {
 		commandPalette: [{
 			command: "minifier.generateUuid",
 			when: "false"
-		}, {
-			command: "minifier.sortList",
-			when: rid.json
-		}, {
-			command: "minifier.sortListBy",
-			when: rid.json
 		}],
 		"explorer/context": [],
 		"editor/title/context": []
@@ -74,14 +78,14 @@ const ret = {
 };
 contr.forEach((e, i) => {
 	const command = "minifier." + e.command;
-	const when = e.when[1].map(e => rid[e]).join(" || ");
+	const when = e.when[2].map(e => rid[e]).join(" || ");
 	ret.commands.push({
 		command,
 		title: e.title
 	});
 	ret.menus["editor/context"].push({
 		command,
-		when: "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && " + (e.when[0] ? "!" : "") + "editorHasSelection && (" + when + ")"
+		when: "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && " + (e.when[1] ? "!" : "") + "editorHasSelection && (" + when + ")"
 	});
 	ret.menus.commandPalette.push({
 		command,
