@@ -45,8 +45,13 @@ const contr = [{
 const ret = {
 	commands: [{
 		command: "minifier.generateUuid",
-		title: "Generate UUID",
-		category: "Minifier"
+		title: "Generate UUID"
+	}, {
+		command: "minifier.sortList",
+		title: "Sort lists"
+	}, {
+		command: "minifier.sortListBy",
+		title: "Sort lists by keys"
 	}],
 	menus: {
 		"editor/context": [{
@@ -56,6 +61,12 @@ const ret = {
 		commandPalette: [{
 			command: "minifier.generateUuid",
 			when: "false"
+		}, {
+			command: "minifier.sortList",
+			when: rid.json
+		}, {
+			command: "minifier.sortListBy",
+			when: rid.json
 		}],
 		"explorer/context": [],
 		"editor/title/context": []
@@ -66,8 +77,7 @@ contr.forEach((e, i) => {
 	const when = e.when[1].map(e => rid[e]).join(" || ");
 	ret.commands.push({
 		command,
-		title: e.title,
-		category: "Minifier"
+		title: e.title
 	});
 	ret.menus["editor/context"].push({
 		command,
@@ -88,6 +98,10 @@ contr.forEach((e, i) => {
 		})
 	}
 });
+ret.commands = ret.commands.map(e => ({
+	category: "Minifier",
+	...e
+}));
 
 function addGroup (e, i, arr) {
 	return {

@@ -47,19 +47,29 @@ function jsonStringify1L (data) {
 		if (node && node.toJSON && typeof node.toJSON === "function") {
 			node = node.toJSON()
 		}
-		if (node === undefined) return;
-		if (typeof node == "number") return isFinite(node) ? "" + node : "null";
-		if (typeof node !== "object") return JSON.stringify(node);
+		if (node === undefined) {
+			return
+		}
+		if (typeof node == "number") {
+			return isFinite(node) ? "" + node : "null"
+		}
+		if (typeof node !== "object") {
+			return JSON.stringify(node)
+		}
 		var i, out;
 		if (Array.isArray(node)) {
 			out = "[";
 			for (i = 0; i < node.length; i++) {
-				if (i) out += ", ";
+				if (i) {
+					out += ", "
+				}
 				out += stringify(node[i]) || "null"
 			}
 			return out + "]"
 		}
-		if (node === null) return "null";
+		if (node === null) {
+			return "null"
+		}
 		if (seen.indexOf(node) !== -1) {
 			throw new TypeError("Converting circular structure to JSON")
 		}
@@ -69,8 +79,12 @@ function jsonStringify1L (data) {
 		for (i = 0; i < keys.length; i++) {
 			var key = keys[i];
 			var value = stringify(node[key]);
-			if (!value) continue;
-			if (out) out += ", ";
+			if (!value) {
+				continue
+			}
+			if (out) {
+				out += ", "
+			}
 			out += JSON.stringify(key) + ": " + value
 		}
 		seen.splice(seenIndex, 1);
@@ -91,7 +105,9 @@ function mitifyFile (content) {
 }
 
 function sortObject (value) {
-	if (Array.isArray(value)) return value.map(sortObject);
+	if (Array.isArray(value)) {
+		return value.map(sortObject)
+	}
 	if (value && typeof value === "object") {
 		const out = {};
 		for (const k of Object.keys(value).sort()) {
@@ -102,11 +118,49 @@ function sortObject (value) {
 	return value
 }
 
+function getKey (a, key) {
+	return JSON.stringify(a?.[key])
+}
+
+function sortCompare (a, b) {
+	return a[1] < b[1] ? -1 : a[1] > b[1] ? 1 : 0
+}
+
+function sortArray (value, key) {
+	if (Array.isArray(value)) {
+		return value.map(e => [e, JSON.stringify(e)]).sort(sortCompare).map(e => e[0]).map(v => sortArray(v, key))
+	}
+	if (value && typeof value === "object") {
+		const out = {};
+		for (const k of Object.keys(value)) {
+			out[k] = sortArray(value[k], key)
+		}
+		return out
+	}
+	return value
+}
+
+function sortArrayByKey (value, key) {
+	if (Array.isArray(value)) {
+		return value.map(e => [e, getKey(e, key)]).sort(sortCompare).map(e => e[0]).map(v => sortArrayByKey(v, key))
+	}
+	if (value && typeof value === "object") {
+		const out = {};
+		for (const k of Object.keys(value)) {
+			out[k] = sortArrayByKey(value[k], key)
+		}
+		return out
+	}
+	return value
+}
+
 function parseJsonL (text) {
 	const parser = new JSONParse;
 	const result = [];
 	parser.onValue = function (value) {
-		if (this.stack.length === 0) result.push(value)
+		if (this.stack.length === 0) {
+			result.push(value)
+		}
 	};
 	parser.write(text);
 	return result
@@ -126,6 +180,14 @@ function beautifyJson (content) {
 
 function sortJson (content) {
 	return jsonStringify(sortObject(jsonc.parse(content)))
+}
+
+function sortList (content) {
+	return jsonStringify(sortArray(jsonc.parse(content)))
+}
+
+function sortListByKey (content, key) {
+	return jsonStringify(sortArrayByKey(jsonc.parse(content), key))
 }
 
 function minifyJsonL (content) {
@@ -238,17 +300,16 @@ function activate (context) {
 		["beautify", "Beautified", "Beautifier"],
 		["mitify", "Mitified", "Mitifier"],
 		["sort", "Sorted", "Sorter"]
-	].map(([action, sucMsg, ActionName]) => vscode.commands.registerCommand("minifier." + action + "Sel", async uri => {
+	].map(([action, sucMsg, ActionName]) => vscode.commands.registerCommand("minifier." + action + "Sel", async () => {
 		try {
 			const editor = vscode.window.activeTextEditor;
 			if (editor) {
-				const replacements = [];
-				let changed = false;
 				const sels = editor.selections.filter(e => !e.isEmpty);
 				if (!sels.length) {
 					vscode.window.showWarningMessage(ActionName + ": No text selected.");
 					return
 				}
+				const replacements = [];
 				const {
 					lang
 				} = getDocInfo(editor.document);
@@ -258,27 +319,85 @@ function activate (context) {
 						content,
 						lang
 					}).trim();
-					if (content === result) {
-						continue
+					if (content !== result) {
+						replacements.push({
+							sel,
+							result
+						})
 					}
-					changed = true;
-					replacements.push({
-						sel,
-						result
-					})
 				}
-				await editor.edit(editBuilder => {
-					for (const item of replacements) {
-						editBuilder.replace(item.sel, item.result)
-					}
-				});
-				if (!changed) {
+				if (replacements.length) {
+					await editor.edit(editBuilder => {
+						for (const item of replacements) {
+							editBuilder.replace(item.sel, item.result)
+						}
+					})
+				} else {
 					vscode.window.showWarningMessage(ActionName + ": Nothing changed.");
 					return
 				}
 				vscode.window.showInformationMessage(sucMsg + " successfully.")
 			} else {
 				throw new Error(ActionName + ": No file selected.")
+			}
+		} catch (e) {
+			vscode.window.showErrorMessage(e.message || String(e))
+		}
+	})));
+	context.subscriptions.push(...[true, false].map(useKey => vscode.commands.registerCommand("minifier.sortList" + (useKey ? "By" : ""), async () => {
+		try {
+			const editor = vscode.window.activeTextEditor;
+			if (editor) {
+				let key;
+				if (useKey) {
+					key = await vscode.window.showInputBox({
+						prompt: "Enter the key name to sort by",
+						ignoreFocusOut: true
+					});
+					if (!key) {
+						vscode.window.showWarningMessage("Sorter: Operation canceled.");
+						return
+					}
+				}
+				const sels = editor.selections.filter(e => !e.isEmpty);
+				if (sels.length) {
+					const replacements = [];
+					for (const sel of sels) {
+						const content = editor.document.getText(sel);
+						const result = (useKey ? sortListByKey(content, key) : sortList(content)).trim();
+						if (content !== result) {
+							replacements.push({
+								sel,
+								result
+							})
+						}
+					}
+					if (replacements.length) {
+						await editor.edit(editBuilder => {
+							for (const item of replacements) {
+								editBuilder.replace(item.sel, item.result)
+							}
+						})
+					} else {
+						vscode.window.showWarningMessage("Sorter: Nothing changed.");
+						return
+					}
+				} else {
+					const doc = editor.document;
+					const {
+						content
+					} = getDocInfo(doc);
+					const result = (useKey ? sortListByKey(content, key) : sortList(content)).trim();
+					if (content === result) {
+						vscode.window.showWarningMessage("Sorter: Nothing changed.");
+						return
+					}
+					await saveDocContent(doc, result);
+					vscode.window.showInformationMessage("Sorted successfully.")
+				}
+				vscode.window.showInformationMessage("Sorted successfully.")
+			} else {
+				throw new Error("Sorter: No file selected.")
 			}
 		} catch (e) {
 			vscode.window.showErrorMessage(e.message || String(e))
@@ -291,8 +410,11 @@ function activate (context) {
 				const uuid = randomUUID();
 				await editor.edit(editBuilder => {
 					for (const sel of editor.selections) {
-						if (!sel.isEmpty) editBuilder.replace(sel, uuid);
-						else editBuilder.insert(sel.start, uuid)
+						if (!sel.isEmpty) {
+							editBuilder.replace(sel, uuid)
+						} else {
+							editBuilder.insert(sel.start, uuid)
+						}
 					}
 				});
 				vscode.window.showInformationMessage("UUID Generator: Generated successfully.")

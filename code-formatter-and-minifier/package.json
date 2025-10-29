@@ -2,7 +2,7 @@
 	"name": "code-formatter-and-minifier",
 	"displayName": "Code Formatter & Minifier",
 	"private": false,
-	"version": "1.0.14",
+	"version": "1.0.15",
 	"publisher": "lyuwenhan",
 	"description": "A VS Code extension to minify and beautify JavaScript, and sort JSON files with one click.",
 	"engines": {
@@ -55,49 +55,59 @@
 	"contributes": {
 		"commands": [
 			{
+				"category": "Minifier",
 				"command": "minifier.generateUuid",
-				"title": "Generate UUID",
-				"category": "Minifier"
+				"title": "Generate UUID"
 			},
 			{
+				"category": "Minifier",
+				"command": "minifier.sortList",
+				"title": "Sort lists"
+			},
+			{
+				"category": "Minifier",
+				"command": "minifier.sortListBy",
+				"title": "Sort lists by keys"
+			},
+			{
+				"category": "Minifier",
 				"command": "minifier.minifySel",
-				"title": "Minify current selection",
-				"category": "Minifier"
+				"title": "Minify current selection"
 			},
 			{
+				"category": "Minifier",
 				"command": "minifier.beautifySel",
-				"title": "Beautify current selection",
-				"category": "Minifier"
+				"title": "Beautify current selection"
 			},
 			{
+				"category": "Minifier",
 				"command": "minifier.mitifySel",
-				"title": "Mitify current selection",
-				"category": "Minifier"
+				"title": "Mitify current selection"
 			},
 			{
+				"category": "Minifier",
 				"command": "minifier.sortSel",
-				"title": "Sort current selection",
-				"category": "Minifier"
+				"title": "Sort current selection"
 			},
 			{
+				"category": "Minifier",
 				"command": "minifier.minify",
-				"title": "Minify current file",
-				"category": "Minifier"
+				"title": "Minify current file"
 			},
 			{
+				"category": "Minifier",
 				"command": "minifier.beautify",
-				"title": "Beautify current file",
-				"category": "Minifier"
+				"title": "Beautify current file"
 			},
 			{
+				"category": "Minifier",
 				"command": "minifier.mitify",
-				"title": "Mitify current file",
-				"category": "Minifier"
+				"title": "Mitify current file"
 			},
 			{
+				"category": "Minifier",
 				"command": "minifier.sort",
-				"title": "Sort current file",
-				"category": "Minifier"
+				"title": "Sort current file"
 			}
 		],
 		"menus": {
@@ -152,6 +162,14 @@
 				{
 					"command": "minifier.generateUuid",
 					"when": "false"
+				},
+				{
+					"command": "minifier.sortList",
+					"when": "resourceLangId == json || resourceLangId == jsonc"
+				},
+				{
+					"command": "minifier.sortListBy",
+					"when": "resourceLangId == json || resourceLangId == jsonc"
 				},
 				{
 					"command": "minifier.minifySel",
