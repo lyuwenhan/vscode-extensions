@@ -1,6 +1,6 @@
 # Code Formatter & Minifier
 
-A simple VS Code extension to **minify**, **beautify**, **mitify**, **sort JSON**, and provide **UUID generation** utilities.
+A simple VS Code extension to **minify**, **beautify**, **mitify**, **sort JSON**, **sort JSON arrays**, **sort JSON arrays by key**, and provide **UUID generation** utilities.
 
 ## Features
 
@@ -14,8 +14,10 @@ A simple VS Code extension to **minify**, **beautify**, **mitify**, **sort JSON*
 ### JSON / JSONC
 - Right-click inside a **JSON (.json)** or **JSONC (.jsonc)** file:
   - **“Minify this file”** -> Compact JSON into a single line.
-  - **“Sort this file”** -> Sort JSON keys recursively in alphabetical order.
   - **“Beautify this file”** -> Format JSON with indentation (using tabs).
+  - **“Sort this file”** -> Sort JSON keys recursively in alphabetical order.
+  - **“Sort List”** -> Sort all arrays recursively by their JSON stringified values.
+  - **“Sort List by Key”** -> Prompt for a key name and sort JSON arrays of objects by that key.
 - **Note:**
   `.jsonc` files are automatically parsed as `.json` (comments are stripped).
 
@@ -25,6 +27,8 @@ A simple VS Code extension to **minify**, **beautify**, **mitify**, **sort JSON*
 - Right-click inside a **JSON Lines (.jsonl)** file:
   - **“Minify this file”** -> Compress each JSON object on every line into a single compact line.
   - **“Beautify this file”** -> Format each JSON object on every line with indentation and line breaks.
+  - **“Sort List”** -> Sort JSON objects and arrays line by line recursively.
+  - **“Sort List by Key”** -> Prompt for a key name and sort JSON objects by that key line by line.
 - Each line is parsed and processed independently without merging across lines.
 - **Note:**
   The **“Sort this file”** action is not available for JSONL, since JSONL files are designed as collections of independent JSON records.
@@ -36,7 +40,7 @@ A simple VS Code extension to **minify**, **beautify**, **mitify**, **sort JSON*
   The operation supports both **full file** and **selected text**.
 
 ### UUID Generator
-- Right-click to use `Generate UUID`.
+- Right-click to use **Generate UUID**.
 - Inserts a freshly generated UUID at each selected cursor position in the active editor.
 
 ## Usage
@@ -44,16 +48,21 @@ A simple VS Code extension to **minify**, **beautify**, **mitify**, **sort JSON*
 2. Right-click inside the editor.
 3. Choose the operation you want from the context menu.
 4. You can also **select specific text** and run commands like:
-   - **“Minify Selected”**
-   - **“Beautify Selected”**
-   - **“Sort Selected”**
+   - **“Minify selection**
+   - **“Beautify selection**
+   - **“Sort selection**
+   - **“Sort lists (selection)**
+   - **“Sort lists by keys (selection)**
 
 ## Notes
 - JavaScript minification uses [terser](https://github.com/terser/terser).
 - JavaScript beautification uses [js-beautify](https://github.com/beautify-web/js-beautify).
 - JSON parsing uses [jsonc-parser](https://github.com/microsoft/node-jsonc-parser).
+- JSONL parsing uses [jsonparse](https://github.com/creationix/jsonparse).
 - JSON operations do not preserve comments when saving.
 
 ## Extra
 - All edit operations automatically save the document (unless untitled).
 - Both `LF (\n)` and `CRLF (\r\n)` line endings are supported.
+- Works with multiple selections.
+- Displays success, warning, and error messages for all actions.

@@ -2,7 +2,7 @@
 	"name": "code-formatter-and-minifier",
 	"displayName": "Code Formatter & Minifier",
 	"private": false,
-	"version": "1.0.16",
+	"version": "1.0.17",
 	"publisher": "lyuwenhan",
 	"description": "A VS Code extension to minify and beautify JavaScript, and sort JSON files with one click.",
 	"engines": {
@@ -150,12 +150,12 @@
 				{
 					"group": "navigation@92",
 					"command": "minifier.sortListSel",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (resourceLangId == json || resourceLangId == jsonc)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
 				},
 				{
 					"group": "navigation@93",
 					"command": "minifier.sortListByKeySel",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (resourceLangId == json || resourceLangId == jsonc)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
 				},
 				{
 					"group": "navigation@94",
@@ -180,12 +180,12 @@
 				{
 					"group": "navigation@98",
 					"command": "minifier.sortList",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (resourceLangId == json || resourceLangId == jsonc)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
 				},
 				{
 					"group": "navigation@99",
 					"command": "minifier.sortListByKey",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (resourceLangId == json || resourceLangId == jsonc)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
 				}
 			],
 			"commandPalette": [
@@ -211,11 +211,11 @@
 				},
 				{
 					"command": "minifier.sortListSel",
-					"when": "resourceLangId == json || resourceLangId == jsonc"
+					"when": "resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				},
 				{
 					"command": "minifier.sortListByKeySel",
-					"when": "resourceLangId == json || resourceLangId == jsonc"
+					"when": "resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				},
 				{
 					"command": "minifier.minify",
@@ -235,11 +235,11 @@
 				},
 				{
 					"command": "minifier.sortList",
-					"when": "resourceLangId == json || resourceLangId == jsonc"
+					"when": "resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				},
 				{
 					"command": "minifier.sortListByKey",
-					"when": "resourceLangId == json || resourceLangId == jsonc"
+					"when": "resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				}
 			],
 			"explorer/context": [

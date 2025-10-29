@@ -28,11 +28,11 @@ const contr = [{
 }, {
 	command: "sortListSel",
 	title: "Sort lists (selection)",
-	when: [false, false, ["json"]]
+	when: [false, false, ["json", "jsonl"]]
 }, {
 	command: "sortListByKeySel",
 	title: "Sort lists by keys (selection)",
-	when: [false, false, ["json"]]
+	when: [false, false, ["json", "jsonl"]]
 }, {
 	command: "minify",
 	title: "Minify current file",
@@ -52,11 +52,11 @@ const contr = [{
 }, {
 	command: "sortList",
 	title: "Sort lists",
-	when: [false, true, ["json"]]
+	when: [false, true, ["json", "jsonl"]]
 }, {
 	command: "sortListByKey",
 	title: "Sort lists by keys",
-	when: [false, true, ["json"]]
+	when: [false, true, ["json", "jsonl"]]
 }];
 const ret = {
 	commands: [{

@@ -9,6 +9,9 @@ const jsonc = require("jsonc-parser/lib/esm/main.js");
 const {
 	error
 } = require("console");
+const {
+	type
+} = require("os");
 const opts = {
 	minify: {
 		compress: false,
@@ -156,6 +159,16 @@ function sortArrayByKey (value, key) {
 	}
 	return value
 }
+async function getArrayKey () {
+	const key = await vscode.window.showInputBox({
+		prompt: "Enter the key name to sort by",
+		ignoreFocusOut: true
+	});
+	if (!key) {
+		throw new Error("Sorter: Operation canceled.")
+	}
+	return key
+}
 
 function parseJsonL (text) {
 	const parser = new JSONParse;
@@ -189,13 +202,7 @@ function sortListJson (content) {
 	return jsonStringify(sortArray(jsonc.parse(content)))
 }
 async function sortListByKeyJson (content) {
-	const key = await vscode.window.showInputBox({
-		prompt: "Enter the key name to sort by",
-		ignoreFocusOut: true
-	});
-	if (!key) {
-		throw new error("Sorter: Operation canceled.")
-	}
+	const key = await getArrayKey();
 	return jsonStringify(sortArrayByKey(jsonc.parse(content), key))
 }
 
@@ -205,6 +212,14 @@ function minifyJsonL (content) {
 
 function beautifyJsonL (content) {
 	return parseJsonL(content).map(jsonStringify).join("\n")
+}
+
+function sortListJsonL (content) {
+	return parseJsonL(content).map(sortObject).map(jsonStringify).join("\n")
+}
+async function sortListByKeyJsonL (content) {
+	const key = await getArrayKey();
+	return parseJsonL(content).map(e => sortArrayByKey(e, key)).map(jsonStringify).join("\n")
 }
 async function getDoc (uri) {
 	if (!uri || !uri.fsPath) {
@@ -259,10 +274,12 @@ const actions = {
 		json: sortJson
 	},
 	sortList: {
-		json: sortListJson
+		json: sortListJson,
+		jsonl: sortListJsonL
 	},
 	sortListByKey: {
-		json: sortListByKeyJson
+		json: sortListByKeyJson,
+		jsonl: sortListByKeyJsonL
 	}
 };
 async function actionByLang (action, {
@@ -294,7 +311,6 @@ function activate (context) {
 		["sortListByKey", "Sorted", "Sorter"]
 	];
 	context.subscriptions.push(...opers.map(([action, sucMsg, ActionName]) => vscode.commands.registerCommand("minifier." + action, async uri => {
-		console.log("minifier." + action);
 		try {
 			const doc = await getDoc(uri);
 			if (doc) {
