@@ -6,12 +6,6 @@ const terser = require("terser");
 const beautify = require("js-beautify");
 const JSONParse = require("jsonparse");
 const jsonc = require("jsonc-parser/lib/esm/main.js");
-const {
-	error
-} = require("console");
-const {
-	type
-} = require("os");
 const opts = {
 	minify: {
 		compress: false,
@@ -215,11 +209,11 @@ function beautifyJsonL (content) {
 }
 
 function sortListJsonL (content) {
-	return parseJsonL(content).map(sortObject).map(jsonStringify).join("\n")
+	return sortArray(parseJsonL(content)).map(jsonStringify).join("\n")
 }
 async function sortListByKeyJsonL (content) {
 	const key = await getArrayKey();
-	return parseJsonL(content).map(e => sortArrayByKey(e, key)).map(jsonStringify).join("\n")
+	return sortArrayByKey(parseJsonL(content), key).map(jsonStringify).join("\n")
 }
 async function getDoc (uri) {
 	if (!uri || !uri.fsPath) {
@@ -258,96 +252,124 @@ async function saveDocContent (doc, content) {
 }
 const actions = {
 	minify: {
-		javascript: minifyFile,
-		json: minifyJson,
-		jsonl: minifyJsonL
+		sucMsg: "Minified",
+		actionName: "Minifier",
+		opers: {
+			javascript: minifyFile,
+			json: minifyJson,
+			jsonl: minifyJsonL
+		}
 	},
 	beautify: {
-		javascript: beautifyFile,
-		json: beautifyJson,
-		jsonl: beautifyJsonL
+		sucMsg: "Beautified",
+		actionName: "Beautifier",
+		opers: {
+			javascript: beautifyFile,
+			json: beautifyJson,
+			jsonl: beautifyJsonL
+		}
 	},
 	mitify: {
-		javascript: mitifyFile
+		sucMsg: "Mitified",
+		actionName: "Mitifier",
+		opers: {
+			javascript: mitifyFile
+		}
 	},
 	sort: {
-		json: sortJson
+		sucMsg: "Sorted",
+		actionName: "Sorter",
+		opers: {
+			json: sortJson
+		}
 	},
 	sortList: {
-		json: sortListJson,
-		jsonl: sortListJsonL
+		sucMsg: "Sorted",
+		actionName: "Sorter",
+		opers: {
+			json: sortListJson,
+			jsonl: sortListJsonL
+		}
 	},
 	sortListByKey: {
-		json: sortListByKeyJson,
-		jsonl: sortListByKeyJsonL
+		sucMsg: "Sorted",
+		actionName: "Sorter",
+		opers: {
+			json: sortListByKeyJson,
+			jsonl: sortListByKeyJsonL
+		}
 	}
 };
-async function actionByLang (action, {
-	content,
-	lang
-}) {
-	const act = actions[action];
-	if (!act) {
-		throw new Error("Invalid action type.")
-	}
-	const actByLang = act[lang];
-	if (!actByLang) {
-		throw new Error("Invalid file type." + lang)
-	}
-	content = content.trim();
-	if (content === "") {
-		return ""
-	}
-	return (await actByLang(content)).trim()
-}
 
 function activate (context) {
-	const opers = [
-		["minify", "Minified", "Minifier"],
-		["beautify", "Beautified", "Beautifier"],
-		["mitify", "Mitified", "Mitifier"],
-		["sort", "Sorted", "Sorter"],
-		["sortList", "Sorted", "Sorter"],
-		["sortListByKey", "Sorted", "Sorter"]
-	];
-	context.subscriptions.push(...opers.map(([action, sucMsg, ActionName]) => vscode.commands.registerCommand("minifier." + action, async uri => {
+	context.subscriptions.push(...Object.entries(actions).map(([action, {
+		sucMsg,
+		actionName,
+		opers
+	}]) => vscode.commands.registerCommand("minifier." + action, async uri => {
 		try {
 			const doc = await getDoc(uri);
 			if (doc) {
-				const info = getDocInfo(doc);
-				let result = await actionByLang(action, info) + "\n";
-				if (info.content === result) {
-					vscode.window.showWarningMessage(ActionName + ": Nothing changed.");
+				const {
+					lang,
+					content
+				} = getDocInfo(doc);
+				if (!opers) {
+					vscode.window.showErrorMessage("Invalid action type.");
+					return
+				}
+				const actByLang = opers[lang];
+				if (!actByLang) {
+					vscode.window.showErrorMessage("Invalid file type." + lang);
+					return
+				}
+				let nContent = content.trim();
+				let result = "";
+				if (nContent !== "") {
+					result = (await actByLang(nContent)).trim() + "\n"
+				}
+				if (content === result) {
+					vscode.window.showWarningMessage(actionName + ": Nothing changed.");
 					return
 				}
 				await saveDocContent(doc, result);
 				vscode.window.showInformationMessage(sucMsg + " successfully.")
 			} else {
-				throw new Error(ActionName + ": No file selected.")
+				throw new Error(actionName + ": No file selected.")
 			}
 		} catch (e) {
 			vscode.window.showErrorMessage(e.message || String(e))
 		}
 	})));
-	context.subscriptions.push(...opers.map(([action, sucMsg, ActionName]) => vscode.commands.registerCommand("minifier." + action + "Sel", async () => {
+	context.subscriptions.push(...Object.entries(actions).map(([action, {
+		sucMsg,
+		actionName,
+		opers
+	}]) => vscode.commands.registerCommand("minifier." + action + "Sel", async () => {
 		try {
 			const editor = vscode.window.activeTextEditor;
 			if (editor) {
 				const sels = editor.selections.filter(e => !e.isEmpty);
 				if (!sels.length) {
-					vscode.window.showWarningMessage(ActionName + ": No text selected.");
+					vscode.window.showWarningMessage(actionName + ": No text selected.");
 					return
 				}
 				const replacements = [];
 				const {
 					lang
 				} = getDocInfo(editor.document);
+				if (!opers) {
+					vscode.window.showErrorMessage("Invalid action type.");
+					return
+				}
+				const actByLang = opers[lang];
+				if (!actByLang) {
+					vscode.window.showErrorMessage("Invalid file type." + lang);
+					return
+				}
 				for (const sel of sels) {
 					const content = editor.document.getText(sel);
-					const result = await actionByLang(action, {
-						content,
-						lang
-					});
+					const result = (await actByLang(content)).trim();
 					if (content !== result) {
 						replacements.push({
 							sel,
@@ -362,12 +384,12 @@ function activate (context) {
 						}
 					})
 				} else {
-					vscode.window.showWarningMessage(ActionName + ": Nothing changed.");
+					vscode.window.showWarningMessage(actionName + ": Nothing changed.");
 					return
 				}
 				vscode.window.showInformationMessage(sucMsg + " successfully.")
 			} else {
-				throw new Error(ActionName + ": No file selected.")
+				throw new Error(actionName + ": No file selected.")
 			}
 		} catch (e) {
 			vscode.window.showErrorMessage(e.message || String(e))
