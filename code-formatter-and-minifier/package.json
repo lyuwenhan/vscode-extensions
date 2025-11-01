@@ -2,7 +2,7 @@
 	"name": "code-formatter-and-minifier",
 	"displayName": "Code Formatter & Minifier",
 	"private": false,
-	"version": "1.0.18",
+	"version": "1.0.19",
 	"publisher": "lyuwenhan",
 	"description": "A VS Code extension to minify and beautify JavaScript, and sort JSON files with one click.",
 	"engines": {
@@ -175,7 +175,7 @@
 				{
 					"group": "navigation@97",
 					"command": "minifier.sort",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (resourceLangId == json || resourceLangId == jsonc)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
 				},
 				{
 					"group": "navigation@98",
@@ -231,7 +231,7 @@
 				},
 				{
 					"command": "minifier.sort",
-					"when": "resourceLangId == json || resourceLangId == jsonc"
+					"when": "resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				},
 				{
 					"command": "minifier.sortList",
@@ -261,7 +261,7 @@
 				{
 					"group": "navigation@99",
 					"command": "minifier.sort",
-					"when": "resourceLangId == json || resourceLangId == jsonc"
+					"when": "resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				}
 			],
 			"editor/title/context": [
@@ -283,7 +283,7 @@
 				{
 					"group": "navigation@99",
 					"command": "minifier.sort",
-					"when": "resourceLangId == json || resourceLangId == jsonc"
+					"when": "resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				}
 			]
 		}

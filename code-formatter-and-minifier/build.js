@@ -48,7 +48,7 @@ const contr = [{
 }, {
 	command: "sort",
 	title: "Sort current file",
-	when: [true, true, ["json"]]
+	when: [true, true, ["json", "jsonl"]]
 }, {
 	command: "sortList",
 	title: "Sort lists",

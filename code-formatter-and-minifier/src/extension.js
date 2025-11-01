@@ -208,6 +208,10 @@ function beautifyJsonL (content) {
 	return parseJsonL(content).map(jsonStringify).join("\n")
 }
 
+function sortJsonL (content) {
+	return parseJsonL(content).map(sortObject).map(jsonStringify).join("\n")
+}
+
 function sortListJsonL (content) {
 	return sortArray(parseJsonL(content)).map(jsonStringify).join("\n")
 }
@@ -280,7 +284,8 @@ const actions = {
 		sucMsg: "Sorted",
 		actionName: "Sorter",
 		opers: {
-			json: sortJson
+			json: sortJson,
+			jsonl: sortJsonL
 		}
 	},
 	sortList: {
@@ -300,55 +305,55 @@ const actions = {
 		}
 	}
 };
+async function runAction (oper, content) {
+	content = content.trim();
+	oper ??= e => e;
+	if (content === "") {
+		return ""
+	}
+	return (await oper(content)).trim()
+}
 
 function activate (context) {
-	context.subscriptions.push(...Object.entries(actions).map(([action, {
+	Object.entries(actions).forEach(([action, {
 		sucMsg,
 		actionName,
 		opers
-	}]) => vscode.commands.registerCommand("minifier." + action, async uri => {
-		try {
-			const doc = await getDoc(uri);
-			if (doc) {
+	}]) => {
+		if (!opers) {
+			return
+		}
+		context.subscriptions.push(vscode.commands.registerCommand("minifier." + action, async uri => {
+			try {
+				const doc = await getDoc(uri);
+				if (!doc) {
+					throw new Error(actionName + ": No file selected.")
+				}
 				const {
 					lang,
 					content
 				} = getDocInfo(doc);
-				if (!opers) {
-					vscode.window.showErrorMessage("Invalid action type.");
-					return
-				}
 				const actByLang = opers[lang];
 				if (!actByLang) {
-					vscode.window.showErrorMessage("Invalid file type." + lang);
+					vscode.window.showErrorMessage("Invalid file type.");
 					return
 				}
-				let nContent = content.trim();
-				let result = "";
-				if (nContent !== "") {
-					result = (await actByLang(nContent)).trim() + "\n"
-				}
+				let result = await runAction(actByLang, content) + "\n";
 				if (content === result) {
 					vscode.window.showWarningMessage(actionName + ": Nothing changed.");
 					return
 				}
 				await saveDocContent(doc, result);
 				vscode.window.showInformationMessage(sucMsg + " successfully.")
-			} else {
-				throw new Error(actionName + ": No file selected.")
+			} catch (e) {
+				vscode.window.showErrorMessage(e.message || String(e))
 			}
-		} catch (e) {
-			vscode.window.showErrorMessage(e.message || String(e))
-		}
-	})));
-	context.subscriptions.push(...Object.entries(actions).map(([action, {
-		sucMsg,
-		actionName,
-		opers
-	}]) => vscode.commands.registerCommand("minifier." + action + "Sel", async () => {
-		try {
-			const editor = vscode.window.activeTextEditor;
-			if (editor) {
+		}), vscode.commands.registerCommand("minifier." + action + "Sel", async () => {
+			try {
+				const editor = vscode.window.activeTextEditor;
+				if (!editor) {
+					throw new Error(actionName + ": No file selected.")
+				}
 				const sels = editor.selections.filter(e => !e.isEmpty);
 				if (!sels.length) {
 					vscode.window.showWarningMessage(actionName + ": No text selected.");
@@ -358,18 +363,14 @@ function activate (context) {
 				const {
 					lang
 				} = getDocInfo(editor.document);
-				if (!opers) {
-					vscode.window.showErrorMessage("Invalid action type.");
-					return
-				}
 				const actByLang = opers[lang];
 				if (!actByLang) {
-					vscode.window.showErrorMessage("Invalid file type." + lang);
+					vscode.window.showErrorMessage("Invalid file type.");
 					return
 				}
 				for (const sel of sels) {
 					const content = editor.document.getText(sel);
-					const result = (await actByLang(content)).trim();
+					let result = await runAction(actByLang, content);
 					if (content !== result) {
 						replacements.push({
 							sel,
@@ -377,42 +378,38 @@ function activate (context) {
 						})
 					}
 				}
-				if (replacements.length) {
-					await editor.edit(editBuilder => {
-						for (const item of replacements) {
-							editBuilder.replace(item.sel, item.result)
-						}
-					})
-				} else {
+				if (!replacements.length) {
 					vscode.window.showWarningMessage(actionName + ": Nothing changed.");
 					return
 				}
+				await editor.edit(editBuilder => {
+					for (const item of replacements) {
+						editBuilder.replace(item.sel, item.result)
+					}
+				});
 				vscode.window.showInformationMessage(sucMsg + " successfully.")
-			} else {
-				throw new Error(actionName + ": No file selected.")
+			} catch (e) {
+				vscode.window.showErrorMessage(e.message || String(e))
 			}
-		} catch (e) {
-			vscode.window.showErrorMessage(e.message || String(e))
-		}
-	})));
+		}))
+	});
 	const generateUuidCmd = vscode.commands.registerCommand("minifier.generateUuid", async () => {
 		try {
 			const editor = vscode.window.activeTextEditor;
-			if (editor) {
-				const uuid = randomUUID();
-				await editor.edit(editBuilder => {
-					for (const sel of editor.selections) {
-						if (!sel.isEmpty) {
-							editBuilder.replace(sel, uuid)
-						} else {
-							editBuilder.insert(sel.start, uuid)
-						}
-					}
-				});
-				vscode.window.showInformationMessage("UUID Generator: Generated successfully.")
-			} else {
+			if (!editor) {
 				vscode.window.showErrorMessage("No active editor.")
 			}
+			const uuid = randomUUID();
+			await editor.edit(editBuilder => {
+				for (const sel of editor.selections) {
+					if (!sel.isEmpty) {
+						editBuilder.replace(sel, uuid)
+					} else {
+						editBuilder.insert(sel.start, uuid)
+					}
+				}
+			});
+			vscode.window.showInformationMessage("UUID Generator: Generated successfully.")
 		} catch (e) {
 			vscode.window.showErrorMessage(e.message || String(e))
 		}
