@@ -1,69 +1,61 @@
-# Code Formatter & Minifier
+# Sidebar Notes
 
-A simple VS Code extension to **minify**, **beautify**, **mitify**, **sort JSON**, **sort JSON arrays**, **sort JSON arrays by key**, and provide **UUID generation** utilities.
+A lightweight **VS Code extension** that adds a simple note-taking area to the **sidebar** — ideal for writing quick thoughts, reminders, or temporary text while coding.
+
+---
 
 ## Features
 
-### JavaScript
-- Right-click inside a **JavaScript (.js)** file:
-  - **“Minify this file”** -> Minify using [terser](https://github.com/terser/terser).
-  - **“Beautify this file”** -> Beautify using [js-beautify](https://github.com/beautify-web/js-beautify).
-  - **“Mitify this file”** -> Runs **minify + beautify** in sequence (for normalized, clean code).
-- **Note:** The “Mitify” command is available **only for JavaScript files**.
+### 1. Sidebar Notepad
+- Opens directly inside the **VS Code sidebar**.
+- Provides a single, large **textarea** for typing notes.
+- Supports typing, editing, and clearing manually — just like a plain text pad.
 
-### JSON / JSONC
-- Right-click inside a **JSON (.json)** or **JSONC (.jsonc)** file:
-  - **“Minify this file”** -> Compact JSON into a single line.
-  - **“Beautify this file”** -> Format JSON with indentation (using tabs).
-  - **“Sort this file”** -> Sort JSON keys recursively in alphabetical order.
-  - **“Sort List”** -> Sort all arrays recursively by their JSON stringified values.
-  - **“Sort List by Key”** -> Prompt for a key name and sort JSON arrays of objects by that key.
-- **Note:**
-  `.jsonc` files are automatically parsed as `.json` (comments are stripped).
+---
 
-  The output file will **not** contain comments, as they are removed during parsing.
+### 2. Theme Integration
+- The note area automatically adapts to your current **VS Code theme**:
+  - Background color: `--vscode-input-background`
+  - Text color: `--vscode-input-foreground`
+  - Focus border: `--vscode-focusBorder`
+  - Placeholder color: `--vscode-input-placeholderForeground`
+- Works seamlessly in **light**, **dark**, and **high-contrast** themes.
 
-### JSONL
-- Right-click inside a **JSON Lines (.jsonl)** file:
-  - **“Minify this file”** -> Compress each JSON object on every line into a single compact line.
-  - **“Beautify this file”** -> Format each JSON object on every line with indentation and line breaks.
-  - **“Sort this file”** -> Sort JSON keys recursively within each JSON object.
-  - **“Sort List”** -> Sort JSON objects and arrays line by line recursively.
-  - **“Sort List by Key”** -> Prompt for a key name and sort JSON objects by that key line by line.
-- Each line is parsed and processed independently without merging across lines.
-- **Note:**
-  Internally, JSONL parsing uses [jsonparse](https://github.com/creationix/jsonparse) and a custom circular-safe stringifier.
+---
 
-### Sorting by Key
-- Use the **“Sort List by Key”** command to sort JSON or JSONL arrays of objects by a specific key.
-  You will be prompted to enter the key name in an input box.
-  Works for both **entire files** and **selected text**.
+### 3. Minimal UI
+- Clean layout — no menus, no toolbars.
+- Uses the font family `Consolas, Courier, monospace` for a code-friendly look.
+- Displays placeholder text when empty:  
+  > *“Write your notes here...”*
 
-### UUID Generator
-- Right-click to use **Generate UUID**.
-- Inserts a freshly generated UUID at every selected cursor position in the active editor.
+---
 
-## Usage
-1. Open a `.js`, `.json`, `.jsonc`, or `.jsonl` file in VS Code.
-2. Right-click inside the editor.
-3. Choose the desired operation from the context menu.
-4. You can also **select text** and run:
-   - **“Minify current selection”**
-   - **“Beautify current selection”**
-   - **“Mitify current selection”**
-   - **“Sort current selection”**
-   - **“Sort lists (selection)”**
-   - **“Sort lists by keys (selection)”**
+## Current Limitations
+- Notes are **not saved** after closing VS Code.
+- No sync, commands, or persistent storage yet.
+- Focused purely on layout and theme adaptation for now.
 
-## Notes
-- JavaScript minification uses [terser](https://github.com/terser/terser).
-- JavaScript beautification uses [js-beautify](https://github.com/beautify-web/js-beautify).
-- JSON parsing uses [jsonc-parser](https://github.com/microsoft/node-jsonc-parser).
-- JSONL parsing uses [jsonparse](https://github.com/creationix/jsonparse).
-- JSON operations remove comments on save.
+---
 
-## Extra
-- All edit operations automatically save the document (unless untitled).
-- Both `LF (\n)` and `CRLF (\r\n)` line endings are supported.
-- Works with multiple selections.
-- Displays success, warning, and error messages consistently.
+## Installation
+
+1. Open **VS Code**.
+2. Go to **Extensions** (`Ctrl+Shift+X` / `Cmd+Shift+X`).
+3. Search for **"Sidebar Notes"** by `lyuwenhan`.
+4. Click **Install**.
+5. Click the **Notes** icon in the Activity Bar to open your notepad.
+
+---
+
+## Technical Notes
+- Built with **HTML + CSS + VS Code Webview API**.
+- The notepad fills the entire sidebar panel.
+- Uses VS Code’s built-in theme color tokens for styling.
+- Contains no external dependencies or scripts.
+
+---
+
+## License
+
+MIT License © 2025 **lyuwenhan**
