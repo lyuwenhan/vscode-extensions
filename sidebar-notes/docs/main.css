@@ -1,0 +1,59 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+*,
+body,
+html {
+  font-family: Consolas, Courier, monospace;
+}
+
+#notepad {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: calc(100% - 22px);
+  height: calc(100% - 22px);
+  padding: 10px;
+  font-size: 16px;
+  border: none;
+  outline: 0;
+  resize: none;
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+}
+
+#notepad:focus {
+  border: 1px solid var(--vscode-focusBorder);
+}
+
+#notepad::placeholder {
+  color: var(--vscode-input-placeholderForeground, #888);
+}
+
+#panel {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  width: 30px;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  padding: 10px;
+}
+
+#panel > * {
+  width: 100%;
+  fill: var(--vscode-foreground, #000);
+}
+
+#panel > :hover {
+  opacity: 0.7;
+}
+
+#panel > :active {
+  opacity: 0.8;
+}
