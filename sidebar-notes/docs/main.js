@@ -68,6 +68,7 @@ function tomode (mode) {
 		indentUnit: 4,
 		indentWithTabs: true,
 		styleActiveLine: true,
+		placeholder: "Write your notes here...",
 		...mode
 	}
 }

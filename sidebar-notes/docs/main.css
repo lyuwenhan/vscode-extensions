@@ -90,3 +90,7 @@ html {
 .CodeMirror-hscrollbar {
 	scrollbar-color: #bfbfbf #f0f0f0 !important;
 }
+
+.CodeMirror-empty .CodeMirror-placeholder {
+	color: #888 !important
+}

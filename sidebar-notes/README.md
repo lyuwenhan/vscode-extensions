@@ -27,7 +27,7 @@ A lightweight **VS Code extension** that adds a simple note-taking area to the *
 - Clean layout — no menus, no toolbars.
 - Uses the font family `Consolas, Courier, monospace` for a code-friendly look.
 - Displays placeholder text when empty:  
-  > *“Write your notes here...”*
+  *Write your notes here...*
 
 ---
 
