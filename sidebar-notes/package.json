@@ -2,7 +2,7 @@
 	"name": "sidebar-notes",
 	"displayName": "Sidebar Notes",
 	"private": false,
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"publisher": "lyuwenhan",
 	"description": "A VS Code extension for taking quick notes in the sidebar.",
 	"engines": {
@@ -18,7 +18,7 @@
 		"package": "vsce package --allow-missing-repository"
 	},
 	"devDependencies": {
-		"@vscode/vsce": "^3.0.0",
+		"@vscode/vsce": "^3.7.0",
 		"esbuild": "^0.25.10"
 	},
 	"license": "MIT",

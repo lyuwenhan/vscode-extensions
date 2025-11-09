@@ -1,59 +1,92 @@
 body,
 html {
-  margin: 0;
-  padding: 0;
-  height: 100%;
+	margin: 0;
+	padding: 0;
+	height: 100%;
 }
 
 *,
 body,
 html {
-  font-family: Consolas, Courier, monospace;
+	font-family: Consolas, Courier, monospace;
 }
 
-#notepad {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: calc(100% - 22px);
-  height: calc(100% - 22px);
-  padding: 10px;
-  font-size: 16px;
-  border: none;
-  outline: 0;
-  resize: none;
-  background-color: var(--vscode-input-background);
-  color: var(--vscode-input-foreground);
+.choose-lang {
+	position: fixed;
+	top: 0;
+	left: 0;
+	padding: 5px 10px;
+	height: 30px;
+	width: calc(100% - 20px);
+	display: flex;
+	flex-direction: row;
+	align-items: center;
 }
 
-#notepad:focus {
-  border: 1px solid var(--vscode-focusBorder);
+.choose-lang #lang-text {
+	margin-right: 8px;
+	white-space: nowrap;
 }
 
-#notepad::placeholder {
-  color: var(--vscode-input-placeholderForeground, #888);
+.choose-lang #lang-choose {
+	min-width: 5px;
+	width: auto !important;
+	height: 100%;
+	flex: 1;
+}
+
+.well {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	width: calc(100% - 22px);
+	height: calc(100% - 112px);
+	padding: 20px 20px 50px 0;
+	font-size: 16px;
+	border: none;
+	outline: 0;
+	resize: none;
+	background-color: #f7f7f7;
+}
+
+.well:focus {
+	border: 1px solid black;
+}
+
+.well::placeholder {
+	color: #888;
+}
+
+.CodeMirror {
+	line-height: 1.3em !important;
+	height: calc(100%) !important;
 }
 
 #panel {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  width: 30px;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  padding: 10px;
+	position: fixed;
+	right: 0;
+	bottom: 0;
+	display: flex;
+	height: 30px;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	padding: 10px;
 }
 
-#panel > * {
-  width: 100%;
-  fill: var(--vscode-foreground, #000);
+#panel>* {
+	height: 100%;
+	fill: var(--vscode-foreground, #000);
 }
 
-#panel > :hover {
-  opacity: 0.7;
+#panel> :hover {
+	opacity: 0.7;
 }
 
-#panel > :active {
-  opacity: 0.8;
+#panel> :active {
+	opacity: 0.8;
+}
+
+.CodeMirror-vscrollbar,
+.CodeMirror-hscrollbar {
+	scrollbar-color: #bfbfbf #f0f0f0 !important;
 }
