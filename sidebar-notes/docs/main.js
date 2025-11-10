@@ -123,6 +123,10 @@ if (window.acquireVsCodeApi) {
 		const message = event.data;
 		if (message.type == "setup") {
 			lang = message.lang ?? "plain text";
+			previewButEle.hidden = lang !== "markdown" && lang !== "html";
+			if(previewButEle.hidden){
+				prev = false;
+			}
 			codeLangEle.value = lang;
 			edtlang = languageModes[lang];
 			fontSize = +(message.fontSize ?? "16");
