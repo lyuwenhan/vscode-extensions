@@ -33,6 +33,7 @@ html {
 	width: auto !important;
 	height: 100%;
 	flex: 1;
+	border-radius: 5px;
 }
 
 .well {
@@ -55,6 +56,32 @@ html {
 
 .well::placeholder {
 	color: #888;
+}
+
+#preview-button {
+	margin-left: 8px;
+	height: 100%;
+	border-radius: 5px;
+}
+
+#preview-button:hover {
+	opacity: 0.7;
+}
+
+#preview-button:active {
+	opacity: 0.8;
+}
+
+#preview-button.on {
+	background-color: #afafaf;
+}
+
+#preview {
+	margin-left: 20px;
+	width: calc(100% - 20px);
+	height: 100%;
+	overflow: auto;
+	color: black;
 }
 
 .CodeMirror {

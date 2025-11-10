@@ -76,13 +76,15 @@ let sendMessage = () => {};
 const codeEle = textarea;
 const codeLangEle = document.getElementById("lang-choose");
 let lang = codeLangEle.value || "plain text";
+let previewButEle = document.getElementById("preview-button");
+let previewEle = document.getElementById("preview");
 var edtlang = languageModes[lang];
 let editor;
+let prev = false;
 
 function ed_init () {
 	editor?.toTextArea();
 	editor = CodeMirror.fromTextArea(codeEle, tomode(edtlang));
-	editor.getWrapperElement().classList.add("code-cm");
 	editor.setSize("auto", `${innerHeight}px`);
 	editor.on("change", () => {
 		editor.setSize("auto", `${innerHeight}px`);
@@ -92,6 +94,7 @@ function ed_init () {
 ed_init();
 codeLangEle.addEventListener("change", function () {
 	lang = this.value || "plain text";
+	previewButEle.hidden = lang !== "markdown"
 	edtlang = languageModes[lang];
 	ed_init();
 	sendMessage()
@@ -106,12 +109,6 @@ if (window.acquireVsCodeApi) {
 		type: "get"
 	});
 	sendMessage = function () {
-		console.log({
-			type: "edit",
-			content: editor.getValue(),
-			fontSize,
-			lang
-		});
 		vscode.postMessage({
 			type: "edit",
 			content: editor.getValue(),
@@ -122,18 +119,71 @@ if (window.acquireVsCodeApi) {
 	window.addEventListener("message", event => {
 		const message = event.data;
 		if (message.type == "setup") {
-			console.log(message);
 			lang = message.lang ?? "plain text";
-			codeLangEle.value = lang
+			codeLangEle.value = lang;
 			edtlang = languageModes[lang];
 			fontSize = +(message.fontSize ?? "16");
 			ed_init();
 			editor.getWrapperElement().style.fontSize = fontSize + "px";
 			editor.refresh();
-			editor.setValue(message.content ?? "");
+			editor.setValue(message.content ?? "")
 		}
 	})
 }
+const renderer = new marked.Renderer;
+const escapeHtml = code => code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+renderer.codespan = function (text) {
+	return `<code class='code'>${text.text}</code>`
+};
+renderer.code = function (code) {
+	if (!code.lang) {
+		code.lang = "none"
+	}
+	if (code.lang == "c++") {
+		code.lang = "cpp"
+	}
+	return `<pre class="line-numbers language-${code.lang}"><code class="language-${code.lang}">${escapeHtml(code.text)}</code></pre>`
+};
+marked.setOptions({
+	renderer,
+	highlight: function (code, lang) {
+		const language = Prism.languages[lang] || Prism.languages.javascript;
+		return Prism.highlight(code, language, lang)
+	}
+});
+MathJax = {
+	options: {
+		safeUrls: {
+			allow: ['http', 'https', 'mailto']
+		}
+	}
+};
+previewButEle.addEventListener("click", () => {
+	prev = !prev;
+	if (prev) {
+		previewEle.hidden = false;
+		editor.getWrapperElement().hidden = true;
+		let text = marked.parse(editor.getValue());
+		console.log(text);
+		text = DOMPurify.sanitize(text, {
+			USE_PROFILES: {
+				html: true
+			},
+			FORBID_TAGS: ['style', 'iframe', 'script', 'object', 'embed', 'form'],
+			FORBID_ATTR: [/^on/i, 'srcset'],
+			ALLOW_UNKNOWN_PROTOCOLS: false,
+			RETURN_TRUSTED_TYPE: false,
+			FORBID_CONTENTS: ["script", "iframe"],
+		});
+		previewEle.innerHTML = text;
+		MathJax.typesetPromise([previewEle]);
+		Prism.highlightAllUnder(previewEle)
+	} else {
+		previewEle.hidden = true;
+		editor.getWrapperElement().hidden = false;
+		editor.refresh()
+	}
+});
 
 function sendResize () {
 	sendMessage();
