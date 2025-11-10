@@ -94,7 +94,10 @@ function ed_init () {
 ed_init();
 codeLangEle.addEventListener("change", function () {
 	lang = this.value || "plain text";
-	previewButEle.hidden = lang !== "markdown"
+	previewButEle.hidden = lang !== "markdown" && lang !== "html";
+	if(previewButEle.hidden){
+		prev = false;
+	}
 	edtlang = languageModes[lang];
 	ed_init();
 	sendMessage()
@@ -151,37 +154,41 @@ marked.setOptions({
 		return Prism.highlight(code, language, lang)
 	}
 });
-MathJax = {
-	options: {
-		safeUrls: {
-			allow: ['http', 'https', 'mailto']
-		}
+DOMPurify.addHook("uponSanitizeAttribute", (node, data) => {
+	if (data.attrName === "style" && /position\s*:/.test(data.attrValue)) {
+		data.keepAttr = false
 	}
-};
+});
 previewButEle.addEventListener("click", () => {
-	prev = !prev;
-	if (prev) {
-		previewEle.hidden = false;
-		editor.getWrapperElement().hidden = true;
-		let text = marked.parse(editor.getValue());
-		console.log(text);
-		text = DOMPurify.sanitize(text, {
-			USE_PROFILES: {
-				html: true
-			},
-			FORBID_TAGS: ['style', 'iframe', 'script', 'object', 'embed', 'form'],
-			FORBID_ATTR: [/^on/i, 'srcset'],
-			ALLOW_UNKNOWN_PROTOCOLS: false,
-			RETURN_TRUSTED_TYPE: false,
-			FORBID_CONTENTS: ["script", "iframe"],
-		});
-		previewEle.innerHTML = text;
-		MathJax.typesetPromise([previewEle]);
-		Prism.highlightAllUnder(previewEle)
-	} else {
-		previewEle.hidden = true;
-		editor.getWrapperElement().hidden = false;
-		editor.refresh()
+	if (lang === "markdown" || lang === "html") {
+		prev = !prev;
+		if (prev) {
+			previewEle.hidden = false;
+			editor.getWrapperElement().hidden = true;
+			let text = editor.getValue();
+			if (lang == "markdown") {
+				text = marked.parse(text)
+			}
+			text = DOMPurify.sanitize(text, {
+				USE_PROFILES: {
+					html: true
+				},
+				FORBID_TAGS: ["style", "iframe", "script", "object", "embed", "form"],
+				FORBID_ATTR: [/^on/i, "srcset"],
+				ALLOW_UNKNOWN_PROTOCOLS: false,
+				RETURN_TRUSTED_TYPE: false,
+				FORBID_CONTENTS: ["script", "iframe"]
+			});
+			previewEle.innerHTML = text;
+			if (lang == "markdown") {
+				MathJax.typesetPromise([previewEle]);
+				Prism.highlightAllUnder(previewEle)
+			}
+		} else {
+			previewEle.hidden = true;
+			editor.getWrapperElement().hidden = false;
+			editor.refresh()
+		}
 	}
 });
 
