@@ -16,6 +16,7 @@ if (window.acquireVsCodeApi) {
 		const message = event.data;
 		if (message.type == "setup" && message.content) {
 			notepadEle.value = message.content
+			renderMermaid();
 		}
 	})
 }
@@ -45,8 +46,9 @@ async function renderMermaid () {
 		previewEle.insertAdjacentElement("beforeend", svgEle);
 		svgEle.classList.add("imgSvg")
 	} catch (err) {
-		previewEle.innerHTML = `<pre style="color:red;">${err.message}</pre>`
+		previewEle.innerHTML = `<p style="color:red;">${err.message}</p>`
 	}
+	document.getElementById("dtheGraph")?.remove();
 }
 notepadEle.value = `graph TD\n    A[Start] --\x3e B{Is it working?}\n    B --\x3e|Yes| C[Great!]\n    B --\x3e|No| D[Fix it]`;
 renderMermaid();
