@@ -1,0 +1,49 @@
+const vscode = require("vscode");
+const path = require("path");
+class LeftPanelWebviewProvider {
+	constructor (context) {
+		this.context = context;
+		this.content = ""
+	}
+	refresh () {}
+	resolveWebviewView (webviewView) {
+		webviewView.webview.options = {
+			enableScripts: true,
+			localResourceRoots: [vscode.Uri.file(path.join(this.context.extensionPath, "docs"))]
+		};
+		webviewView.webview.html = this.getHtml(webviewView);
+		console.log(webviewView.webview.html);
+		this.activateMessageListener(webviewView)
+	}
+	getHtml (webviewView) {
+		const maincss = webviewView.webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, "docs", "main.css")));
+		const mainjs = webviewView.webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, "docs", "main.js")));
+		const scriptsjs = webviewView.webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, "docs", "scripts.js")));
+		return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="${maincss}"><script src="${scriptsjs}"><\/script></head><body><textarea id="notepad" placeholder="Type your mermaid here..."></textarea><div id="preview"><h2>Preview:</h2><div id="previewEle"></div><script src="${mainjs}"><\/script></body></html>`
+	}
+	sendSetup (webviewView) {
+		webviewView.webview.postMessage({
+			type: "setup",
+			content: this.content
+		})
+	}
+	activateMessageListener (webviewView) {
+		webviewView.webview.onDidReceiveMessage(async message => {
+			if (message.type == "edit") {
+				this.content = message.content ?? ""
+			} else if (message.type == "get") {
+				this.sendSetup(webviewView)
+			}
+		})
+	}
+}
+
+function activate (context) {
+	context.subscriptions.push(vscode.window.registerWebviewViewProvider("mmdPreview", new LeftPanelWebviewProvider(context)))
+}
+
+function deactivate () {}
+module.exports = {
+	activate,
+	deactivate
+};
