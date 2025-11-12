@@ -29,41 +29,40 @@ for (const dir of dirs) {
 			status = {}
 		}
 		if (!status.needsPublish) {
+			console.log(`Building & publishing ${dir}...`);
+			const pkg = JSON.parse(fs.readFileSync(pkgFile, "utf8"));
+			const [major, minor, patch] = pkg.version.split(".").map(Number);
+			if (status.useVersion && typeof status.useVersion === "string") {
+				pkg.version = status.useVersion;
+				console.log(`Version set manually to ${pkg.version}`)
+			} else if (status.majorUp) {
+				pkg.version = `${major+1}.0.0`;
+				console.log(`Major version bumped to ${pkg.version}`)
+			} else if (status.minorUp) {
+				pkg.version = `${major}.${minor+1}.0`;
+				console.log(`Minor version bumped to ${pkg.version}`)
+			} else {
+				pkg.version = `${major}.${minor}.${patch+1}`;
+				console.log(`Patch version bumped to ${pkg.version}`)
+			}
+			fs.writeFileSync(pkgFile, JSON.stringify(pkg, null, 2));
+			execSync(`npx vsce package`, {
+				cwd: extPath,
+				stdio: "inherit"
+			});
+			if (vsMarketToken) execSync(`npx vsce publish -p ${vsMarketToken}`, {
+				cwd: extPath,
+				stdio: "inherit"
+			});
+			if (openVsxToken) execSync(`npx ovsx publish -p ${openVsxToken}`, {
+				cwd: extPath,
+				stdio: "inherit"
+			});
+			console.log(`${dir} published successfully.`)
+		}else{
 			console.log(`Skip ${dir}: no new content`);
-			fs.writeFileSync(statusFile, JSON.stringify(defaultStatus, null, "\t"), "utf8");
-			continue
 		}
-		console.log(`Building & publishing ${dir}...`);
-		const pkg = JSON.parse(fs.readFileSync(pkgFile, "utf8"));
-		const [major, minor, patch] = pkg.version.split(".").map(Number);
-		if (status.useVersion && typeof status.useVersion === "string") {
-			pkg.version = status.useVersion;
-			console.log(`Version set manually to ${pkg.version}`)
-		} else if (status.majorUp) {
-			pkg.version = `${major+1}.0.0`;
-			console.log(`Major version bumped to ${pkg.version}`)
-		} else if (status.minorUp) {
-			pkg.version = `${major}.${minor+1}.0`;
-			console.log(`Minor version bumped to ${pkg.version}`)
-		} else {
-			pkg.version = `${major}.${minor}.${patch+1}`;
-			console.log(`Patch version bumped to ${pkg.version}`)
-		}
-		fs.writeFileSync(pkgFile, JSON.stringify(pkg, null, 2));
-		execSync(`npx vsce package`, {
-			cwd: extPath,
-			stdio: "inherit"
-		});
-		if (vsMarketToken) execSync(`npx vsce publish -p ${vsMarketToken}`, {
-			cwd: extPath,
-			stdio: "inherit"
-		});
-		if (openVsxToken) execSync(`npx ovsx publish -p ${openVsxToken}`, {
-			cwd: extPath,
-			stdio: "inherit"
-		});
-		fs.writeFileSync(statusFile, JSON.stringify(defaultStatus, null, "\t"), "utf8");
-		console.log(`${dir} published successfully.`)
+		fs.writeFileSync(statusFile, JSON.stringify(defaultStatus, null, "\t") + "\n", "utf8");
 	} catch (err) {
 		console.error(`Failed to publish ${dir}: ${err.message}`)
 	}
