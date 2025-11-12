@@ -3,10 +3,11 @@ import path from "path";
 import {
 	execSync
 } from "child_process";
-const root = "extensions";
 const openVsxToken = process.env.OPEN_VSX_TOKEN;
 const vsMarketToken = process.env.VS_MARKETPLACE_TOKEN;
-const dirs = fs.readdirSync(root).filter(d => fs.existsSync(path.join(root, d, "status.json")));
+const root = ".";
+const excluded = ["scripts", ".git", "node_modules"];
+const dirs = fs.readdirSync(root).filter(d => !excluded.includes(d)).filter(d => fs.existsSync(path.join(root, d, "package.json")));
 const defaultStatus = {
 	needsPublish: false,
 	majorUp: false,
@@ -19,9 +20,9 @@ for (const dir of dirs) {
 		const extPath = path.join(root, dir);
 		const statusFile = path.join(extPath, "status.json");
 		const pkgFile = path.join(extPath, "package.json");
-		const raw = fs.readFileSync(statusFile, "utf8") || "{}";
 		let status;
 		try {
+			const raw = fs.readFileSync(statusFile, "utf8") || "{}";
 			status = JSON.parse(raw)
 		} catch {
 			console.warn(`${dir}: invalid or missing status.json, using default.`);
