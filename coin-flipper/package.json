@@ -62,10 +62,6 @@
 		"vscode:prepublish": "node build.js",
 		"package": "vsce package --allow-missing-repository"
 	},
-	"devDependencies": {
-		"@vscode/vsce": "^3.0.0",
-		"esbuild": "^0.25.10"
-	},
 	"license": "MIT",
 	"repository": {
 		"type": "git",

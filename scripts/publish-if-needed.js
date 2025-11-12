@@ -7,7 +7,7 @@ const openVsxToken = process.env.OPEN_VSX_TOKEN;
 const vsMarketToken = process.env.VS_MARKETPLACE_TOKEN;
 const root = ".";
 const excluded = ["scripts", ".git", "node_modules"];
-const dirs = fs.readdirSync(root).filter(d => !excluded.includes(d)).filter(d => fs.existsSync(path.join(root, d, "package.json")));
+const dirs = fs.readdirSync(root).filter(d => !excluded.includes(d) && fs.existsSync(path.join(root, d, "status.json")));
 const defaultStatus = {
 	needsPublish: false,
 	majorUp: false,
@@ -30,6 +30,7 @@ for (const dir of dirs) {
 		}
 		if (!status.needsPublish) {
 			console.log(`Skip ${dir}: no new content`);
+			fs.writeFileSync(statusFile, JSON.stringify(defaultStatus, null, "\t"), "utf8");
 			continue
 		}
 		console.log(`Building & publishing ${dir}...`);
@@ -61,10 +62,6 @@ for (const dir of dirs) {
 			cwd: extPath,
 			stdio: "inherit"
 		});
-		status.needsPublish = false;
-		status.majorUp = false;
-		status.minorUp = false;
-		status.useVersion = null;
 		fs.writeFileSync(statusFile, JSON.stringify(defaultStatus, null, "\t"), "utf8");
 		console.log(`${dir} published successfully.`)
 	} catch (err) {

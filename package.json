@@ -1,0 +1,17 @@
+{
+	"name": "vscode-extension",
+	"description": "A VS Code extension that lets you preview Mermaid diagrams.",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/lyuwenhan/vscode-extensions"
+	},
+	"bugs": {
+		"url": "https://github.com/lyuwenhan/vscode-extensions/issues"
+	},
+	"homepage": "https://lyuwenhan.github.io",
+	"devDependencies": {
+		"@vscode/vsce": "^3.7.0",
+		"esbuild": "^0.25.10"
+	}
+}
