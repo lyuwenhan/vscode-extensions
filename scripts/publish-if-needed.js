@@ -28,7 +28,7 @@ for (const dir of dirs) {
 			console.warn(`${dir}: invalid or missing status.json, using default.`);
 			status = {}
 		}
-		if (!status.needsPublish) {
+		if (status.needsPublish) {
 			console.log(`Building & publishing ${dir}...`);
 			const pkg = JSON.parse(fs.readFileSync(pkgFile, "utf8"));
 			const [major, minor, patch] = pkg.version.split(".").map(Number);
@@ -46,6 +46,10 @@ for (const dir of dirs) {
 				console.log(`Patch version bumped to ${pkg.version}`)
 			}
 			fs.writeFileSync(pkgFile, JSON.stringify(pkg, null, 2));
+			execSync(`npm install`, {
+				cwd: extPath,
+				stdio: "inherit"
+			});
 			execSync(`npx vsce package`, {
 				cwd: extPath,
 				stdio: "inherit"
