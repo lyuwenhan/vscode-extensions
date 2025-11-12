@@ -1,8 +1,8 @@
-import fs from "fs";
-import path from "path";
-import {
+const fs = require("fs");
+const path = require("path");
+const {
 	execSync
-} from "child_process";
+} = require("child_process");
 const openVsxToken = process.env.OPEN_VSX_TOKEN;
 const vsMarketToken = process.env.VS_MARKETPLACE_TOKEN;
 const root = ".";
