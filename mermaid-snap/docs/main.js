@@ -1,4 +1,4 @@
-const textarea = document.getElementById("notepad");
+const notepadEle = document.getElementById("notepad");
 let sendMessage = () => {};
 let previewEle = document.getElementById("previewEle");
 if (window.acquireVsCodeApi) {
@@ -9,14 +9,14 @@ if (window.acquireVsCodeApi) {
 	sendMessage = function () {
 		vscode.postMessage({
 			type: "edit",
-			content: textarea.value
+			content: notepadEle.value
 		})
 	};
 	window.addEventListener("message", event => {
-		// const message = event.data;
-		// if (message.type == "setup") {
-		// 	textarea.value = message.content ?? ""
-		// }
+		const message = event.data;
+		if (message.type == "setup" && message.content) {
+			notepadEle.value = message.content
+		}
 	})
 }
 mermaid.initialize({
@@ -24,12 +24,13 @@ mermaid.initialize({
 	theme: "default"
 });
 let timer;
-textarea.addEventListener("input", () => {
+notepadEle.addEventListener("input", () => {
+	sendMessage();
 	clearTimeout(timer);
 	timer = setTimeout(renderMermaid, 400)
 });
 async function renderMermaid () {
-	const code = textarea.value.trim();
+	const code = notepadEle.value.trim();
 	if (!code) {
 		previewEle.innerHTML = "";
 		return
@@ -47,5 +48,5 @@ async function renderMermaid () {
 		previewEle.innerHTML = `<pre style="color:red;">${err.message}</pre>`
 	}
 }
-textarea.value = `graph TD\n    A[Start] --\x3e B{Is it working?}\n    B --\x3e|Yes| C[Great!]\n    B --\x3e|No| D[Fix it]`;
+notepadEle.value = `graph TD\n    A[Start] --\x3e B{Is it working?}\n    B --\x3e|Yes| C[Great!]\n    B --\x3e|No| D[Fix it]`;
 renderMermaid();
