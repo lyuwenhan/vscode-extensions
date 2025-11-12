@@ -14,8 +14,19 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install -g vsce ovsx
+      - run: npm install
       - run: node scripts/publish-if-needed.js
         env:
           OPEN_VSX_TOKEN: ${{ secrets.OPEN_VSX_TOKEN }}
           VS_MARKETPLACE_TOKEN: ${{ secrets.VS_MARKETPLACE_TOKEN }}
+      - name: Commit and push status updates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain)" ]; then
+            git add .
+            git commit -m "Auto-update status.json after publish"
+            git push
+          else
+            echo "No changes detected, skipping commit."
+          fi
