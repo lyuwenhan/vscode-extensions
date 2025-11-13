@@ -25,7 +25,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           if [ -n "$(git status --porcelain)" ]; then
             git add .
-            git commit -m "Auto-update status.json after publish"
+            git commit -m "Auto-update after publish by github-actions[bot]"
             git push
           else
             echo "No changes detected, skipping commit."
