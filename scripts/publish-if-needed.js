@@ -50,23 +50,29 @@ for (const dir of dirs) {
 				cwd: extPath,
 				stdio: "inherit"
 			});
-			execSync(`npx vsce package`, {
+			const extensionsDir = path.join(root, "extensions");
+			if (!fs.existsSync(extensionsDir)) {
+				fs.mkdirSync(extensionsDir, {
+					recursive: true
+				});
+				console.log("Created directory:", extensionsDir)
+			}
+			const outPath = path.join(extensionsDir, `${pkg.name}-${pkg.version}.vsix`);
+			execSync(`npx vsce package --out "${outPath}"`, {
 				cwd: extPath,
 				stdio: "inherit"
 			});
-			if (vsMarketToken) execSync(`npx vsce publish -p ${vsMarketToken}`, {
-				cwd: extPath,
+			if (vsMarketToken) execSync(`npx vsce publish --packagePath "${outPath}" -p ${vsMarketToken}`, {
 				stdio: "inherit"
 			});
-			if (openVsxToken) execSync(`npx ovsx publish -p ${openVsxToken}`, {
-				cwd: extPath,
+			if (openVsxToken) execSync(`npx ovsx publish "${outPath}" -p ${openVsxToken}`, {
 				stdio: "inherit"
 			});
 			console.log(`${dir} published successfully.`)
-		}else{
-			console.log(`Skip ${dir}: no new content`);
+		} else {
+			console.log(`Skip ${dir}: no new content`)
 		}
-		fs.writeFileSync(statusFile, JSON.stringify(defaultStatus, null, "\t") + "\n", "utf8");
+		fs.writeFileSync(statusFile, JSON.stringify(defaultStatus, null, "\t") + "\n", "utf8")
 	} catch (err) {
 		console.error(`Failed to publish ${dir}: ${err.message}`)
 	}
