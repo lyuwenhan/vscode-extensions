@@ -14,6 +14,15 @@ const defaultStatus = {
 	minorUp: false,
 	useVersion: null
 };
+let versions = {};
+const versionsPath = path.join(root, "versions.json");
+if (fs.existsSync(versionsPath)) {
+	try {
+		versions = JSON.parse(fs.readFileSync(versionsPath, "utf8"))
+	} catch (e) {
+		console.error(e)
+	}
+}
 for (const dir of dirs) {
 	try {
 		console.log(`Loading files in ${dir}...`);
@@ -68,6 +77,10 @@ for (const dir of dirs) {
 			if (openVsxToken) execSync(`npx ovsx publish "${outPath}" -p ${openVsxToken}`, {
 				stdio: "inherit"
 			});
+			if (!versions[pkg.name]) {
+				versions[pkg.name] = []
+			}
+			versions[pkg.name].push(pkg.version);
 			console.log(`${dir} published successfully.`)
 		} else {
 			console.log(`Skip ${dir}: no new content`)
@@ -77,3 +90,4 @@ for (const dir of dirs) {
 		console.error(`Failed to publish ${dir}: ${err.message}`)
 	}
 }
+fs.writeFileSync(versionsPath, JSON.stringify(versions));
