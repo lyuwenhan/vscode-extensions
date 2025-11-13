@@ -57,3 +57,23 @@ textarea {
 	height: 100%;
 	border: 0;
 }
+
+#exportsBt {
+	border-radius: 5px;
+	padding: 10px;
+}
+
+#exportsBt:hover {
+	opacity: 0.7;
+}
+
+#exportsBt:active {
+	opacity: 0.8;
+}
+
+#prevtext {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: center
+}

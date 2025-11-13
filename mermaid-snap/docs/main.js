@@ -1,6 +1,9 @@
 const notepadEle = document.getElementById("notepad");
 let sendMessage = () => {};
+let sendExport = () => {};
 let previewEle = document.getElementById("previewEle");
+let exportBt = document.getElementById("exportsBt");
+let prevSvg = "";
 if (window.acquireVsCodeApi) {
 	const vscode = acquireVsCodeApi();
 	vscode.postMessage({
@@ -12,11 +15,17 @@ if (window.acquireVsCodeApi) {
 			content: notepadEle.value
 		})
 	};
+	sendExport = function () {
+		vscode.postMessage({
+			type: "export",
+			content: prevSvg
+		})
+	};
 	window.addEventListener("message", event => {
 		const message = event.data;
 		if (message.type == "setup" && message.content) {
-			notepadEle.value = message.content
-			renderMermaid();
+			notepadEle.value = message.content;
+			renderMermaid()
 		}
 	})
 }
@@ -40,6 +49,7 @@ async function renderMermaid () {
 		const {
 			svg
 		} = await mermaid.render("theGraph", code);
+		prevSvg = svg;
 		previewEle.innerHTML = "";
 		const svgEle = document.createElement("iframe");
 		svgEle.srcdoc = `<!DOCTYPE html><html><head><style>body,html{margin:0;padding:0;overflow:hidden;height:100%;width:100%}svg#theGraph{max-width:100%!important;max-height:100%!important}</style></head><body>${svg}</body></html>`;
@@ -48,7 +58,8 @@ async function renderMermaid () {
 	} catch (err) {
 		previewEle.innerHTML = `<p style="color:red;">${err.message}</p>`
 	}
-	document.getElementById("dtheGraph")?.remove();
+	document.getElementById("dtheGraph")?.remove()
 }
 notepadEle.value = `graph TD\n    A[Start] --\x3e B{Is it working?}\n    B --\x3e|Yes| C[Great!]\n    B --\x3e|No| D[Fix it]`;
 renderMermaid();
+exportBt.addEventListener("click", sendExport);

@@ -19,7 +19,7 @@ class LeftPanelWebviewProvider {
 		const maincss = webviewView.webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, "docs", "main.css")));
 		const mainjs = webviewView.webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, "docs", "main.js")));
 		const scriptsjs = webviewView.webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, "docs", "scripts.js")));
-		return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="${maincss}"><script src="${scriptsjs}"><\/script></head><body><textarea id="notepad" placeholder="Type your mermaid here..."></textarea><div id="preview"><h2>Preview:</h2><div id="previewEle"></div><script src="${mainjs}"><\/script></body></html>`
+		return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="${maincss}"><script src="${scriptsjs}"><\/script></head><body><textarea id="notepad" placeholder="Type your mermaid here..."></textarea><div id="preview"><div id="prevtext"><h2>Preview:</h2><button id="exportsBt">Export</button></div><div id="previewEle"></div><script src="${mainjs}"><\/script></body></html>`
 	}
 	sendSetup (webviewView) {
 		webviewView.webview.postMessage({
@@ -27,12 +27,24 @@ class LeftPanelWebviewProvider {
 			content: this.content
 		})
 	}
+	async showExports (content) {
+		if (!content) {
+			return
+		}
+		const document = await vscode.workspace.openTextDocument({
+			language: "html",
+			content: content.trim() + "\n"
+		});
+		const editor = await vscode.window.showTextDocument(document)
+	}
 	activateMessageListener (webviewView) {
 		webviewView.webview.onDidReceiveMessage(async message => {
 			if (message.type == "edit") {
 				this.content = message.content ?? ""
 			} else if (message.type == "get") {
 				this.sendSetup(webviewView)
+			} else if (message.type == "export") {
+				this.showExports(message.content ?? "")
 			}
 		})
 	}
