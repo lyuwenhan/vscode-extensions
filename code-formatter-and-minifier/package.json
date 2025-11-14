@@ -2,7 +2,7 @@
 	"name": "code-formatter-and-minifier",
 	"displayName": "Code Formatter & Minifier",
 	"private": false,
-	"version": "1.0.22",
+	"version": "1.0.23",
 	"publisher": "lyuwenhan",
 	"description": "A VS Code extension to minify and beautify JavaScript, and sort JSON files with one click.",
 	"engines": {
@@ -78,12 +78,12 @@
 			{
 				"category": "Minifier",
 				"command": "minifier.sortListSel",
-				"title": "Sort lists (selection)"
+				"title": "Sort lists from current selection"
 			},
 			{
 				"category": "Minifier",
 				"command": "minifier.sortListByKeySel",
-				"title": "Sort lists by keys (selection)"
+				"title": "Sort lists by keys from current selection"
 			},
 			{
 				"category": "Minifier",
@@ -108,12 +108,12 @@
 			{
 				"category": "Minifier",
 				"command": "minifier.sortList",
-				"title": "Sort lists"
+				"title": "Sort lists from current file"
 			},
 			{
 				"category": "Minifier",
 				"command": "minifier.sortListByKey",
-				"title": "Sort lists by keys"
+				"title": "Sort lists by keys from current file"
 			}
 		],
 		"menus": {
