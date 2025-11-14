@@ -6,18 +6,18 @@ A simple VS Code extension to **minify**, **beautify**, **mitify**, **sort JSON*
 
 ### JavaScript
 - Right-click inside a **JavaScript (.js)** file:
-  - **“Minify this file”** -> Minify using [terser](https://github.com/terser/terser).
-  - **“Beautify this file”** -> Beautify using [js-beautify](https://github.com/beautify-web/js-beautify).
-  - **“Mitify this file”** -> Runs **minify + beautify** in sequence (for normalized, clean code).
+  - **“Minify current file”** -> Minify using [terser](https://github.com/terser/terser).
+  - **“Beautify current file”** -> Beautify using [js-beautify](https://github.com/beautify-web/js-beautify).
+  - **“Mitify current file”** -> Runs **minify + beautify** in sequence (for normalized, clean code).
 - **Note:** The “Mitify” command is available **only for JavaScript files**.
 
 ### JSON / JSONC
 - Right-click inside a **JSON (.json)** or **JSONC (.jsonc)** file:
-  - **“Minify this file”** -> Compact JSON into a single line.
-  - **“Beautify this file”** -> Format JSON with indentation (using tabs).
-  - **“Sort this file”** -> Sort JSON keys recursively in alphabetical order.
-  - **“Sort List”** -> Sort all arrays recursively by their JSON stringified values.
-  - **“Sort List by Key”** -> Prompt for a key name and sort JSON arrays of objects by that key.
+  - **“Minify current file”** -> Compact JSON into a single line.
+  - **“Beautify current file”** -> Format JSON with indentation (using tabs).
+  - **“Sort current file”** -> Sort JSON keys recursively in alphabetical order.
+  - **“Sort lists from current file”** -> Sort all arrays recursively by their JSON stringified values.
+  - **“Sort lists by keys from current file”** -> Prompt for a key name and sort JSON arrays of objects by that key.
 - **Note:**
   `.jsonc` files are automatically parsed as `.json` (comments are stripped).
 
@@ -25,17 +25,17 @@ A simple VS Code extension to **minify**, **beautify**, **mitify**, **sort JSON*
 
 ### JSONL
 - Right-click inside a **JSON Lines (.jsonl)** file:
-  - **“Minify this file”** -> Compress each JSON object on every line into a single compact line.
-  - **“Beautify this file”** -> Format each JSON object on every line with indentation and line breaks.
-  - **“Sort this file”** -> Sort JSON keys recursively within each JSON object.
-  - **“Sort List”** -> Sort JSON objects and arrays line by line recursively.
-  - **“Sort List by Key”** -> Prompt for a key name and sort JSON objects by that key line by line.
+  - **“Minify current file”** -> Compress each JSON object on every line into a single compact line.
+  - **“Beautify current file”** -> Format each JSON object on every line with indentation and line breaks.
+  - **“Sort current file”** -> Sort JSON keys recursively within each JSON object.
+  - **“Sort lists from current file”** -> Sort JSON objects and arrays line by line recursively.
+  - **“Sort lists by keys from current file”** -> Prompt for a key name and sort JSON objects by that key line by line.
 - Each line is parsed and processed independently without merging across lines.
 - **Note:**
   Internally, JSONL parsing uses [jsonparse](https://github.com/creationix/jsonparse) and a custom circular-safe stringifier.
 
 ### Sorting by Key
-- Use the **“Sort List by Key”** command to sort JSON or JSONL arrays of objects by a specific key.
+- Use the **“Sort lists by keys from current file”** command to sort JSON or JSONL arrays of objects by a specific key.
   You will be prompted to enter the key name in an input box.
   Works for both **entire files** and **selected text**.
 
@@ -52,8 +52,8 @@ A simple VS Code extension to **minify**, **beautify**, **mitify**, **sort JSON*
    - **“Beautify current selection”**
    - **“Mitify current selection”**
    - **“Sort current selection”**
-   - **“Sort lists (selection)”**
-   - **“Sort lists by keys (selection)”**
+   - **“Sort lists from current selection”**
+   - **“Sort lists by keys from current selection”**
 
 ## Notes
 - JavaScript minification uses [terser](https://github.com/terser/terser).

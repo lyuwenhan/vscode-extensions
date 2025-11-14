@@ -93,7 +93,7 @@ function jsonStringify1L (data) {
 }
 
 function minifyFile (content) {
-	return terser.minify_sync(content, opts.minify).code
+	return terser.minify(content, opts.minify).code
 }
 
 function beautifyFile (content) {
@@ -101,7 +101,7 @@ function beautifyFile (content) {
 }
 
 function mitifyFile (content) {
-	return beautifyFile(minifyFile(content))
+	return minifyFile(content).then(beautifyFile)
 }
 
 function sortObject (value) {
