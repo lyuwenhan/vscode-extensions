@@ -90,4 +90,4 @@ for (const dir of dirs) {
 		console.error(`Failed to publish ${dir}: ${err.message}`)
 	}
 }
-fs.writeFileSync(versionsPath, JSON.stringify(versions));
+fs.writeFileSync(versionsPath, JSON.stringify(versions) + "\n");
