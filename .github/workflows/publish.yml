@@ -15,14 +15,20 @@ jobs:
         with:
           node-version: 20
       - run: npm install
-      - run: node scripts/publish-if-needed.js
+
+      - name: Run publish script
+        id: publish
+        continue-on-error: true
+        run: node scripts/publish-if-needed.js
         env:
           OPEN_VSX_TOKEN: ${{ secrets.OPEN_VSX_TOKEN }}
           VS_MARKETPLACE_TOKEN: ${{ secrets.VS_MARKETPLACE_TOKEN }}
+
       - name: Commit and push status updates
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
           if [ -n "$(git status --porcelain)" ]; then
             git add .
             git commit -m "Auto-update after publish by github-actions[bot]"
@@ -30,3 +36,9 @@ jobs:
           else
             echo "No changes detected, skipping commit."
           fi
+
+      - name: Fail workflow if publish failed
+        if: steps.publish.outcome == 'failure'
+        run: |
+          echo "Publish failed."
+          exit 1
