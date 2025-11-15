@@ -73,13 +73,7 @@ const opts = {
 			preserve_newlines: false,
 			max_preserve_newlines: 1,
 			wrap_line_length: 0,
-			indent_inner_html: false,
-			indent_scripts: "normal",
-			extra_liners: [],
-			inline: [],
-			void_elements: ["area", "base", "br", "col", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr"],
-			unformatted: ["code", "pre", "script", "style"],
-			content_unformatted: ["pre", "textarea"],
+			indent_inner_html: true,
 			indent_empty_lines: false
 		}
 	},
