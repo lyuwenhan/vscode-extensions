@@ -87,7 +87,7 @@ ret.commands = ret.commands.map(e => ({
 	...e
 }));
 
-function addGroup (e, i, arr) {
+function addGroup(e, i, arr) {
 	return {
 		group: "navigation@" + (100 - arr.length + i),
 		...e

@@ -256,7 +256,7 @@ async function getArrayKey() {
 function parseJsonL(text) {
 	const parser = new JSONParse;
 	const result = [];
-	parser.onValue = function (value) {
+	parser.onValue = function(value) {
 		if (this.stack.length === 0) {
 			result.push(value)
 		}
