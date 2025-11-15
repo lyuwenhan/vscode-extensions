@@ -40,6 +40,12 @@ const ret = {
 	commands: [{
 		command: "minifier.generateUuid",
 		title: "Generate UUID"
+	}, {
+		command: "minifier.runAs",
+		title: "Run [action] as [launguage]"
+	}, {
+		command: "minifier.runAsSel",
+		title: "Run [action] as [launguage] from current selection"
 	}],
 	menus: {
 		"editor/context": [{

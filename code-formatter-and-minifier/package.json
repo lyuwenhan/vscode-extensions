@@ -59,6 +59,16 @@
 			},
 			{
 				"category": "Minifier",
+				"command": "minifier.runAs",
+				"title": "Run [action] as [launguage]"
+			},
+			{
+				"category": "Minifier",
+				"command": "minifier.runAsSel",
+				"title": "Run [action] as [launguage] from current selection"
+			},
+			{
+				"category": "Minifier",
 				"command": "minifier.minifySel",
 				"title": "Minify current selection"
 			},

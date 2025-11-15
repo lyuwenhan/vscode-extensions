@@ -503,6 +503,95 @@ function activate(context) {
 			vscode.window.showErrorMessage(e.message || String(e))
 		}
 	});
+	[{
+		addText: "Sel",
+		runAct: async (editor, actionName, actByLang) => {
+			const sels = editor.selections.filter(e => !e.isEmpty);
+			if (!sels.length) {
+				vscode.window.showWarningMessage(actionName + ": No text selected.");
+				return
+			}
+			const replacements = [];
+			for (const sel of sels) {
+				const content = editor.document.getText(sel);
+				let result = await runAction(actByLang, content);
+				vscode.window.showWarningMessage(content);
+				vscode.window.showWarningMessage(result);
+				if (content !== result) {
+					replacements.push({
+						sel,
+						result
+					})
+				}
+			}
+			if (!replacements.length) {
+				vscode.window.showWarningMessage(actionName + ": Nothing changed.");
+				return
+			}
+			await editor.edit(editBuilder => {
+				for (const item of replacements) {
+					editBuilder.replace(item.sel, item.result)
+				}
+			})
+		}
+	}, {
+		addText: "",
+		runAct: async (editor, actionName, actByLang) => {
+			const doc = editor.document;
+			const {
+				content
+			} = getDocInfo(doc);
+			let result = await runAction(actByLang, content) + "\n";
+			if (content === result) {
+				vscode.window.showWarningMessage(actionName + ": Nothing changed.");
+				return
+			}
+			await saveDocContent(doc, result)
+		}
+	}].map(({
+		addText,
+		runAct
+	}) => {
+		vscode.commands.registerCommand("minifier.runAs" + addText, async () => {
+			try {
+				const items = Object.keys(actions).map(action => ({
+					label: action
+				}));
+				const picked = await vscode.window.showQuickPick(items, {
+					placeHolder: "Choose an action",
+					ignoreFocusOut: true
+				});
+				const actionName = picked?.label;
+				const action = actions?.[actionName];
+				if (!picked || !actionName || !action) {
+					vscode.window.showWarningMessage("Operation canceled.");
+					return
+				}
+				const items2 = Object.keys(action.opers).map(action => ({
+					label: action
+				}));
+				const picked2 = await vscode.window.showQuickPick(items2, {
+					placeHolder: "Choose the language for " + actionName,
+					ignoreFocusOut: true
+				});
+				const lang = picked2?.label;
+				const actByLang = action.opers[lang];
+				if (!picked2 || !lang || !actByLang) {
+					vscode.window.showWarningMessage("Operation canceled.");
+					return
+				}
+				vscode.window.showInformationMessage(`Running ${actionName} as ${lang}.`);
+				const editor = vscode.window.activeTextEditor;
+				if (!editor) {
+					throw new Error(action.actionName + ": No file selected.")
+				}
+				await runAct(editor, action.actionName, actByLang);
+				vscode.window.showInformationMessage(action.sucMsg + " successfully.")
+			} catch (e) {
+				vscode.window.showErrorMessage(e.message || String(e))
+			}
+		})
+	});
 	context.subscriptions.push(generateUuidCmd)
 }
 
