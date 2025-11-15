@@ -7,20 +7,22 @@ const rid = {
 	js: "resourceLangId == javascript",
 	json: "resourceLangId == json || resourceLangId == jsonc",
 	jsonl: "resourceLangId == jsonl",
+	html: "resourceLangId == html",
+	css: "resourceLangId == css",
 	yes: "true"
 };
 const contr = [{
 	command: "minify",
 	title: "Minify",
-	when: [true, true, ["js", "json", "jsonl"]]
+	when: [true, true, ["js", "json", "jsonl", "html", "css"]]
 }, {
 	command: "beautify",
 	title: "Beautify",
-	when: [true, true, ["js", "json", "jsonl"]]
+	when: [true, true, ["js", "json", "jsonl", "html", "css"]]
 }, {
 	command: "mitify",
 	title: "Mitify",
-	when: [true, true, ["js"]]
+	when: [true, true, ["js", "html", "css"]]
 }, {
 	command: "sort",
 	title: "Sort",

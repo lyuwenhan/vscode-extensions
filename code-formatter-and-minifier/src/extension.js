@@ -2,48 +2,113 @@ const vscode = require("vscode");
 const {
 	randomUUID
 } = require("crypto");
+const htmlMinify = require("html-minifier-terser").minify;
+const cleanCSS = require("clean-css");
 const terser = require("terser");
 const beautify = require("js-beautify");
 const JSONParse = require("jsonparse");
 const jsonc = require("jsonc-parser/lib/esm/main.js");
 const opts = {
-	minify: {
-		compress: false,
-		mangle: false,
-		format: {
-			beautify: false,
-			semicolons: true,
-			shorthand: true
+	javascript: {
+		minify: {
+			compress: false,
+			mangle: false,
+			format: {
+				beautify: false,
+				semicolons: true,
+				shorthand: true
+			}
+		},
+		beautify: {
+			indent_size: 4,
+			indent_char: "\t",
+			indent_level: 0,
+			brace_style: "collapse",
+			eol: "\n",
+			end_with_newline: true,
+			preserve_newlines: false,
+			indent_with_tabs: true,
+			max_preserve_newlines: 1,
+			jslint_happy: false,
+			space_after_named_function: false,
+			space_after_anon_function: false,
+			keep_array_indentation: false,
+			keep_function_indentation: false,
+			space_before_conditional: true,
+			break_chained_methods: false,
+			eval_code: false,
+			unescape_strings: false,
+			wrap_line_length: 0,
+			indent_empty_lines: false,
+			templating: ["auto"]
 		}
 	},
-	beautify: {
-		indent_size: 4,
-		indent_char: "\t",
-		indent_level: 0,
-		brace_style: "collapse",
-		eol: "\n",
-		end_with_newline: true,
-		preserve_newlines: false,
-		indent_with_tabs: true,
-		max_preserve_newlines: 1,
-		jslint_happy: false,
-		space_after_named_function: true,
-		space_after_anon_function: true,
-		keep_array_indentation: false,
-		keep_function_indentation: false,
-		space_before_conditional: true,
-		break_chained_methods: false,
-		eval_code: false,
-		unescape_strings: false,
-		wrap_line_length: 0,
-		indent_empty_lines: false,
-		templating: ["auto"]
+	html: {
+		minify: {
+			collapseWhitespace: true,
+			removeComments: true,
+			removeEmptyAttributes: true,
+			removeTagWhitespace: true,
+			minifyCSS: minifyCss,
+			minifyJS: minifyFile,
+			removeAttributeQuotes: false,
+			removeEmptyElements: false,
+			removeRedundantAttributes: false,
+			removeOptionalTags: false,
+			sortAttributes: false,
+			sortClassName: false,
+			keepClosingSlash: true,
+			processConditionalComments: false,
+			ignoreCustomComments: [],
+			ignoreCustomFragments: [],
+			caseSensitive: false,
+			html5: true
+		},
+		beautify: {
+			indent_size: 4,
+			indent_char: "\t",
+			indent_with_tabs: true,
+			eol: "\n",
+			end_with_newline: true,
+			preserve_newlines: false,
+			max_preserve_newlines: 1,
+			wrap_line_length: 0,
+			indent_inner_html: false,
+			indent_scripts: "normal",
+			extra_liners: [],
+			inline: [],
+			void_elements: ["area", "base", "br", "col", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr"],
+			unformatted: ["code", "pre", "script", "style"],
+			content_unformatted: ["pre", "textarea"],
+			indent_empty_lines: false
+		}
+	},
+	css: {
+		minify: {
+			level: 0
+		},
+		beautify: {
+			indent_size: 4,
+			indent_char: "\t",
+			indent_with_tabs: true,
+			eol: "\n",
+			end_with_newline: true,
+			newline_between_rules: false,
+			selector_separator_newline: false,
+			preserve_newlines: false,
+			max_preserve_newlines: 1,
+			wrap_line_length: 0,
+			space_around_combinator: true,
+			space_around_selector_separator: true,
+			indent_empty_lines: false
+		}
 	}
 };
+const cleanCSSRunner = new cleanCSS(opts.css.minify);
 
-function jsonStringify1L (data) {
+function jsonStringify1L(data) {
 	var seen = [];
-	return function stringify (node) {
+	return function stringify(node) {
 		if (node && node.toJSON && typeof node.toJSON === "function") {
 			node = node.toJSON()
 		}
@@ -91,20 +156,47 @@ function jsonStringify1L (data) {
 		return "{" + out + "}"
 	}(data)
 }
-
-function minifyFile (content) {
-	return terser.minify(content, opts.minify).code
+async function minifyHtml(content) {
+	return await htmlMinify(content, opts.html.minify)
 }
 
-function beautifyFile (content) {
-	return beautify.js(content, opts.beautify)
+function beautifyHtml(content) {
+	return beautify.html(content, {
+		indent_size: 4,
+		wrap_line_length: 120
+	})
+}
+async function mitifyHtml(content) {
+	const min = await minifyHtml(content);
+	return beautifyHtml(min)
 }
 
-function mitifyFile (content) {
+function minifyCss(content) {
+	return cleanCSSRunner.minify(content).styles
+}
+
+function beautifyCss(content) {
+	return beautify.css(content, {
+		indent_size: 4
+	})
+}
+async function mitifyCss(content) {
+	return beautifyCss(minifyCss(content))
+}
+
+function minifyFile(content) {
+	return terser.minify(content, opts.javascript.minify).then(e => e.code)
+}
+
+function beautifyFile(content) {
+	return beautify.js(content, opts.javascript.beautify)
+}
+
+function mitifyFile(content) {
 	return minifyFile(content).then(beautifyFile)
 }
 
-function sortObject (value) {
+function sortObject(value) {
 	if (Array.isArray(value)) {
 		return value.map(sortObject)
 	}
@@ -118,15 +210,15 @@ function sortObject (value) {
 	return value
 }
 
-function getKey (a, key) {
+function getKey(a, key) {
 	return JSON.stringify(a?.[key])
 }
 
-function sortCompare (a, b) {
+function sortCompare(a, b) {
 	return a[1] < b[1] ? -1 : a[1] > b[1] ? 1 : 0
 }
 
-function sortArray (value, key) {
+function sortArray(value, key) {
 	if (Array.isArray(value)) {
 		return value.map(e => [e, JSON.stringify(e)]).sort(sortCompare).map(e => e[0]).map(v => sortArray(v, key))
 	}
@@ -140,7 +232,7 @@ function sortArray (value, key) {
 	return value
 }
 
-function sortArrayByKey (value, key) {
+function sortArrayByKey(value, key) {
 	if (Array.isArray(value)) {
 		return value.map(e => [e, getKey(e, key)]).sort(sortCompare).map(e => e[0]).map(v => sortArrayByKey(v, key))
 	}
@@ -153,7 +245,7 @@ function sortArrayByKey (value, key) {
 	}
 	return value
 }
-async function getArrayKey () {
+async function getArrayKey() {
 	const key = await vscode.window.showInputBox({
 		prompt: "Enter the key name to sort by",
 		ignoreFocusOut: true
@@ -164,7 +256,7 @@ async function getArrayKey () {
 	return key
 }
 
-function parseJsonL (text) {
+function parseJsonL(text) {
 	const parser = new JSONParse;
 	const result = [];
 	parser.onValue = function (value) {
@@ -176,50 +268,50 @@ function parseJsonL (text) {
 	return result
 }
 
-function jsonStringify (json) {
+function jsonStringify(json) {
 	return JSON.stringify(json, null, "\t")
 }
 
-function minifyJson (content) {
+function minifyJson(content) {
 	return JSON.stringify(jsonc.parse(content))
 }
 
-function beautifyJson (content) {
+function beautifyJson(content) {
 	return jsonStringify(jsonc.parse(content))
 }
 
-function sortJson (content) {
+function sortJson(content) {
 	return jsonStringify(sortObject(jsonc.parse(content)))
 }
 
-function sortListJson (content) {
+function sortListJson(content) {
 	return jsonStringify(sortArray(jsonc.parse(content)))
 }
-async function sortListByKeyJson (content) {
+async function sortListByKeyJson(content) {
 	const key = await getArrayKey();
 	return jsonStringify(sortArrayByKey(jsonc.parse(content), key))
 }
 
-function minifyJsonL (content) {
+function minifyJsonL(content) {
 	return parseJsonL(content).map(jsonStringify1L).join("\n")
 }
 
-function beautifyJsonL (content) {
+function beautifyJsonL(content) {
 	return parseJsonL(content).map(jsonStringify).join("\n")
 }
 
-function sortJsonL (content) {
+function sortJsonL(content) {
 	return parseJsonL(content).map(sortObject).map(jsonStringify).join("\n")
 }
 
-function sortListJsonL (content) {
+function sortListJsonL(content) {
 	return sortArray(parseJsonL(content)).map(jsonStringify).join("\n")
 }
-async function sortListByKeyJsonL (content) {
+async function sortListByKeyJsonL(content) {
 	const key = await getArrayKey();
 	return sortArrayByKey(parseJsonL(content), key).map(jsonStringify).join("\n")
 }
-async function getDoc (uri) {
+async function getDoc(uri) {
 	if (!uri || !uri.fsPath) {
 		return vscode.window.activeTextEditor?.document
 	}
@@ -236,17 +328,17 @@ async function getDoc (uri) {
 	return found ?? await vscode.workspace.openTextDocument(uri)
 }
 
-function normEol (content) {
+function normEol(content) {
 	return content.replace(/\r\n/g, "\n").replace(/\r/g, "\n")
 }
 
-function getDocInfo (doc) {
+function getDocInfo(doc) {
 	return {
 		lang: doc.languageId.replace(/^jsonc$/, "json"),
 		content: normEol(doc.getText() ?? "")
 	}
 }
-async function saveDocContent (doc, content) {
+async function saveDocContent(doc, content) {
 	const edit = new vscode.WorkspaceEdit;
 	edit.replace(doc.uri, new vscode.Range(doc.positionAt(0), doc.positionAt(doc.getText().length)), content);
 	await vscode.workspace.applyEdit(edit);
@@ -261,7 +353,9 @@ const actions = {
 		opers: {
 			javascript: minifyFile,
 			json: minifyJson,
-			jsonl: minifyJsonL
+			jsonl: minifyJsonL,
+			html: minifyHtml,
+			css: minifyCss
 		}
 	},
 	beautify: {
@@ -270,14 +364,18 @@ const actions = {
 		opers: {
 			javascript: beautifyFile,
 			json: beautifyJson,
-			jsonl: beautifyJsonL
+			jsonl: beautifyJsonL,
+			html: beautifyHtml,
+			css: beautifyCss
 		}
 	},
 	mitify: {
 		sucMsg: "Mitified",
 		actionName: "Mitifier",
 		opers: {
-			javascript: mitifyFile
+			javascript: mitifyFile,
+			html: mitifyHtml,
+			css: mitifyCss
 		}
 	},
 	sort: {
@@ -305,7 +403,7 @@ const actions = {
 		}
 	}
 };
-async function runAction (oper, content) {
+async function runAction(oper, content) {
 	content = content.trim();
 	oper ??= e => e;
 	if (content === "") {
@@ -314,7 +412,7 @@ async function runAction (oper, content) {
 	return (await oper(content)).trim()
 }
 
-function activate (context) {
+function activate(context) {
 	Object.entries(actions).forEach(([action, {
 		sucMsg,
 		actionName,
@@ -417,7 +515,7 @@ function activate (context) {
 	context.subscriptions.push(generateUuidCmd)
 }
 
-function deactivate () {}
+function deactivate() {}
 module.exports = {
 	activate,
 	deactivate
