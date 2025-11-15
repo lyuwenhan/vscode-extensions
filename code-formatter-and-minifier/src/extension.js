@@ -161,10 +161,7 @@ async function minifyHtml(content) {
 }
 
 function beautifyHtml(content) {
-	return beautify.html(content, {
-		indent_size: 4,
-		wrap_line_length: 120
-	})
+	return beautify.html(content, opts.html.beautify)
 }
 async function mitifyHtml(content) {
 	const min = await minifyHtml(content);

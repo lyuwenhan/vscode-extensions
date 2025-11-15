@@ -8,8 +8,19 @@ A simple VS Code extension to **minify**, **beautify**, **mitify**, **sort JSON*
 - Right-click inside a **JavaScript (.js)** file:
   - **“Minify current file”** -> Minify using [terser](https://github.com/terser/terser).
   - **“Beautify current file”** -> Beautify using [js-beautify](https://github.com/beautify-web/js-beautify).
-  - **“Mitify current file”** -> Runs **minify + beautify** in sequence (for normalized, clean code).
-- **Note:** The “Mitify” command is available **only for JavaScript files**.
+  - **“Mitify current file”** -> Runs **minify + beautify**.
+
+### HTML
+- Right-click inside an **HTML (.html)** file:
+  - **“Minify current file”** -> Uses [html-minifier-terser](https://github.com/terser/html-minifier-terser)  
+  - **“Beautify current file”** -> Beautify using js-beautify (HTML).
+  - **“Mitify current file”** -> Runs **minify + beautify**.
+
+### CSS
+- Right-click inside a **CSS (.css)** file:
+  - **“Minify current file”** -> Minify using [clean-css](https://github.com/jakubpawlowicz/clean-css).
+  - **“Beautify current file”** -> Format using js-beautify (CSS).
+  - **“Mitify current file”** -> Runs **minify + beautify**.
 
 ### JSON / JSONC
 - Right-click inside a **JSON (.json)** or **JSONC (.jsonc)** file:
@@ -47,6 +58,12 @@ A simple VS Code extension to **minify**, **beautify**, **mitify**, **sort JSON*
 1. Open a `.js`, `.json`, `.jsonc`, or `.jsonl` file in VS Code.
 2. Right-click inside the editor.
 3. Choose the desired operation from the context menu.
+   - **“Minify current file”**
+   - **“Beautify current file”**
+   - **“Mitify current file”**
+   - **“Sort current file”**
+   - **“Sort lists from current file”**
+   - **“Sort lists by keys from current file”**
 4. You can also **select text** and run:
    - **“Minify current selection”**
    - **“Beautify current selection”**
