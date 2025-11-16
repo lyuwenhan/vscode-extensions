@@ -1,67 +1,70 @@
 {
-  "name": "mermaid-snap",
-  "displayName": "Mermaid Snap",
-  "private": false,
-  "version": "1.0.7",
-  "publisher": "lyuwenhan",
-  "description": "A VS Code extension that lets you preview Mermaid diagrams.",
-  "engines": {
-    "vscode": "^1.80.0"
-  },
-  "main": "./out/extension.js",
-  "activationEvents": [
-    "onStartupFinished"
-  ],
-  "icon": "media/icon.png",
-  "scripts": {
-    "vscode:prepublish": "node build.js",
-    "package": "vsce package --allow-missing-repository"
-  },
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/lyuwenhan/vscode-extensions",
-    "directory": "mermaid-snap"
-  },
-  "bugs": {
-    "url": "https://github.com/lyuwenhan/vscode-extensions/issues"
-  },
-  "homepage": "https://lyuwenhan.github.io",
-  "categories": [
-    "Other",
-    "Visualization",
-    "Programming Languages"
-  ],
-  "keywords": [
-    "mermaid",
-    "diagram",
-    "preview",
-    "markdown",
-    "flowchart",
-    "sequence diagram",
-    "graph",
-    "vscode",
-    "chart"
-  ],
-  "contributes": {
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "preview",
-          "title": "Mermaid Preview",
-          "icon": "media/icon.svg"
-        }
-      ]
-    },
-    "views": {
-      "preview": [
-        {
-          "type": "webview",
-          "id": "mmdPreview",
-          "name": "Mermaid Preview",
-          "icon": "media/icon.svg"
-        }
-      ]
-    }
-  }
+	"name": "mermaid-snap",
+	"displayName": "Mermaid Snap",
+	"private": false,
+	"version": "1.0.7",
+	"publisher": "lyuwenhan",
+	"description": "A VS Code extension that lets you preview Mermaid diagrams.",
+	"engines": {
+		"vscode": "^1.80.0"
+	},
+	"main": "./out/extension.js",
+	"activationEvents": [
+		"onStartupFinished"
+	],
+	"icon": "media/icon.png",
+	"scripts": {
+		"vscode:prepublish": "node build.js",
+		"package": "vsce package --allow-missing-repository"
+	},
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/lyuwenhan/vscode-extensions",
+		"directory": "mermaid-snap"
+	},
+	"bugs": {
+		"url": "https://github.com/lyuwenhan/vscode-extensions/issues"
+	},
+	"homepage": "https://lyuwenhan.github.io",
+	"categories": [
+		"Other",
+		"Visualization",
+		"Programming Languages"
+	],
+	"keywords": [
+		"mermaid",
+		"diagram",
+		"preview",
+		"markdown",
+		"flowchart",
+		"sequence diagram",
+		"graph",
+		"vscode",
+		"chart"
+	],
+	"dependencies": {
+		"@resvg/resvg-js": "^2.6.2"
+	},
+	"contributes": {
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "preview",
+					"title": "Mermaid Preview",
+					"icon": "media/icon.svg"
+				}
+			]
+		},
+		"views": {
+			"preview": [
+				{
+					"type": "webview",
+					"id": "mmdPreview",
+					"name": "Mermaid Preview",
+					"icon": "media/icon.svg"
+				}
+			]
+		}
+	}
 }
