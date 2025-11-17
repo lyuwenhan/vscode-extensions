@@ -486,7 +486,7 @@ function activate(context) {
 		try {
 			const editor = vscode.window.activeTextEditor;
 			if (!editor) {
-				vscode.window.showErrorMessage("No active editor.")
+				vscode.window.showErrorMessage("UUID Generator: No active editor.")
 			}
 			const uuid = randomUUID();
 			await editor.edit(editBuilder => {

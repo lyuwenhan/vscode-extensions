@@ -52,10 +52,7 @@ const ret = {
 			command: "minifier.generateUuid",
 			when: "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled')"
 		}],
-		commandPalette: [{
-			command: "minifier.generateUuid",
-			when: "false"
-		}],
+		commandPalette: [],
 		"explorer/context": [],
 		"editor/title/context": []
 	}

@@ -198,10 +198,6 @@
 			],
 			"commandPalette": [
 				{
-					"command": "minifier.generateUuid",
-					"when": "false"
-				},
-				{
 					"command": "minifier.minifySel",
 					"when": "resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl || resourceLangId == html || resourceLangId == css"
 				},
