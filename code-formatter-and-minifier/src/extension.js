@@ -515,8 +515,6 @@ function activate(context) {
 			for (const sel of sels) {
 				const content = editor.document.getText(sel);
 				let result = await runAction(actByLang, content);
-				vscode.window.showWarningMessage(content);
-				vscode.window.showWarningMessage(result);
 				if (content !== result) {
 					replacements.push({
 						sel,
