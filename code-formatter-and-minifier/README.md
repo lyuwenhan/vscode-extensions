@@ -1,87 +1,90 @@
 # Code Formatter & Minifier
 
-A simple VS Code extension to **minify**, **beautify**, **mitify**, **sort JSON**, **sort JSON arrays**, **sort JSON arrays by key**, and provide **UUID generation** utilities.
+A simple VS Code extension to **Minify**, **Beautify**, **Mitify**, **Sort**, **Sort lists**, **Sort lists by keys**, and provide **UUID generation** utilities.
+This extension can also **Run [action] as [language]**.
 
-## Features
+## Supported Actions
 
-### JavaScript
-- Right-click inside a **JavaScript (.js)** file:
-  - **"Minify current file"** -> Minify using [terser](https://github.com/terser/terser).
-  - **"Beautify current file"** -> Beautify using [js-beautify](https://github.com/beautify-web/js-beautify).
-  - **"Mitify current file"** -> Runs **minify + beautify**.
+For each language, the table below shows whether the action is supported.
 
-### HTML
-- Right-click inside an **HTML (.html)** file:
-  - **"Minify current file"** -> Uses [html-minifier-terser](https://github.com/terser/html-minifier-terser)  
-  - **"Beautify current file"** -> Beautify using js-beautify (HTML).
-  - **"Mitify current file"** -> Runs **minify + beautify**.
+|**Languages**|**Minify**|**Beautify**|**Mitify**|**Sort**|**Sort lists**|**Sort lists by keys**|
+|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+|**JavaScript**|✔|✔|✔|✖|✖|✖|
+|**HTML**|✔|✔|✔|✖|✖|✖|
+|**CSS**|✔|✔|✔|✖|✖|✖|
+|**JSON / JSONC**|✔|✔|✖|✔|✔|✔|
+|**JSON Lines**|✔|✔|✖|✔|✔|✔|
 
-### CSS
-- Right-click inside a **CSS (.css)** file:
-  - **"Minify current file"** -> Minify using [clean-css](https://github.com/jakubpawlowicz/clean-css).
-  - **"Beautify current file"** -> Format using js-beautify (CSS).
-  - **"Mitify current file"** -> Runs **minify + beautify**.
+**Notes:** **UUID generation** works with all languages.
 
-### JSON / JSONC
-- Right-click inside a **JSON (.json)** or **JSONC (.jsonc)** file:
-  - **"Minify current file"** -> Compact JSON into a single line.
-  - **"Beautify current file"** -> Format JSON with indentation (using tabs).
-  - **"Sort current file"** -> Sort JSON keys recursively in alphabetical order.
-  - **"Sort lists from current file"** -> Sort all arrays recursively by their JSON stringified values.
-  - **"Sort lists by keys from current file"** -> Prompt for a key name and sort JSON arrays of objects by that key.
-- **Note:**
-  `.jsonc` files are automatically parsed as `.json` (comments are stripped).
+---
 
-  The output file will **not** contain comments, as they are removed during parsing.
+## Action Descriptions
 
-### JSONL
-- Right-click inside a **JSON Lines (.jsonl)** file:
-  - **"Minify current file"** -> Compress each JSON object on every line into a single compact line.
-  - **"Beautify current file"** -> Format each JSON object on every line with indentation and line breaks.
-  - **"Sort current file"** -> Sort JSON keys recursively within each JSON object.
-  - **"Sort lists from current file"** -> Sort JSON objects and arrays line by line recursively.
-  - **"Sort lists by keys from current file"** -> Prompt for a key name and sort JSON objects by that key line by line.
-- Each line is parsed and processed independently without merging across lines.
-- **Note:**
-  Internally, JSONL parsing uses [jsonparse](https://github.com/creationix/jsonparse) and a custom circular-safe stringifier.
+### Minify
+- Makes your code smaller by removing unnecessary whitespace.
+- This action only performs whitespace-related changes.
+- The actual data remains unchanged.
 
-### Sorting by Key
-- Use the **"Sort lists by keys from current file"** command to sort JSON or JSONL arrays of objects by a specific key.
-  You will be prompted to enter the key name in an input box.
-  Works for both **entire files** and **selected text**.
+### Beautify
+- Formats your code to a unified, readable style.
+- Makes your code look cleaner and more consistent.
 
-### UUID Generator
-- Right-click to use **Generate UUID**.
+### Mitify
+- A combination of minify and beautify.
+- Useful when your code is too messy and beautify alone is not effective.
+- Runs both minify and beautify in sequence.
+
+### Sort
+- **Does not** change the actual data.
+- Only works with **JSON**, **JSONC**, and **JSON Lines**.
+- Sorts the keys of all objects alphabetically.
+
+### Sort lists
+- **Does** change the actual data.
+- **Do not** use this unless you know exactly what you are doing.
+- This action is **irreversible**.
+- Sorts the items inside lists alphabetically.
+
+### Sort lists by keys
+- **Does** change the actual data.
+- **Do not** use this unless you know exactly what you are doing.
+- This action is **irreversible**.
+- Sorts the list based on a chosen key within each item, in alphabetical order.
+
+### Generate UUID
 - Inserts a freshly generated UUID at every selected cursor position in the active editor.
 
 ### Run [action] as [language]
-Use these commands to manually choose both the **operation** and the **language processor**.
+- Use these commands to manually choose both the **operation** and the **language processor**.
 
-- **"Run [action] as [language]"**
-- **"Run [action] as [language] from current selection"**
+- You will be prompted twice:
 
-You will be prompted twice:
+1. Select the **action**
+2. Select the **language** (**JavaScript**, **HTML**, **CSS**, **JSON**, **JSON Lines**)
 
-1. Select the **action**  
-   (minify, beautify, mitify, sort, sort lists, sort lists by keys)
-2. Select the **language**  
-   (JavaScript, HTML, CSS, JSON, JSONL)
-
-This provides full manual control, allowing any supported operation to be executed using any supported processor. Works with entire files and selected text.
+- This provides full manual control, allowing any supported operation to be executed using any supported processor. Works with entire files and selected text.
 
 - These commands can be invoked from the Command Palette (**Ctrl + Shift + P**).
-- They are not shown in the editor's context menu.
+- This action is **not** shown in the editor's context menu.
 
 ## Usage
-1. Open a `.js`, `.json`, `.jsonc`, or `.jsonl` file in VS Code.
+
+1. Open any file in VS Code.  
+   - For formatting-related actions, the file should be one of:  
+     `.js`, `.json`, `.jsonc`, `.jsonl`, `.html`, `.css`.
+
 2. Right-click inside the editor.
-3. Choose the desired operation from the context menu.
+
+3. Choose the desired operation from the context menu:
    - **"Minify current file"**
    - **"Beautify current file"**
    - **"Mitify current file"**
    - **"Sort current file"**
    - **"Sort lists from current file"**
    - **"Sort lists by keys from current file"**
+   - **"Generate UUID"** ← *works in any file type*
+
 4. You can also **select text** and run:
    - **"Minify current selection"**
    - **"Beautify current selection"**
@@ -90,12 +93,22 @@ This provides full manual control, allowing any supported operation to be execut
    - **"Sort lists from current selection"**
    - **"Sort lists by keys from current selection"**
 
+5. All actions can also be invoked from the Command Palette (**Ctrl + Shift + P**):
+   - **"Run [action] as [language] from current file"**
+   - **"Run [action] as [language] from current selection"**
+
+   These two commands work in **any file** and let you manually choose both the action and the processor.
+
 ## Notes
-- JavaScript minification uses [terser](https://github.com/terser/terser).
-- JavaScript beautification uses [js-beautify](https://github.com/beautify-web/js-beautify).
-- JSON parsing uses [jsonc-parser](https://github.com/microsoft/node-jsonc-parser).
-- JSONL parsing uses [jsonparse](https://github.com/creationix/jsonparse).
-- JSON operations remove comments on save.
+- **JavaScript** minification uses [terser](https://github.com/terser/terser).
+- **HTML** minification uses [html-minifier-terser](https://github.com/terser/html-minifier-terser).
+- **CSS** minification uses [clean-css](https://github.com/jakubpawlowicz/clean-css).
+- **JavaScript**, **HTML**, **CSS** beautification uses [js-beautify](https://github.com/beautify-web/js-beautify).
+- **JSON** parsing uses [jsonc-parser](https://github.com/microsoft/node-jsonc-parser).
+- **JSON Lines** parsing uses [jsonparse](https://github.com/creationix/jsonparse).
+- **JSON** and **JSON Lines** stringification uses native `JSON.stringify`.
+- **JSON** operations remove comments on save.
+- **UUID Generator** uses [crypto](https://nodejs.org/api/crypto.html)
 
 ## Extra
 - All edit operations automatically save the document (unless untitled).

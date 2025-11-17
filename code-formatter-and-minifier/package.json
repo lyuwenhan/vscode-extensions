@@ -60,12 +60,12 @@
 			{
 				"category": "Minifier",
 				"command": "minifier.runAs",
-				"title": "Run [action] as [launguage] from current file"
+				"title": "Run [action] as [language] from current file"
 			},
 			{
 				"category": "Minifier",
 				"command": "minifier.runAsSel",
-				"title": "Run [action] as [launguage] from current selection"
+				"title": "Run [action] as [language] from current selection"
 			},
 			{
 				"category": "Minifier",
