@@ -97,10 +97,10 @@ if (fs.existsSync(versionsPath)) {
 					stdio: "inherit"
 				});
 				if (vsMarketToken) {
-					erro ||= await retryExec(`npx vsce publish --packagePath "${outPath}" -p ${vsMarketToken}`, {}, 3, 100)
+					erro ||= await retryExec(`npx vsce publish --packagePath "${outPath}" -p ${vsMarketToken}`, {}, 5, 500)
 				}
 				if (openVsxToken) {
-					erro ||= await retryExec(`npx ovsx publish "${outPath}" -p ${openVsxToken}`, {}, 3, 100)
+					erro ||= await retryExec(`npx ovsx publish "${outPath}" -p ${openVsxToken}`, {}, 5, 500)
 				}
 				if (!versions[pkg.name]) {
 					versions[pkg.name] = []
