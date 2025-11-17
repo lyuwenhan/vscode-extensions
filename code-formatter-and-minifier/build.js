@@ -42,7 +42,7 @@ const ret = {
 		title: "Generate UUID"
 	}, {
 		command: "minifier.runAs",
-		title: "Run [action] as [launguage]"
+		title: "Run [action] as [launguage] from current file"
 	}, {
 		command: "minifier.runAsSel",
 		title: "Run [action] as [launguage] from current selection"
