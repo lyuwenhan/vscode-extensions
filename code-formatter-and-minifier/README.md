@@ -26,67 +26,67 @@ For each language, the table below shows whether the action is supported.
 - This action only performs whitespace-related changes.
 - The actual data remains unchanged.
 - Example:
-> Before
-> ```javascript
-> function   test( ){ console.log(  "x"  )  }
-> ```
-> After
-> ```javascript
-> function test(){console.log("x")}
-> ```
+Before
+```javascript
+function   test( ){ console.log(  "x"  )  }
+```
+After
+```javascript
+function test(){console.log("x")}
+```
 
 ### Beautify
 - Formats your code to a unified, readable style.
 - Makes your code look cleaner and more consistent.
 - Example:
-> Before
-> ```javascript
-> function   test( ){ console.log(  "x"  )  }
-> ```
-> After
-> ```javascript
-> function test() {
-> 	console.log("x")
-> }
-> ```
+Before
+```javascript
+function   test( ){ console.log(  "x"  )  }
+```
+After
+```javascript
+function test() {
+	console.log("x")
+}
+```
 
 ### Mitify
 - A combination of minify and beautify.
 - Useful when your code is too messy and beautify alone is not effective.
 - Runs both minify and beautify in sequence.
 - Example:
-> Before
-> ```javascript
-> function   test( ){ console.log(  "x"  )  }
-> ```
-> After
-> ```javascript
-> function test() {
-> 	console.log("x")
-> }
-> ```
+Before
+```javascript
+function   test( ){ console.log(  "x"  )  }
+```
+After
+```javascript
+function test() {
+	console.log("x")
+}
+```
 
 ### Sort
 - **Does not** change the actual data.
 - Only works with **JSON**, **JSONC**, and **JSON Lines**.
 - Sorts the keys of all objects alphabetically.
 - Example:
-> Before
-> ```json
-> {
-> 	"banana": 5,
-> 	"pear": 3,
-> 	"apple": 4
-> }
-> ```
-> After
-> ```json
-> {
-> 	"apple": 4,
-> 	"banana": 5,
-> 	"pear": 3
-> }
-> ```
+Before
+```json
+{
+	"banana": 5,
+	"pear": 3,
+	"apple": 4
+}
+```
+After
+```json
+{
+	"apple": 4,
+	"banana": 5,
+	"pear": 3
+}
+```
 
 ### Sort lists
 - **Does** change the actual data.
@@ -94,22 +94,22 @@ For each language, the table below shows whether the action is supported.
 - This action is **irreversible**.
 - Sorts the items inside lists alphabetically.
 - Example:
-> Before
-> ```json
-> [
-> 	"banana",
-> 	"pear",
-> 	"apple"
-> ]
-> ```
-> After
-> ```json
-> [
-> 	"apple",
-> 	"banana",
-> 	"pear"
-> ]
-> ```
+Before
+```json
+[
+	"banana",
+	"pear",
+	"apple"
+]
+```
+After
+```json
+[
+	"apple",
+	"banana",
+	"pear"
+]
+```
 
 ### Sort lists by keys
 - **Does** change the actual data.
@@ -117,57 +117,57 @@ For each language, the table below shows whether the action is supported.
 - This action is **irreversible**.
 - Sorts the list based on a chosen key within each item, in alphabetical order.
 - Example:
-> Before
-> ```json
-> [
-> 	{
-> 		"type": "banana",
-> 		"price": 5
-> 	},
-> 	{
-> 		"type": "pear",
-> 		"price": 3
-> 	},
-> 	{
-> 		"type": "apple",
-> 		"price": 4
-> 	}
-> ]
-> ```
-> After (sort by type)
-> ```json
-> [
-> 	{
-> 		"type": "apple",
-> 		"price": 4
-> 	},
-> 	{
-> 		"type": "banana",
-> 		"price": 5
-> 	},
-> 	{
-> 		"type": "pear",
-> 		"price": 3
-> 	}
-> ]
-> ```
-> After (sort by price)
-> ```json
-> [
-> 	{
-> 		"type": "pear",
-> 		"price": 3
-> 	},
-> 	{
-> 		"type": "apple",
-> 		"price": 4
-> 	},
-> 	{
-> 		"type": "banana",
-> 		"price": 5
-> 	}
-> ]
-> ```
+Before
+```json
+[
+	{
+		"type": "banana",
+		"price": 5
+	},
+	{
+		"type": "pear",
+		"price": 3
+	},
+	{
+		"type": "apple",
+		"price": 4
+	}
+]
+```
+After (sort by type)
+```json
+[
+	{
+		"type": "apple",
+		"price": 4
+	},
+	{
+		"type": "banana",
+		"price": 5
+	},
+	{
+		"type": "pear",
+		"price": 3
+	}
+]
+```
+After (sort by price)
+```json
+[
+	{
+		"type": "pear",
+		"price": 3
+	},
+	{
+		"type": "apple",
+		"price": 4
+	},
+	{
+		"type": "banana",
+		"price": 5
+	}
+]
+```
 
 ### Generate UUID
 - Inserts a freshly generated UUID at every selected cursor position in the active editor.
