@@ -187,14 +187,18 @@ function mitifyFile(content) {
 	return minifyFile(content).then(beautifyFile)
 }
 
-function sortObject(value) {
+function sortCompare2(a, b, isD) {
+	return (a < b ? -1 : a > b ? 1 : 0) * (isD ? -1 : 1)
+}
+
+function sortObject(value, isD) {
 	if (Array.isArray(value)) {
-		return value.map(sortObject)
+		return value.map(e => sortObject(e, isD))
 	}
 	if (value && typeof value === "object") {
 		const out = {};
-		for (const k of Object.keys(value).sort()) {
-			out[k] = sortObject(value[k])
+		for (const k of Object.keys(value).sort((e, e2) => sortCompare2(e, e2, isD))) {
+			out[k] = sortObject(value[k], isD)
 		}
 		return out
 	}
@@ -205,32 +209,32 @@ function getKey(a, key) {
 	return JSON.stringify(a?.[key])
 }
 
-function sortCompare(a, b) {
-	return a[1] < b[1] ? -1 : a[1] > b[1] ? 1 : 0
+function sortCompare(a, b, isD) {
+	return (a[1] < b[1] ? -1 : a[1] > b[1] ? 1 : 0) * (isD ? -1 : 1)
 }
 
-function sortArray(value, key) {
+function sortArray(value, isD) {
 	if (Array.isArray(value)) {
-		return value.map(e => [e, JSON.stringify(e)]).sort(sortCompare).map(e => e[0]).map(v => sortArray(v, key))
+		return value.map(e => [e, JSON.stringify(e)]).sort((e, e2) => sortCompare(e, e2, isD)).map(e => e[0]).map(v => sortArray(v, isD))
 	}
 	if (value && typeof value === "object") {
 		const out = {};
 		for (const k of Object.keys(value)) {
-			out[k] = sortArray(value[k], key)
+			out[k] = sortArray(value[k], isD)
 		}
 		return out
 	}
 	return value
 }
 
-function sortArrayByKey(value, key) {
+function sortArrayByKey(value, key, isD) {
 	if (Array.isArray(value)) {
-		return value.map(e => [e, getKey(e, key)]).sort(sortCompare).map(e => e[0]).map(v => sortArrayByKey(v, key))
+		return value.map(e => [e, getKey(e, key)]).sort((e, e2) => sortCompare(e, e2, isD)).map(e => e[0]).map(v => sortArrayByKey(v, key, isD))
 	}
 	if (value && typeof value === "object") {
 		const out = {};
 		for (const k of Object.keys(value)) {
-			out[k] = sortArrayByKey(value[k], key)
+			out[k] = sortArrayByKey(value[k], key, isD)
 		}
 		return out
 	}
@@ -245,6 +249,23 @@ async function getArrayKey() {
 		throw new Error("Sorter: Operation canceled.")
 	}
 	return key
+}
+async function getAD() {
+	const items = [{
+		label: "Ascending order",
+		dec: false
+	}, {
+		label: "Descending order",
+		dec: true
+	}];
+	const picked = await vscode.window.showQuickPick(items, {
+		placeHolder: "Choose the order",
+		ignoreFocusOut: true
+	});
+	if (!picked) {
+		throw new Error("Sorter: Operation canceled.")
+	}
+	return picked.dec
 }
 
 function parseJsonL(text) {
@@ -270,17 +291,18 @@ function minifyJson(content) {
 function beautifyJson(content) {
 	return jsonStringify(jsonc.parse(content))
 }
-
-function sortJson(content) {
-	return jsonStringify(sortObject(jsonc.parse(content)))
+async function sortJson(content) {
+	const isD = await getAD();
+	return jsonStringify(sortObject(jsonc.parse(content), isD))
 }
-
-function sortListJson(content) {
-	return jsonStringify(sortArray(jsonc.parse(content)))
+async function sortListJson(content) {
+	const isD = await getAD();
+	return jsonStringify(sortArray(jsonc.parse(content), isD))
 }
 async function sortListByKeyJson(content) {
+	const isD = await getAD();
 	const key = await getArrayKey();
-	return jsonStringify(sortArrayByKey(jsonc.parse(content), key))
+	return jsonStringify(sortArrayByKey(jsonc.parse(content), key, isD))
 }
 
 function minifyJsonL(content) {
@@ -290,17 +312,18 @@ function minifyJsonL(content) {
 function beautifyJsonL(content) {
 	return parseJsonL(content).map(jsonStringify).join("\n")
 }
-
-function sortJsonL(content) {
-	return parseJsonL(content).map(sortObject).map(jsonStringify).join("\n")
+async function sortJsonL(content) {
+	const isD = await getAD();
+	return parseJsonL(content).map(e => sortObject(e, isD)).map(jsonStringify).join("\n")
 }
-
-function sortListJsonL(content) {
-	return sortArray(parseJsonL(content)).map(jsonStringify).join("\n")
+async function sortListJsonL(content) {
+	const isD = await getAD();
+	return sortArray(parseJsonL(content), isD).map(jsonStringify).join("\n")
 }
 async function sortListByKeyJsonL(content) {
 	const key = await getArrayKey();
-	return sortArrayByKey(parseJsonL(content), key).map(jsonStringify).join("\n")
+	const isD = await getAD();
+	return sortArrayByKey(parseJsonL(content), key, isD).map(jsonStringify).join("\n")
 }
 async function getDoc(uri) {
 	if (!uri || !uri.fsPath) {
@@ -441,7 +464,8 @@ function activate(context) {
 			try {
 				const editor = vscode.window.activeTextEditor;
 				if (!editor) {
-					throw new Error(actionName + ": No file selected.")
+					vscode.window.showErrorMessage(actionName + ": No file selected.");
+					return
 				}
 				const sels = editor.selections.filter(e => !e.isEmpty);
 				if (!sels.length) {
@@ -486,7 +510,8 @@ function activate(context) {
 		try {
 			const editor = vscode.window.activeTextEditor;
 			if (!editor) {
-				vscode.window.showErrorMessage("UUID Generator: No active editor.")
+				vscode.window.showErrorMessage("UUID Generator: No active editor.");
+				return
 			}
 			const uuid = randomUUID();
 			await editor.edit(editBuilder => {
