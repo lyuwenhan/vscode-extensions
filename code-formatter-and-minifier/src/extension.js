@@ -167,9 +167,7 @@ function minifyCss(content) {
 }
 
 function beautifyCss(content) {
-	return beautify.css(content, {
-		indent_size: 4
-	})
+	return beautify.css(content, opts.css.beautify)
 }
 async function mitifyCss(content) {
 	return beautifyCss(minifyCss(content))
