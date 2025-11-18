@@ -73,7 +73,10 @@ notepadEle.addEventListener("input", () => {
 	clearTimeout(timer);
 	timer = setTimeout(renderMermaid, 400)
 });
+let curSize = 1;
+let setSize = () => {};
 async function renderMermaid() {
+	setSize = () => {};
 	const code = notepadEle.value.trim();
 	if (!code) {
 		previewEle.innerHTML = "";
@@ -86,7 +89,12 @@ async function renderMermaid() {
 		prevSvg = svg;
 		previewEle.innerHTML = "";
 		const svgEle = document.createElement("iframe");
-		svgEle.srcdoc = `<!DOCTYPE html><html><head><style>body,html{margin:0;padding:0;overflow:hidden;height:100%;width:100%}svg#theGraph{max-width:100%!important;max-height:100%!important}</style></head><body>${svg}</body></html>`;
+		svgEle.srcdoc = `<!DOCTYPE html><html><head><style>body,html{margin:0;padding:0;overflow:hidden;height:100%;width:100%}svg#theGraph{max-width:100% !important;max-height:100% !important}</style></head><body>${svg}</body></html>`;
+		setSize = () => {
+			console.log("set", curSize);
+			svgEle.style.setProperty("--perview-size", curSize)
+		};
+		setSize();
 		previewEle.insertAdjacentElement("beforeend", svgEle);
 		svgEle.classList.add("imgSvg")
 	} catch (err) {
@@ -97,3 +105,48 @@ async function renderMermaid() {
 notepadEle.value = `graph TD\n    A[Start] --\x3e B{Is it working?}\n    B --\x3e|Yes| C[Great!]\n    B --\x3e|No| D[Fix it]`;
 renderMermaid();
 exportBt.addEventListener("click", sendExport);
+
+function sizeUp() {
+	curSize = Math.min(curSize + 0.2, 5);
+	setSize()
+}
+
+function sizeDown() {
+	curSize = Math.max(curSize - 0.2, 1);
+	setSize()
+}
+
+function sizeRe() {
+	curSize = 1;
+	setSize()
+}
+window.addEventListener("wheel", e => {
+	if (e.altKey) {
+		e.preventDefault();
+		if (e.deltaY < 0) {
+			sizeUp()
+		} else {
+			sizeDown()
+		}
+	}
+}, true);
+window.addEventListener("keydown", e => {
+	if (e.altKey && e.key === "+") {
+		e.preventDefault();
+		sizeUp()
+	}
+	if (e.altKey && e.key === "=") {
+		e.preventDefault();
+		sizeRe()
+	}
+	if (e.altKey && e.key === "-") {
+		e.preventDefault();
+		sizeDown()
+	}
+});
+let addEle = document.getElementById("add");
+let equalEle = document.getElementById("equal");
+let minusEle = document.getElementById("minus");
+addEle.addEventListener("click", sizeUp);
+equalEle.addEventListener("click", sizeRe);
+minusEle.addEventListener("click", sizeDown);
