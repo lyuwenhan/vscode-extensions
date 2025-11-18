@@ -103,9 +103,9 @@ codeLangEle.addEventListener("change", function () {
 	sendMessage()
 });
 let fontSize = 16;
-addEle = document.getElementById("add");
-equalEle = document.getElementById("equal");
-minusEle = document.getElementById("minus");
+let addEle = document.getElementById("add");
+let equalEle = document.getElementById("equal");
+let minusEle = document.getElementById("minus");
 if (window.acquireVsCodeApi) {
 	const vscode = acquireVsCodeApi();
 	vscode.postMessage({
