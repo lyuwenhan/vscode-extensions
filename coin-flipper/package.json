@@ -1,75 +1,75 @@
 {
-  "name": "coin-flipper",
-  "displayName": "Coin Flipper",
-  "private": false,
-  "version": "1.0.7",
-  "publisher": "lyuwenhan",
-  "description": "A VS Code extension to make a coin flip with one click.",
-  "engines": {
-    "vscode": "^1.80.0"
-  },
-  "main": "./out/extension.js",
-  "icon": "./media/icon.png",
-  "activationEvents": [
-    "onStartupFinished"
-  ],
-  "contributes": {
-    "commands": [
-      {
-        "command": "minifier.flipCoin",
-        "title": "Flip a coin",
-        "icon": {
-          "light": "./media/icon.svg",
-          "dark": "./media/icon.svg"
-        },
-        "category": "Coin"
-      },
-      {
-        "command": "minifier.flipCoin.currentState",
-        "title": "Show current coin stats",
-        "category": "Coin"
-      },
-      {
-        "command": "minifier.flipCoin.reset",
-        "title": "Reset coin stats",
-        "category": "Coin"
-      }
-    ],
-    "menus": {
-      "commandPalette": [
-        {
-          "command": "minifier.flipCoin",
-          "when": "true"
-        },
-        {
-          "command": "minifier.flipCoin.currentState",
-          "when": "true"
-        },
-        {
-          "command": "minifier.flipCoin.reset",
-          "when": "true"
-        }
-      ],
-      "editor/title": [
-        {
-          "command": "minifier.flipCoin",
-          "group": "navigation"
-        }
-      ]
-    }
-  },
-  "scripts": {
-    "vscode:prepublish": "node build.js",
-    "package": "vsce package --allow-missing-repository"
-  },
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/lyuwenhan/vscode-extensions",
-    "directory": "coin-flipper"
-  },
-  "bugs": {
-    "url": "https://github.com/lyuwenhan/vscode-extensions/issues"
-  },
-  "homepage": "https://lyuwenhan.github.io"
+	"name": "coin-flipper",
+	"displayName": "Coin Flipper",
+	"private": false,
+	"version": "1.0.7",
+	"publisher": "lyuwenhan",
+	"description": "A VS Code extension to make a coin flip with one click.",
+	"engines": {
+		"vscode": "^1.80.0"
+	},
+	"main": "./out/extension.js",
+	"icon": "./media/icon.png",
+	"activationEvents": [
+		"onStartupFinished"
+	],
+	"contributes": {
+		"commands": [
+			{
+				"command": "minifier.flipCoin",
+				"title": "Flip a coin",
+				"icon": {
+					"light": "./media/icon.svg",
+					"dark": "./media/icon.svg"
+				},
+				"category": "Coin"
+			},
+			{
+				"command": "minifier.flipCoin.currentState",
+				"title": "Show current coin stats",
+				"category": "Coin"
+			},
+			{
+				"command": "minifier.flipCoin.reset",
+				"title": "Reset coin stats",
+				"category": "Coin"
+			}
+		],
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "minifier.flipCoin",
+					"when": "true"
+				},
+				{
+					"command": "minifier.flipCoin.currentState",
+					"when": "true"
+				},
+				{
+					"command": "minifier.flipCoin.reset",
+					"when": "true"
+				}
+			],
+			"editor/title": [
+				{
+					"command": "minifier.flipCoin",
+					"group": "navigation"
+				}
+			]
+		}
+	},
+	"scripts": {
+		"vscode:prepublish": "node build.js",
+		"package": "vsce package --allow-missing-repository"
+	},
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/lyuwenhan/vscode-extensions",
+		"directory": "coin-flipper"
+	},
+	"bugs": {
+		"url": "https://github.com/lyuwenhan/vscode-extensions/issues"
+	},
+	"homepage": "https://lyuwenhan.github.io"
 }
