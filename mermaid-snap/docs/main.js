@@ -88,8 +88,8 @@ async function renderMermaid() {
 		} = await mermaid.render("theGraph", code);
 		prevSvg = svg;
 		previewEle.innerHTML = "";
-		const svgEle = document.createElement("iframe");
-		svgEle.srcdoc = `<!DOCTYPE html><html><head><style>body,html{margin:0;padding:0;overflow:hidden;height:100%;width:100%}svg#theGraph{max-width:100% !important;max-height:100% !important}</style></head><body>${svg}</body></html>`;
+		const svgEle = document.createElement("div");
+		svgEle.innerHTML = svg;
 		setSize = () => {
 			console.log("set", curSize);
 			svgEle.style.setProperty("--perview-size", curSize)
@@ -107,12 +107,12 @@ renderMermaid();
 exportBt.addEventListener("click", sendExport);
 
 function sizeUp() {
-	curSize = Math.min(curSize + 0.2, 10);
+	curSize = Math.min(curSize + .2, 10);
 	setSize()
 }
 
 function sizeDown() {
-	curSize = Math.max(curSize - 0.2, 1);
+	curSize = Math.max(curSize - .2, 1);
 	setSize()
 }
 
@@ -129,7 +129,10 @@ window.addEventListener("wheel", e => {
 			sizeDown()
 		}
 	}
-}, true);
+}, {
+	passive: false,
+	capture: true
+});
 window.addEventListener("keydown", e => {
 	if (e.altKey && e.key === "+") {
 		e.preventDefault();
