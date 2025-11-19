@@ -107,7 +107,7 @@ renderMermaid();
 exportBt.addEventListener("click", sendExport);
 
 function sizeUp() {
-	curSize = Math.min(curSize + 0.2, 5);
+	curSize = Math.min(curSize + 0.2, 10);
 	setSize()
 }
 
