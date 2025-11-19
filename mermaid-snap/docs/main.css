@@ -96,7 +96,7 @@ textarea {
 
 #panel>* {
 	height: 100%;
-	fill: var(--vscode-foreground, #000);
+	fill: #000;
 }
 
 #panel> :hover {
