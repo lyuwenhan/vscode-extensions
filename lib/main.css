@@ -1,11 +1,14 @@
-html, body{
+html, body {
 	margin: 0;
-	border: none;
+	border: none
 }
-#main{
+#main {
 	padding: 0 10px 30px 10px;
 	width: calc(100% - 20px);
 	height: 100%;
 	overflow-wrap: anywhere;
-	overflow-x: hidden;
+	overflow-x: hidden
+}
+.extension-name {
+	display: inline
 }
