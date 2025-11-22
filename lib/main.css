@@ -12,3 +12,9 @@ html, body {
 .extension-name {
 	display: inline
 }
+.lisum {
+	list-style-type: none
+}
+.lisum summary {
+	list-style-position: outside
+}
