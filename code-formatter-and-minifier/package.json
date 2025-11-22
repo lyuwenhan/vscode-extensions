@@ -2,7 +2,7 @@
 	"name": "code-formatter-and-minifier",
 	"displayName": "Code Formatter & Minifier",
 	"private": false,
-	"version": "1.0.36",
+	"version": "1.0.37",
 	"publisher": "lyuwenhan",
 	"description": "A VS Code extension to minify and beautify JavaScript, and sort JSON files with one click.",
 	"engines": {
@@ -138,12 +138,12 @@
 				{
 					"group": "navigation@88",
 					"command": "minifier.minifySel",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl || resourceLangId == html || resourceLangId == css)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
 				},
 				{
 					"group": "navigation@89",
 					"command": "minifier.beautifySel",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl || resourceLangId == html || resourceLangId == css)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
 				},
 				{
 					"group": "navigation@90",
@@ -168,12 +168,12 @@
 				{
 					"group": "navigation@94",
 					"command": "minifier.minify",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl || resourceLangId == html || resourceLangId == css)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
 				},
 				{
 					"group": "navigation@95",
 					"command": "minifier.beautify",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl || resourceLangId == html || resourceLangId == css)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
 				},
 				{
 					"group": "navigation@96",
@@ -199,11 +199,11 @@
 			"commandPalette": [
 				{
 					"command": "minifier.minifySel",
-					"when": "resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl || resourceLangId == html || resourceLangId == css"
+					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				},
 				{
 					"command": "minifier.beautifySel",
-					"when": "resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl || resourceLangId == html || resourceLangId == css"
+					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				},
 				{
 					"command": "minifier.mitifySel",
@@ -223,11 +223,11 @@
 				},
 				{
 					"command": "minifier.minify",
-					"when": "resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl || resourceLangId == html || resourceLangId == css"
+					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				},
 				{
 					"command": "minifier.beautify",
-					"when": "resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl || resourceLangId == html || resourceLangId == css"
+					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				},
 				{
 					"command": "minifier.mitify",
@@ -250,12 +250,12 @@
 				{
 					"group": "navigation@96",
 					"command": "minifier.minify",
-					"when": "resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl || resourceLangId == html || resourceLangId == css"
+					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				},
 				{
 					"group": "navigation@97",
 					"command": "minifier.beautify",
-					"when": "resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl || resourceLangId == html || resourceLangId == css"
+					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				},
 				{
 					"group": "navigation@98",
@@ -272,12 +272,12 @@
 				{
 					"group": "navigation@96",
 					"command": "minifier.minify",
-					"when": "resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl || resourceLangId == html || resourceLangId == css"
+					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				},
 				{
 					"group": "navigation@97",
 					"command": "minifier.beautify",
-					"when": "resourceLangId == javascript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl || resourceLangId == html || resourceLangId == css"
+					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				},
 				{
 					"group": "navigation@98",
