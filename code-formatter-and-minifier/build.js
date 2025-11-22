@@ -5,19 +5,18 @@ const content = fs.readFileSync("package.json", "utf8");
 const pkg = jsonc.parse(content);
 const rid = {
 	js: "resourceLangId == javascript",
-	json: "resourceLangId == json || resourceLangId == jsonc",
-	jsonl: "resourceLangId == jsonl",
+	jsons: "resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl",
 	html: "resourceLangId == html",
 	css: "resourceLangId == css"
 };
 const contr = [{
 	command: "minify",
 	title: "Minify",
-	when: [true, true, ["js", "json", "jsonl", "html", "css"]]
+	when: [true, true, ["js", "jsons", "html", "css"]]
 }, {
 	command: "beautify",
 	title: "Beautify",
-	when: [true, true, ["js", "json", "jsonl", "html", "css"]]
+	when: [true, true, ["js", "jsons", "html", "css"]]
 }, {
 	command: "mitify",
 	title: "Mitify",
@@ -25,15 +24,15 @@ const contr = [{
 }, {
 	command: "sort",
 	title: "Sort",
-	when: [true, true, ["json", "jsonl"]]
+	when: [true, true, ["jsons"]]
 }, {
 	command: "sortList",
 	title: "Sort lists from",
-	when: [false, true, ["json", "jsonl"]]
+	when: [false, true, ["jsons"]]
 }, {
 	command: "sortListByKey",
 	title: "Sort lists by keys from",
-	when: [false, true, ["json", "jsonl"]]
+	when: [false, true, ["jsons"]]
 }];
 const ret = {
 	commands: [{
