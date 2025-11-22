@@ -8,8 +8,7 @@ const rid = {
 	json: "resourceLangId == json || resourceLangId == jsonc",
 	jsonl: "resourceLangId == jsonl",
 	html: "resourceLangId == html",
-	css: "resourceLangId == css",
-	yes: "true"
+	css: "resourceLangId == css"
 };
 const contr = [{
 	command: "minify",
