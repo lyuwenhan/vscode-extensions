@@ -4,23 +4,21 @@ const esbuild = require("esbuild");
 const content = fs.readFileSync("package.json", "utf8");
 const pkg = jsonc.parse(content);
 const rid = {
-	js: "resourceLangId == javascript",
+	jsBeautify: "resourceLangId == javascript || resourceLangId == html || resourceLangId == css",
 	jsons: "resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl",
-	html: "resourceLangId == html",
-	css: "resourceLangId == css"
 };
 const contr = [{
 	command: "minify",
 	title: "Minify",
-	when: [true, true, ["js", "jsons", "html", "css"]]
+	when: [true, true, ["jsBeautify", "jsons"]]
 }, {
 	command: "beautify",
 	title: "Beautify",
-	when: [true, true, ["js", "jsons", "html", "css"]]
+	when: [true, true, ["jsBeautify", "jsons"]]
 }, {
 	command: "mitify",
 	title: "Mitify",
-	when: [true, true, ["js", "html", "css"]]
+	when: [true, true, ["jsBeautify"]]
 }, {
 	command: "sort",
 	title: "Sort",
