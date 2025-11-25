@@ -148,7 +148,7 @@
 				{
 					"group": "navigation@90",
 					"command": "minifier.mitifySel",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (config.minifier.enableMitify && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css))"
 				},
 				{
 					"group": "navigation@91",
@@ -178,7 +178,7 @@
 				{
 					"group": "navigation@96",
 					"command": "minifier.mitify",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (config.minifier.enableMitify && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css))"
 				},
 				{
 					"group": "navigation@97",
@@ -207,7 +207,7 @@
 				},
 				{
 					"command": "minifier.mitifySel",
-					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css"
+					"when": "config.minifier.enableMitify && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css)"
 				},
 				{
 					"command": "minifier.sortSel",
@@ -231,7 +231,7 @@
 				},
 				{
 					"command": "minifier.mitify",
-					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css"
+					"when": "config.minifier.enableMitify && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css)"
 				},
 				{
 					"command": "minifier.sort",
@@ -260,7 +260,7 @@
 				{
 					"group": "navigation@98",
 					"command": "minifier.mitify",
-					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css"
+					"when": "config.minifier.enableMitify && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css)"
 				},
 				{
 					"group": "navigation@99",
@@ -282,7 +282,7 @@
 				{
 					"group": "navigation@98",
 					"command": "minifier.mitify",
-					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css"
+					"when": "config.minifier.enableMitify && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css)"
 				},
 				{
 					"group": "navigation@99",
@@ -294,6 +294,11 @@
 		"configuration": {
 			"title": "Code Formatter & Minifier Settings",
 			"properties": {
+				"minifier.enableMitify": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable or disable mitify."
+				},
 				"minifier.codeSetting": {
 					"type": "object",
 					"default": {

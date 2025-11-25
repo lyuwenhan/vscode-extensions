@@ -18,7 +18,7 @@ const contr = [{
 }, {
 	command: "mitify",
 	title: "Mitify",
-	when: [true, true, ["jsBeautify"]]
+	when: [true, true, ["jsBeautify"], "config.minifier.enableMitify"]
 }, {
 	command: "sort",
 	title: "Sort",
@@ -55,6 +55,11 @@ const ret = {
 	configuration: {
 		title: "Code Formatter & Minifier Settings",
 		properties: {
+			"minifier.enableMitify": {
+				type: "boolean",
+				default: true,
+				description: "Enable or disable mitify."
+			},
 			"minifier.codeSetting": {
 				type: "object",
 				default: {
@@ -153,7 +158,10 @@ const ret = {
 [true, false].forEach(sel => {
 	contr.forEach(e => {
 		const command = "minifier." + e.command + (sel ? "Sel" : "");
-		const when = e.when[2].map(e => rid[e]).join(" || ");
+		let when = e.when[2].map(e => rid[e]).join(" || ");
+		if (e.when[3]) {
+			when = e.when[3] + " && (" + when + ")"
+		}
 		ret.commands.push({
 			command,
 			title: e.title + " current " + (sel ? "selection" : "file")
