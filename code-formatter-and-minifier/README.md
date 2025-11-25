@@ -216,6 +216,202 @@ After (sort by price)
 
    These two commands work in **any file** and let you manually choose both the action and the processor.
 
+# Formatter & Minifier Settings
+
+This extension provides a **customizable configuration system** for controlling formatter and minifier behavior for **JavaScript**, **HTML**, and **CSS**.
+All fields are optional — missing values automatically fall back to the built-in defaults.
+
+---
+
+## Configuration
+
+You can modify settings through:
+
+### **VS Code Settings UI**
+
+Search for:
+
+```
+Minifier: Code Setting
+```
+
+### **Or in settings.json**
+
+```jsonc
+{
+	"minifier.codeSetting": {
+		"javascript": {
+			"minify": {
+				/* terser options */
+			},
+			"beautify": {
+				/* js-beautify options */
+			}
+		},
+		"html": {
+			"minify": {
+				/* html-minifier-terser options */
+			},
+			"beautify": {
+				/* js-beautify options */
+			}
+		},
+		"css": {
+			"minify": {
+				/* clean-css options */
+			},
+			"beautify": {
+				/* js-beautify options */
+			}
+		}
+	}
+}
+```
+
+Only specified fields override defaults.
+
+---
+
+# Default Settings
+
+These are the built-in defaults used by the extension:
+
+```jsonc
+{
+	"minifier.codeSetting": {
+		"javascript": {
+			"minify": {
+				"compress": false,
+				"mangle": false,
+				"format": {
+					"beautify": false,
+					"semicolons": true,
+					"shorthand": true
+				}
+			},
+			"beautify": {
+				"indent_size": 4,
+				"indent_char": "\t",
+				"indent_level": 0,
+				"brace_style": "collapse",
+				"eol": "\n",
+				"end_with_newline": true,
+				"preserve_newlines": false,
+				"indent_with_tabs": true,
+				"max_preserve_newlines": 1,
+				"jslint_happy": false,
+				"space_after_named_function": false,
+				"space_after_anon_function": false,
+				"keep_array_indentation": false,
+				"keep_function_indentation": false,
+				"space_before_conditional": true,
+				"break_chained_methods": false,
+				"eval_code": false,
+				"unescape_strings": false,
+				"wrap_line_length": 0,
+				"indent_empty_lines": false,
+				"templating": ["auto"]
+			}
+		},
+
+		"html": {
+			"minify": {
+				"collapseWhitespace": true,
+				"removeComments": true,
+				"removeEmptyAttributes": true,
+				"removeTagWhitespace": true,
+				"removeAttributeQuotes": false,
+				"removeEmptyElements": false,
+				"removeRedundantAttributes": false,
+				"removeOptionalTags": false,
+				"sortAttributes": false,
+				"sortClassName": false,
+				"keepClosingSlash": true,
+				"processConditionalComments": false,
+				"ignoreCustomComments": [],
+				"ignoreCustomFragments": [],
+				"caseSensitive": false,
+				"html5": true
+			},
+			"beautify": {
+				"indent_size": 4,
+				"indent_char": "\t",
+				"indent_with_tabs": true,
+				"eol": "\n",
+				"end_with_newline": true,
+				"preserve_newlines": false,
+				"max_preserve_newlines": 1,
+				"wrap_line_length": 0,
+				"indent_inner_html": true,
+				"indent_empty_lines": false
+			}
+		},
+
+		"css": {
+			"minify": {
+				"level": 0
+			},
+			"beautify": {
+				"indent_size": 4,
+				"indent_char": "\t",
+				"indent_with_tabs": true,
+				"eol": "\n",
+				"end_with_newline": true,
+				"newline_between_rules": false,
+				"selector_separator_newline": false,
+				"preserve_newlines": false,
+				"max_preserve_newlines": 1,
+				"wrap_line_length": 0,
+				"space_around_combinator": true,
+				"space_around_selector_separator": true,
+				"indent_empty_lines": false
+			}
+		}
+	}
+}
+```
+
+---
+
+# Example Custom Configuration
+
+```jsonc
+"minifier.codeSetting": {
+	"javascript": {
+		"minify": {
+			"mangle": true,
+			"compress": { "drop_console": true }
+		},
+		"beautify": { "indent_size": 2 }
+	},
+	"html": {
+		"minify": { "collapseWhitespace": true }
+	},
+	"css": {
+		"beautify": { "indent_size": 2 }
+	}
+}
+```
+
+---
+
+# Behavior Notes
+
+* Invalid or non-object values are ignored safely.
+* Missing sections are auto-filled using defaults.
+* Settings take effect immediately.
+* CSS minifier (CleanCSS) is rebuilt when CSS minify settings change.
+
+---
+
+# Summary
+
+The configuration system allows you to:
+
+* Customize formatting and minification per language
+* Override only what you need
+* Rely on defaults for everything else
+
 ## Notes
 - **JavaScript** minification uses [terser](https://github.com/terser/terser).
 - **HTML** minification uses [html-minifier-terser](https://github.com/terser/html-minifier-terser).
