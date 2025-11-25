@@ -8,7 +8,7 @@ const terser = require("terser");
 const beautify = require("js-beautify");
 const JSONParse = require("jsonparse");
 const jsonc = require("jsonc-parser/lib/esm/main.js");
-const opts = {
+const oldOpts = {
 	javascript: {
 		minify: {
 			compress: false,
@@ -98,7 +98,53 @@ const opts = {
 		}
 	}
 };
-const cleanCSSRunner = new cleanCSS(opts.css.minify);
+let cleanCSSRunner = new cleanCSS(oldOpts.css.minify);
+let opts = oldOpts;
+
+function toJson(input) {
+	return Object.prototype.toString.call(input) === "[object Object]" ? input : {}
+}
+
+function readSettings() {
+	const config = vscode.workspace.getConfiguration("minifier");
+	const settings = toJson(config.get("codeSetting"));
+	const newOpts = {
+		javascript: {
+			minify: {
+				...oldOpts.javascript.minify,
+				...toJson(settings.javascript?.minify)
+			},
+			beautify: {
+				...oldOpts.javascript.beautify,
+				...toJson(settings.javascript?.beautify)
+			}
+		},
+		html: {
+			minify: {
+				...oldOpts.html.minify,
+				...toJson(settings.html?.minify)
+			},
+			beautify: {
+				...oldOpts.html.beautify,
+				...toJson(settings.html?.beautify)
+			}
+		},
+		css: {
+			minify: {
+				...oldOpts.css.minify,
+				...toJson(settings.css?.minify)
+			},
+			beautify: {
+				...oldOpts.css.beautify,
+				...toJson(settings.css?.beautify)
+			}
+		}
+	};
+	if (JSON.stringify(newOpts.css.minify) !== JSON.stringify(opts.css.minify)) {
+		cleanCSSRunner = new cleanCSS(newOpts.css.minify)
+	}
+	opts = newOpts
+}
 
 function jsonStringify1L(data) {
 	var seen = [];
@@ -151,37 +197,46 @@ function jsonStringify1L(data) {
 	}(data)
 }
 async function minifyHtml(content) {
+	readSettings();
 	return await htmlMinify(content, opts.html.minify)
 }
 
 function beautifyHtml(content) {
+	readSettings();
 	return beautify.html(content, opts.html.beautify)
 }
 async function mitifyHtml(content) {
+	readSettings();
 	const min = await minifyHtml(content);
 	return beautifyHtml(min)
 }
 
 function minifyCss(content) {
+	readSettings();
 	return cleanCSSRunner.minify(content).styles
 }
 
 function beautifyCss(content) {
+	readSettings();
 	return beautify.css(content, opts.css.beautify)
 }
 async function mitifyCss(content) {
+	readSettings();
 	return beautifyCss(minifyCss(content))
 }
 
 function minifyFile(content) {
+	readSettings();
 	return terser.minify(content, opts.javascript.minify).then(e => e.code)
 }
 
 function beautifyFile(content) {
+	readSettings();
 	return beautify.js(content, opts.javascript.beautify)
 }
 
 function mitifyFile(content) {
+	readSettings();
 	return minifyFile(content).then(beautifyFile)
 }
 

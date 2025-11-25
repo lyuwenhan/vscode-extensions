@@ -1,6 +1,6 @@
 {
-	"needsPublish": false,
+	"needsPublish": true,
 	"majorUp": false,
-	"minorUp": false,
+	"minorUp": true,
 	"useVersion": null
 }
