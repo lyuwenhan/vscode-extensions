@@ -391,7 +391,72 @@
 							}
 						}
 					},
-					"description": "Formatter and Minifier Settings."
+					"description": "Formatter and Minifier Settings.",
+					"required": [
+						"javascript",
+						"html",
+						"css"
+					],
+					"additionalProperties": false,
+					"properties": {
+						"javascript": {
+							"type": "object",
+							"description": "Options for JavaScript beautify(js-beautify) and minification(terser).",
+							"properties": {
+								"minify": {
+									"type": "object",
+									"description": "Options for JavaScript minification(terser)"
+								},
+								"beautify": {
+									"type": "object",
+									"description": "Options for JavaScript beautify(js-beautify)"
+								}
+							},
+							"required": [
+								"minify",
+								"beautify"
+							],
+							"additionalProperties": false
+						},
+						"html": {
+							"type": "object",
+							"description": "Options for HTML beautify(js-beautify) and minification(html-minifier-terser).",
+							"properties": {
+								"minify": {
+									"type": "object",
+									"description": "Options for HTML minification(HTML-minifier-terser)"
+								},
+								"beautify": {
+									"type": "object",
+									"description": "Options for HTML beautify(js-beautify)"
+								}
+							},
+							"required": [
+								"minify",
+								"beautify"
+							],
+							"additionalProperties": false
+						},
+						"css": {
+							"type": "object",
+							"description": "Options for CSS beautify(js-beautify) and minification(terser).",
+							"properties": {
+								"minify": {
+									"type": "object",
+									"description": "Options for CSS minification(clean-css)"
+								},
+								"beautify": {
+									"type": "object",
+									"description": "Options for CSS beautify(js-beautify)"
+								}
+							},
+							"required": [
+								"minify",
+								"beautify"
+							],
+							"additionalProperties": false
+						}
+					}
 				}
 			}
 		}
