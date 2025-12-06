@@ -148,13 +148,24 @@ const ret = {
 							space_around_selector_separator: true,
 							indent_empty_lines: false
 						}
+					},
+					json: {
+						minify: {
+							singleLineSpacing: false
+						},
+						jsonLMinify: {
+							singleLineSpacing: true
+						},
+						beautify: {
+							indent: "\t"
+						}
 					}
 				},
 				description: "Formatter and Minifier Settings.",
 				required: ["javascript", "html", "css"],
 				additionalProperties: false,
 				properties: {
-					"javascript": {
+					javascript: {
 						type: "object",
 						description: "Options for JavaScript beautify(js-beautify) and minification(terser).",
 						properties: {
@@ -170,7 +181,7 @@ const ret = {
 						required: ["minify", "beautify"],
 						additionalProperties: false
 					},
-					"html": {
+					html: {
 						type: "object",
 						description: "Options for HTML beautify(js-beautify) and minification(html-minifier-terser).",
 						properties: {
@@ -186,7 +197,7 @@ const ret = {
 						required: ["minify", "beautify"],
 						additionalProperties: false
 					},
-					"css": {
+					css: {
 						type: "object",
 						description: "Options for CSS beautify(js-beautify) and minification(terser).",
 						properties: {
@@ -200,6 +211,52 @@ const ret = {
 							}
 						},
 						required: ["minify", "beautify"],
+						additionalProperties: false
+					},
+					json: {
+						type: "object",
+						description: "Options for json and jsonL beautify and minification.",
+						properties: {
+							minify: {
+								type: "object",
+								description: "Options for JSON minification",
+								properties: {
+									singleLineSpacing: {
+										type: "boolean"
+									}
+								},
+								required: ["singleLineSpacing"],
+								additionalProperties: false
+							},
+							jsonLMinify: {
+								type: "object",
+								description: "Options for JSON Lines minification",
+								properties: {
+									singleLineSpacing: {
+										type: "boolean"
+									}
+								},
+								required: ["singleLineSpacing"],
+								additionalProperties: false
+							},
+							beautify: {
+								type: "object",
+								description: "Options for JSON beautify",
+								properties: {
+									indent: {
+										description: "String or number of spaces to use as white space for indenting.",
+										oneOf: [{
+											type: "string"
+										}, {
+											type: "number"
+										}]
+									}
+								},
+								required: ["indent"],
+								additionalProperties: false
+							}
+						},
+						required: ["minify", "jsonLMinify", "beautify"],
 						additionalProperties: false
 					}
 				}

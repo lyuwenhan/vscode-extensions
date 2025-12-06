@@ -187,8 +187,8 @@ After (sort by price)
 
 ## Usage
 
-1. Open any file in VS Code.  
-   - For formatting-related actions, the file should be one of:  
+1. Open any file in VS Code.
+   - For formatting-related actions, the file should be one of:
      `.js`, `.json`, `.jsonc`, `.jsonl`, `.html`, `.css`.
 
 2. Right-click inside the editor.
@@ -263,7 +263,18 @@ Minifier: Code Setting
 			"beautify": {
 				/* js-beautify options */
 			}
-		}
+		},
+        "json": {
+            "minify": {
+				/* minify options */
+            },
+            "jsonLMinify": {
+				/* minify options for JSON Lines */
+            },
+            "beautify": {
+				/* beautify options */
+            }
+        }
 	}
 }
 ```
@@ -366,7 +377,19 @@ These are the built-in defaults used by the extension:
 				"space_around_selector_separator": true,
 				"indent_empty_lines": false
 			}
-		}
+		},
+
+        "json": {
+            "minify": {
+                "singleLineSpacing": false
+            },
+            "jsonLMinify": {
+                "singleLineSpacing": true
+            },
+            "beautify": {
+                "indent": "\t"
+            }
+        }
 	}
 }
 ```
@@ -389,6 +412,17 @@ These are the built-in defaults used by the extension:
 	},
 	"css": {
 		"beautify": { "indent_size": 2 }
+	},
+	"json": {
+		"minify": {
+			"singleLineSpacing": false
+		},
+		"jsonLMinify": {
+			"singleLineSpacing": true
+		},
+		"beautify": {
+			"indent": 2
+		}
 	}
 }
 ```

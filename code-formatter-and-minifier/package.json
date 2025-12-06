@@ -389,6 +389,17 @@
 								"space_around_selector_separator": true,
 								"indent_empty_lines": false
 							}
+						},
+						"json": {
+							"minify": {
+								"singleLineSpacing": false
+							},
+							"jsonLMinify": {
+								"singleLineSpacing": true
+							},
+							"beautify": {
+								"indent": "\t"
+							}
 						}
 					},
 					"description": "Formatter and Minifier Settings.",
@@ -452,6 +463,65 @@
 							},
 							"required": [
 								"minify",
+								"beautify"
+							],
+							"additionalProperties": false
+						},
+						"json": {
+							"type": "object",
+							"description": "Options for json and jsonL beautify and minification.",
+							"properties": {
+								"minify": {
+									"type": "object",
+									"description": "Options for JSON minification",
+									"properties": {
+										"singleLineSpacing": {
+											"type": "boolean"
+										}
+									},
+									"required": [
+										"singleLineSpacing"
+									],
+									"additionalProperties": false
+								},
+								"jsonLMinify": {
+									"type": "object",
+									"description": "Options for JSON Lines minification",
+									"properties": {
+										"singleLineSpacing": {
+											"type": "boolean"
+										}
+									},
+									"required": [
+										"singleLineSpacing"
+									],
+									"additionalProperties": false
+								},
+								"beautify": {
+									"type": "object",
+									"description": "Options for JSON beautify",
+									"properties": {
+										"indent": {
+											"description": "String or number of spaces to use as white space for indenting.",
+											"oneOf": [
+												{
+													"type": "string"
+												},
+												{
+													"type": "number"
+												}
+											]
+										}
+									},
+									"required": [
+										"indent"
+									],
+									"additionalProperties": false
+								}
+							},
+							"required": [
+								"minify",
+								"jsonLMinify",
 								"beautify"
 							],
 							"additionalProperties": false

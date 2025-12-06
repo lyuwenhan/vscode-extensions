@@ -96,6 +96,17 @@ const oldOpts = {
 			space_around_selector_separator: true,
 			indent_empty_lines: false
 		}
+	},
+	json: {
+		minify: {
+			singleLineSpacing: false
+		},
+		jsonLMinify: {
+			singleLineSpacing: true
+		},
+		beautify: {
+			indent: "\t"
+		}
 	}
 };
 let cleanCSSRunner = new cleanCSS(oldOpts.css.minify);
@@ -138,6 +149,20 @@ function readSettings() {
 				...oldOpts.css.beautify,
 				...toJson(settings.css?.beautify)
 			}
+		},
+		json: {
+			minify: {
+				...oldOpts.json.minify,
+				...toJson(settings.json?.minify)
+			},
+			jsonLMinify: {
+				...oldOpts.json.jsonLMinify,
+				...toJson(settings.json?.jsonLMinify)
+			},
+			beautify: {
+				...oldOpts.json.beautify,
+				...toJson(settings.json?.beautify)
+			}
 		}
 	};
 	if (JSON.stringify(newOpts.css.minify) !== JSON.stringify(opts.css.minify)) {
@@ -146,12 +171,10 @@ function readSettings() {
 	opts = newOpts
 }
 
-function jsonStringify1L(data) {
+function jsonStringify1L(data, usingSpace) {
+	const spaceIf = usingSpace ? " " : "";
 	var seen = [];
 	return function stringify(node) {
-		if (node && node.toJSON && typeof node.toJSON === "function") {
-			node = node.toJSON()
-		}
 		if (node === undefined) {
 			return
 		}
@@ -166,7 +189,7 @@ function jsonStringify1L(data) {
 			out = "[";
 			for (i = 0; i < node.length; i++) {
 				if (i) {
-					out += ", "
+					out += "," + spaceIf
 				}
 				out += stringify(node[i]) || "null"
 			}
@@ -188,55 +211,46 @@ function jsonStringify1L(data) {
 				continue
 			}
 			if (out) {
-				out += ", "
+				out += "," + spaceIf
 			}
-			out += JSON.stringify(key) + ": " + value
+			out += JSON.stringify(key) + ":" + spaceIf + value
 		}
 		seen.splice(seenIndex, 1);
 		return "{" + out + "}"
 	}(data)
 }
 async function minifyHtml(content) {
-	readSettings();
 	return await htmlMinify(content, opts.html.minify)
 }
 
 function beautifyHtml(content) {
-	readSettings();
 	return beautify.html(content, opts.html.beautify)
 }
 async function mitifyHtml(content) {
-	readSettings();
 	const min = await minifyHtml(content);
 	return beautifyHtml(min)
 }
 
 function minifyCss(content) {
-	readSettings();
 	return cleanCSSRunner.minify(content).styles
 }
 
 function beautifyCss(content) {
-	readSettings();
 	return beautify.css(content, opts.css.beautify)
 }
 async function mitifyCss(content) {
-	readSettings();
 	return beautifyCss(minifyCss(content))
 }
 
 function minifyFile(content) {
-	readSettings();
 	return terser.minify(content, opts.javascript.minify).then(e => e.code)
 }
 
 function beautifyFile(content) {
-	readSettings();
 	return beautify.js(content, opts.javascript.beautify)
 }
 
 function mitifyFile(content) {
-	readSettings();
 	return minifyFile(content).then(beautifyFile)
 }
 
@@ -334,11 +348,11 @@ function parseJsonL(text) {
 }
 
 function jsonStringify(json) {
-	return JSON.stringify(json, null, "\t")
+	return JSON.stringify(json, null, opts.json.beautify.indent)
 }
 
 function minifyJson(content) {
-	return JSON.stringify(jsonc.parse(content))
+	return jsonStringify1L(jsonc.parse(content), opts.json.minify.singleLineSpacing)
 }
 
 function beautifyJson(content) {
@@ -359,7 +373,7 @@ async function sortListByKeyJson(content) {
 }
 
 function minifyJsonL(content) {
-	return parseJsonL(content).map(jsonStringify1L).join("\n")
+	return parseJsonL(content).map(e => jsonStringify1L(e, opts.json.jsonLMinify.singleLineSpacing)).join("\n")
 }
 
 function beautifyJsonL(content) {
@@ -476,6 +490,7 @@ async function runAction(oper, content) {
 	if (content === "") {
 		return ""
 	}
+	readSettings();
 	return (await oper(content)).trim()
 }
 
