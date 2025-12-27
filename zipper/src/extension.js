@@ -6,6 +6,18 @@ const {
 	pipeline
 } = require("stream/promises");
 const unzipper = require("unzipper");
+
+function tryName(faDir, name, ext = "") {
+	let filename = name + ext;
+	let dir = path.join(faDir, filename);
+	let addition = 0;
+	while (fs.existsSync(dir)) {
+		addition++;
+		filename = name + " (" + addition + ")" + ext;
+		dir = path.join(faDir, filename)
+	}
+	return [filename, dir]
+}
 async function getPaths(paths) {
 	let pa = paths[0][0];
 	if (pa != "/") {
@@ -110,14 +122,7 @@ class ZipDocument {
 				const parser = unzipper.Parse();
 				if (isFolder) {
 					const dirName = targetEntryPath.replace(/\/$/, "").split("/").at(-1);
-					let finalDir = dirName;
-					let outputDir = path.join(this.exportDir, finalDir);
-					let addition = 0;
-					while (fs.existsSync(outputDir)) {
-						addition++;
-						finalDir = dirName + " (" + addition + ")";
-						outputDir = path.join(this.exportDir, finalDir)
-					}
+					const [outputDir] = tryName(this.exportDir, dirName);
 					await new Promise((resolve, reject) => {
 						fs.createReadStream(this.filePath).pipe(parser).on("entry", async entry => {
 							try {
@@ -164,14 +169,7 @@ class ZipDocument {
 									name: zipName,
 									ext
 								} = path.parse(targetEntryPath.split("/").pop());
-								let finalName = zipName + ext;
-								let outputFile = path.join(this.exportDir, finalName);
-								let addition = 0;
-								while (fs.existsSync(outputFile)) {
-									addition++;
-									finalName = zipName + " (" + addition + ")" + ext;
-									outputFile = path.join(this.exportDir, finalName)
-								}
+								const [outputFile] = tryName(this.exportDir, zipName, ext);
 								fs.promises.mkdir(this.exportDir, {
 									recursive: true
 								}).then(() => pipeline(entry, fs.createWriteStream(outputFile))).then(() => {
@@ -191,7 +189,7 @@ class ZipDocument {
 						})
 					})
 				}
-			})
+			});
 			vscode.window.showInformationMessage(`Zipper: Extracted "${this.exportName}/${targetEntryPath}"`)
 		} catch (e) {
 			vscode.window.showErrorMessage(e.message || String(e));
@@ -205,15 +203,7 @@ class ZipDocument {
 	async getExport() {
 		if (!this.exportDir) {
 			const baseDir = path.dirname(this.filePath);
-			const targetName = "exports";
-			let finalDir = targetName;
-			let targetDir = path.join(baseDir, finalDir);
-			let addition = 0;
-			while (fs.existsSync(targetDir)) {
-				addition++;
-				finalDir = targetName + " (" + addition + ")";
-				targetDir = path.join(baseDir, finalDir)
-			}
+			const [targetDir, finalDir] = tryName(baseDir, "exports");
 			await fs.promises.mkdir(targetDir, {
 				recursive: true
 			});
@@ -296,14 +286,8 @@ function activate(context) {
 					commonRoot
 				} = await getPaths(inputPaths);
 				const zipName = inputPaths.length === 1 ? `${path.parse(inputPaths[0]).name}` : "archive";
-				finalName = zipName + ".zip";
-				let outputZip = path.join(commonRoot, finalName);
-				let addition = 0;
-				while (fs.existsSync(outputZip)) {
-					addition++;
-					finalName = zipName + " (" + addition + ").zip";
-					outputZip = path.join(commonRoot, finalName)
-				}
+				let outputZip;
+				[finalName, outputZip] = tryName(commonRoot, zipName, ".zip");
 				const output = fs.createWriteStream(outputZip);
 				const archive = archiver("zip", {
 					zlib: {
@@ -337,7 +321,7 @@ function activate(context) {
 			vscode.window.showInformationMessage(`Zipper: ZIP created "${finalName}"`)
 		} catch (e) {
 			vscode.window.showErrorMessage(e.message || String(e));
-			console.error(e)
+			console.error(e);
 			console.error(e.stack)
 		}
 	});
@@ -356,14 +340,8 @@ function activate(context) {
 				const zipPath = uri.fsPath;
 				const baseDir = path.resolve(path.dirname(zipPath));
 				const targetName = path.parse(zipPath).name;
-				finalDir = targetName;
-				let targetDir = path.join(baseDir, targetName);
-				let addition = 0;
-				while (fs.existsSync(targetDir)) {
-					addition++;
-					finalDir = targetName + " (" + addition + ")";
-					targetDir = path.join(baseDir, finalDir)
-				}
+				let targetDir;
+				[finalDir, targetDir] = tryName(baseDir, targetName);
 				await fs.promises.mkdir(targetDir, {
 					recursive: true
 				});
@@ -400,7 +378,7 @@ function activate(context) {
 			vscode.window.showInformationMessage(`Zipper: Extracted to "${finalDir}"`)
 		} catch (e) {
 			vscode.window.showErrorMessage(e.message || String(e));
-			console.error(e)
+			console.error(e);
 			console.error(e.stack)
 		}
 	});
