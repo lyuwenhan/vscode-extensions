@@ -57,11 +57,9 @@ async function getPaths(paths) {
 		ne = neNe
 	}
 	const result = [];
-	console.log(common);
 
 	function dfs(node, pa) {
 		if (node.is) {
-			console.log(path.join(...pa), node.realPa, node.isFolder ? "folder" : "file");
 			result.push({
 				pa: path.join(...pa),
 				realPa: node.realPa,
