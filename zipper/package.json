@@ -2,7 +2,7 @@
   "name": "zipper",
   "displayName": "Zipper",
   "private": false,
-  "version": "1.0.4",
+  "version": "1.0.5",
   "publisher": "lyuwenhan",
   "description": "A VS Code extension to do compression.",
   "engines": {
