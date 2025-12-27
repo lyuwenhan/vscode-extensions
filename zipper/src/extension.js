@@ -2,6 +2,10 @@ const vscode = require("vscode");
 const path = require("path");
 const fs = require("fs");
 const archiver = require("archiver");
+const {
+	pipeline
+} = require("stream/promises");
+const unzipper = require("unzipper");
 async function getPaths(paths) {
 	let pa = paths[0][0];
 	if (pa != "/") {
@@ -151,7 +155,73 @@ function activate(context) {
 			console.error(e.stack)
 		}
 	});
-	context.subscriptions.push(zipDisposable)
+	const unzipDisposable = vscode.commands.registerCommand("zipper.extract", async uri => {
+		try {
+			if (!uri || path.extname(uri.fsPath).toLowerCase() !== ".zip") {
+				vscode.window.showWarningMessage("Zipper: Please select a ZIP file");
+				return
+			}
+			let finalDir;
+			console.log(1);
+			await vscode.window.withProgress({
+				location: vscode.ProgressLocation.Notification,
+				title: "Extracting ZIP...",
+				cancellable: false
+			}, async () => {
+				const zipPath = uri.fsPath;
+				const baseDir = path.resolve(path.dirname(zipPath));
+				const targetName = path.parse(zipPath).name;
+				finalDir = targetName;
+				let targetDir = path.join(baseDir, targetName);
+				let addition = 0;
+				while (fs.existsSync(targetDir)) {
+					addition++;
+					finalDir = targetName + " (" + addition + ")";
+					targetDir = path.join(baseDir, finalDir)
+				}
+				console.log(2);
+				await fs.promises.mkdir(targetDir, {
+					recursive: true
+				});
+				const parser = unzipper.Parse();
+				await new Promise((resolve, reject) => {
+					fs.createReadStream(zipPath).pipe(parser).on("entry", async entry => {
+						try {
+							const unsafePath = entry.path;
+							const resolvedPath = path.resolve(targetDir, unsafePath);
+							if (!resolvedPath.startsWith(targetDir + path.sep)) {
+								entry.autodrain();
+								reject(new Error(`Zip Slip detected: ${unsafePath}`));
+								return
+							}
+							console.log(3, entry.type);
+							if (entry.type === "Directory") {
+								await fs.promises.mkdir(resolvedPath, {
+									recursive: true
+								});
+								entry.autodrain()
+							} else if (entry.type === "File") {
+								await fs.promises.mkdir(path.dirname(resolvedPath), {
+									recursive: true
+								});
+								await pipeline(entry, fs.createWriteStream(resolvedPath))
+							} else {
+								entry.autodrain()
+							}
+						} catch (err) {
+							reject(err)
+						}
+					}).once("close", resolve).once("error", reject)
+				});
+				console.log(4)
+			});
+			vscode.window.showInformationMessage(`Zipper: Extracted to ${finalDir}`)
+		} catch (e) {
+			vscode.window.showErrorMessage(e.message || String(e));
+			console.error(e)
+		}
+	});
+	context.subscriptions.push(zipDisposable, unzipDisposable)
 }
 
 function deactivate() {}

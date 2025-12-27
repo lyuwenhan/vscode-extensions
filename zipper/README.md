@@ -22,7 +22,12 @@ Designed for quick, local file operations without leaving the editor.
 
 ### 2. Unzip Archives
 
-- This feature is **not** yet complete.
+- Right-click a `.zip` file in the **Explorer**
+- Select **Unzip**
+- Extracts contents into a folder with the same name:
+
+**Behavior**
+  `example.zip` → `example/`
 
 ---
 
@@ -32,6 +37,7 @@ Designed for quick, local file operations without leaving the editor.
 2. Select files or folders
 3. Right-click and choose:
    - **Zip** - to create a ZIP archive
+   - **Unzip** - to extract a ZIP file
 
 Progress and results are shown via VS Code notifications.
 
