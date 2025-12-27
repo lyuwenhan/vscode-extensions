@@ -1,18 +1,25 @@
+html, body{
+	font-size: 13px;
+}
 .downloadFa {
+	padding: 10px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	width: 100%;
+	width: 100%
 }
-.downloadFa:hover{
-	background-color: color-mix(in srgb, var(--vscode-editor-background) 90%, var(--vscode-editor-foreground) 10%);
+.downloadFa:hover {
+	background-color: color-mix(in srgb, var(--vscode-editor-background) 90%, var(--vscode-editor-foreground) 10%)
 }
-.downloadFa:not(:hover)>.download{
-	display: none;
+.downloadFa:not(:hover) > .download {
+	display: none
 }
-.lisum {
+li:not(.lisum) {
+	list-style-type: circle
+}
+li.lisum {
 	list-style-type: none
 }
-.lisum summary {
+li.lisum summary {
 	list-style-position: outside
 }
