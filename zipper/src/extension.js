@@ -2,24 +2,83 @@ const vscode = require("vscode");
 const path = require("path");
 const fs = require("fs");
 const archiver = require("archiver");
-
-function getCommonAncestor(paths) {
-	const parsed = paths.map(p => path.parse(p));
-	const roots = new Set(parsed.map(p => p.root));
-	if (roots.size !== 1) return null;
-	const rels = parsed.map(p => p.dir);
-	const segments = rels.map(r => r.split(path.sep).filter(Boolean));
-	const minLen = Math.min(...segments.map(s => s.length));
-	const common = [];
-	for (let i = 0; i < minLen; i++) {
-		const part = segments[0][i];
-		if (segments.every(s => s[i] === part)) {
-			common.push(part)
+async function getPaths(paths) {
+	let pa = paths[0][0];
+	if (pa != "/") {
+		pa = ""
+	}
+	const tree = {
+		is: false,
+		realPa: "",
+		isFolder: false,
+		next: {}
+	};
+	for (const p of paths) {
+		let isF;
+		const stats = await fs.promises.lstat(p);
+		if (stats.isDirectory()) {
+			isF = true
+		} else if (stats.isFile()) {
+			isF = false
 		} else {
-			break
+			continue
+		}
+		const arr = p.split(path.sep).filter(Boolean);
+		let cur = tree;
+		for (const link of arr) {
+			if (cur.is) break;
+			if (!cur.next[link]) {
+				cur.next[link] = {
+					is: false,
+					isFolder: true,
+					next: {}
+				}
+			}
+			cur = cur.next[link]
+		}
+		if (!cur.is) {
+			cur.is = true;
+			cur.realPa = p;
+			cur.isFolder = isF;
+			cur.next = {}
 		}
 	}
-	return common.length === 0 ? parsed[0].root : path.join(parsed[0].root, ...common)
+	let common = [];
+	let cur = tree;
+	let ne = Object.keys(cur.next);
+	while (ne.length === 1) {
+		const curNe = cur.next[ne[0]];
+		const neNe = Object.keys(curNe.next);
+		if (neNe.length === 0) {
+			break
+		}
+		common.push(ne[0]);
+		cur = curNe;
+		ne = neNe
+	}
+	const result = [];
+	console.log(common);
+
+	function dfs(node, pa) {
+		if (node.is) {
+			console.log(path.join(...pa), node.realPa, node.isFolder ? "folder" : "file");
+			result.push({
+				pa: path.join(...pa),
+				realPa: node.realPa,
+				isFolder: node.isFolder
+			})
+		}
+		for (const [name, child] of Object.entries(node.next)) {
+			pa.push(name);
+			dfs(child, pa);
+			pa.pop()
+		}
+	}
+	dfs(cur, []);
+	return {
+		paths: result,
+		commonRoot: pa + path.join(...common)
+	}
 }
 
 function activate(context) {
@@ -44,10 +103,10 @@ function activate(context) {
 						throw new Error(`Cannot access to: ${p}`)
 					}
 				}));
-				const commonRoot = getCommonAncestor(inputPaths);
-				if (!commonRoot) {
-					throw new Error("Zipper: Selected files are on different drives")
-				}
+				const {
+					paths,
+					commonRoot
+				} = await getPaths(inputPaths);
 				const zipName = inputPaths.length === 1 ? `${path.parse(inputPaths[0]).name}` : "archive";
 				finalName = zipName + ".zip";
 				let outputZip = path.join(commonRoot, finalName);
@@ -70,19 +129,17 @@ function activate(context) {
 					archive.once("error", reject)
 				});
 				archive.pipe(output);
-				for (const fullPath of inputPaths) {
-					const stats = await fs.promises.lstat(fullPath);
-					const zipBaseName = commonRoot ? path.relative(commonRoot, fullPath) : path.basename(fullPath);
-					if (stats.isSymbolicLink()) {
-						const realPath = await fs.promises.realpath(fullPath);
-						archive.file(realPath, {
-							name: zipBaseName
-						})
-					} else if (stats.isDirectory()) {
-						archive.directory(fullPath, zipBaseName)
-					} else if (stats.isFile()) {
-						archive.file(fullPath, {
-							name: zipBaseName
+				for (const {
+						pa,
+						realPa,
+						isFolder
+					}
+					of paths) {
+					if (isFolder) {
+						archive.directory(realPa, pa)
+					} else {
+						archive.file(realPa, {
+							name: pa
 						})
 					}
 				}
@@ -92,7 +149,8 @@ function activate(context) {
 			vscode.window.showInformationMessage(`Zipper: ZIP created ${finalName}`)
 		} catch (e) {
 			vscode.window.showErrorMessage(e.message || String(e));
-			console.error(e)
+			console.error(e);
+			console.error(e.stack)
 		}
 	});
 	context.subscriptions.push(zipDisposable)

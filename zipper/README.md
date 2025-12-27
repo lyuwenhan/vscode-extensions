@@ -41,6 +41,8 @@ Progress and results are shown via VS Code notifications.
 
 - Only ZIP format is supported
 - No password-protected archives
+- This was only tested on windows
+- This might not work on linux and mac
 
 ---
 

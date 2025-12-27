@@ -1,10 +1,21 @@
 const esbuild = require("esbuild");
-esbuild.build({
-	entryPoints: ["./src/extension.js"],
-	bundle: true,
-	outfile: "out/extension.js",
-	external: ["vscode", "@aws-sdk/client-s3"],
-	format: "cjs",
-	platform: "node",
-	minify: true
-});
+const fs = require("fs");
+const args = process.argv.slice(2);
+const noMin = args.includes("--noMin");
+if (noMin) {
+	fs.promises.mkdir("out", {
+		recursive: true
+	}).then(() => {
+		fs.promises.copyFile("./src/extension.js", "out/extension.js")
+	})
+} else {
+	esbuild.build({
+		entryPoints: ["./src/extension.js"],
+		bundle: true,
+		outfile: "out/extension.js",
+		external: ["vscode", "@aws-sdk/client-s3"],
+		format: "cjs",
+		platform: "node",
+		minify: true
+	})
+}
