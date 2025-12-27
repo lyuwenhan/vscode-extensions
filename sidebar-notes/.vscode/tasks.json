@@ -6,7 +6,8 @@
 			"type": "shell",
 			"command": "node",
 			"args": [
-				"build.js"
+				"build.js",
+				"--noMin"
 			],
 			"problemMatcher": []
 		}

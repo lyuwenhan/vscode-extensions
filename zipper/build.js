@@ -1,8 +1,6 @@
 const esbuild = require("esbuild");
 const fs = require("fs");
-const args = process.argv.slice(2);
-const noMin = args.includes("--noMin");
-if (noMin) {
+if (process.argv.slice(2).includes("--noMin")) {
 	fs.promises.mkdir("out", {
 		recursive: true
 	}).then(() => {
@@ -13,7 +11,7 @@ if (noMin) {
 		entryPoints: ["./src/extension.js"],
 		bundle: true,
 		outfile: "out/extension.js",
-		external: ["vscode", "@aws-sdk/client-s3"],
+		external: ["vscode"],
 		format: "cjs",
 		platform: "node",
 		minify: true
