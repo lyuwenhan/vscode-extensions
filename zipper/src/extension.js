@@ -82,6 +82,192 @@ async function getPaths(paths) {
 		commonRoot: pa + path.join(...common)
 	}
 }
+class ZipDocument {
+	constructor(uri) {
+		this.uri = uri;
+		this.filePath = uri.fsPath;
+		this.fileName = path.basename(this.filePath);
+		this.structure = null;
+		this.exportDir = null;
+		this.exportName = null
+	}
+	async readZipStructure() {
+		const directory = await unzipper.Open.file(this.filePath);
+		return directory.files.map(f => ({
+			path: f.path,
+			type: f.type,
+			size: f.uncompressedSize
+		}))
+	}
+	async extractSingleFile(targetEntryPath, isFolder) {
+		try {
+			await this.getExport();
+			await vscode.window.withProgress({
+				location: vscode.ProgressLocation.Notification,
+				title: `Zipper: Extracting "${this.exportName}/${targetEntryPath}"`,
+				cancellable: false
+			}, async () => {
+				const parser = unzipper.Parse();
+				if (isFolder) {
+					const dirName = targetEntryPath.replace(/\/$/, "").split("/").at(-1);
+					let finalDir = dirName;
+					let outputDir = path.join(this.exportDir, finalDir);
+					let addition = 0;
+					while (fs.existsSync(outputDir)) {
+						addition++;
+						finalDir = dirName + " (" + addition + ")";
+						outputDir = path.join(this.exportDir, finalDir)
+					}
+					await new Promise((resolve, reject) => {
+						fs.createReadStream(this.filePath).pipe(parser).on("entry", async entry => {
+							try {
+								if (!entry.path.startsWith(targetEntryPath)) {
+									entry.autodrain();
+									return
+								}
+								const unsafePath = entry.path.slice(targetEntryPath.length);
+								const resolvedPath = path.resolve(outputDir, unsafePath);
+								if (!resolvedPath.startsWith(outputDir + path.sep)) {
+									entry.autodrain();
+									reject(new Error(`Zip Slip detected: "${unsafePath}"`));
+									return
+								}
+								if (entry.type === "Directory") {
+									await fs.promises.mkdir(resolvedPath, {
+										recursive: true
+									});
+									entry.autodrain()
+								} else if (entry.type === "File") {
+									await fs.promises.mkdir(path.dirname(resolvedPath), {
+										recursive: true
+									});
+									await pipeline(entry, fs.createWriteStream(resolvedPath))
+								} else {
+									entry.autodrain()
+								}
+							} catch (err) {
+								reject(err)
+							}
+						}).once("close", resolve).once("error", reject)
+					})
+				} else {
+					await new Promise((resolve, reject) => {
+						let found = false;
+						const stream = fs.createReadStream(this.filePath).pipe(parser).on("entry", entry => {
+							if (found) {
+								entry.autodrain();
+								return
+							}
+							if (entry.path === targetEntryPath && entry.type === "File") {
+								found = true;
+								const {
+									name: zipName,
+									ext
+								} = path.parse(targetEntryPath.split("/").pop());
+								let finalName = zipName + ext;
+								let outputFile = path.join(this.exportDir, finalName);
+								let addition = 0;
+								while (fs.existsSync(outputFile)) {
+									addition++;
+									finalName = zipName + " (" + addition + ")" + ext;
+									outputFile = path.join(this.exportDir, finalName)
+								}
+								fs.promises.mkdir(this.exportDir, {
+									recursive: true
+								}).then(() => pipeline(entry, fs.createWriteStream(outputFile))).then(() => {
+									stream.destroy();
+									resolve()
+								}).catch(err => {
+									stream.destroy();
+									reject(err)
+								})
+							} else {
+								entry.autodrain()
+							}
+						}).on("error", reject).on("close", () => {
+							if (!found) {
+								reject(new Error(`File not found: ${targetEntryPath}`))
+							}
+						})
+					})
+				}
+			})
+			vscode.window.showInformationMessage(`Zipper: Extracted "${this.exportName}/${targetEntryPath}"`)
+		} catch (e) {
+			vscode.window.showErrorMessage(e.message || String(e));
+			console.error(e);
+			console.error(e.stack)
+		}
+	}
+	async getStructure() {
+		return this.structure ??= await this.readZipStructure()
+	}
+	async getExport() {
+		if (!this.exportDir) {
+			const baseDir = path.dirname(this.filePath);
+			const targetName = "exports";
+			let finalDir = targetName;
+			let targetDir = path.join(baseDir, finalDir);
+			let addition = 0;
+			while (fs.existsSync(targetDir)) {
+				addition++;
+				finalDir = targetName + " (" + addition + ")";
+				targetDir = path.join(baseDir, finalDir)
+			}
+			await fs.promises.mkdir(targetDir, {
+				recursive: true
+			});
+			this.exportName = finalDir;
+			this.exportDir = targetDir
+		}
+		return {
+			exportDir: this.exportDir,
+			exportName: this.exportName
+		}
+	}
+	dispose() {}
+}
+class ZipPreviewEditor {
+	constructor(context) {
+		this.context = context;
+		this.zipPath = null
+	}
+	async openCustomDocument(uri, openContext, token) {
+		return new ZipDocument(uri)
+	}
+	async resolveCustomEditor(document, webviewPanel, token) {
+		this.zipPath = document.uri.fsPath;
+		webviewPanel.webview.options = {
+			enableScripts: true,
+			localResourceRoots: [vscode.Uri.file(path.join(this.context.extensionPath, "docs"))]
+		};
+		webviewPanel.webview.html = this.getHtml(webviewPanel.webview);
+		this.activateMessageListener(webviewPanel.webview, document)
+	}
+	getHtml(webview) {
+		const maincss = webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, "docs", "main.css")));
+		const mainjs = webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, "docs", "main.js")));
+		return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="${maincss}"></head><body><h2 id="title">ZIP preview</h2><div id="main">loading</div><script src="${mainjs}"><\/script></body></html>`
+	}
+	activateMessageListener(webview, document) {
+		webview.onDidReceiveMessage(async message => {
+			switch (message.type) {
+				case "get": {
+					webview.postMessage({
+						type: "setup",
+						name: document.fileName,
+						content: await document.getStructure()
+					});
+					break
+				}
+				case "download": {
+					await document.extractSingleFile(message.path, message.isFolder);
+					break
+				}
+			}
+		})
+	}
+}
 
 function activate(context) {
 	const zipDisposable = vscode.commands.registerCommand("zipper.compress", async (uri, selectedUris) => {
@@ -102,7 +288,7 @@ function activate(context) {
 					try {
 						await fs.promises.access(p, fs.constants.R_OK)
 					} catch (e) {
-						throw new Error(`Cannot access to: ${p}`)
+						throw new Error(`Cannot access to: "${p}"`)
 					}
 				}));
 				const {
@@ -148,10 +334,10 @@ function activate(context) {
 				await archive.finalize();
 				await completion
 			});
-			vscode.window.showInformationMessage(`Zipper: ZIP created ${finalName}`)
+			vscode.window.showInformationMessage(`Zipper: ZIP created "${finalName}"`)
 		} catch (e) {
 			vscode.window.showErrorMessage(e.message || String(e));
-			console.error(e);
+			console.error(e)
 			console.error(e.stack)
 		}
 	});
@@ -162,7 +348,6 @@ function activate(context) {
 				return
 			}
 			let finalDir;
-			console.log(1);
 			await vscode.window.withProgress({
 				location: vscode.ProgressLocation.Notification,
 				title: "Extracting ZIP...",
@@ -179,7 +364,6 @@ function activate(context) {
 					finalDir = targetName + " (" + addition + ")";
 					targetDir = path.join(baseDir, finalDir)
 				}
-				console.log(2);
 				await fs.promises.mkdir(targetDir, {
 					recursive: true
 				});
@@ -191,10 +375,9 @@ function activate(context) {
 							const resolvedPath = path.resolve(targetDir, unsafePath);
 							if (!resolvedPath.startsWith(targetDir + path.sep)) {
 								entry.autodrain();
-								reject(new Error(`Zip Slip detected: ${unsafePath}`));
+								reject(new Error(`Zip Slip detected: "${unsafePath}"`));
 								return
 							}
-							console.log(3, entry.type);
 							if (entry.type === "Directory") {
 								await fs.promises.mkdir(resolvedPath, {
 									recursive: true
@@ -212,15 +395,16 @@ function activate(context) {
 							reject(err)
 						}
 					}).once("close", resolve).once("error", reject)
-				});
-				console.log(4)
+				})
 			});
-			vscode.window.showInformationMessage(`Zipper: Extracted to ${finalDir}`)
+			vscode.window.showInformationMessage(`Zipper: Extracted to "${finalDir}"`)
 		} catch (e) {
 			vscode.window.showErrorMessage(e.message || String(e));
 			console.error(e)
+			console.error(e.stack)
 		}
 	});
+	context.subscriptions.push(vscode.window.registerCustomEditorProvider("zipPreview.editor", new ZipPreviewEditor(context)));
 	context.subscriptions.push(zipDisposable, unzipDisposable)
 }
 

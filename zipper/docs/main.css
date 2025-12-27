@@ -1,0 +1,18 @@
+.downloadFa {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+}
+.downloadFa:hover{
+	background-color: color-mix(in srgb, var(--vscode-editor-background) 90%, var(--vscode-editor-foreground) 10%);
+}
+.downloadFa:not(:hover)>.download{
+	display: none;
+}
+.lisum {
+	list-style-type: none
+}
+.lisum summary {
+	list-style-position: outside
+}
