@@ -1,103 +1,103 @@
 {
-  "name": "zipper",
-  "displayName": "Zipper",
-  "private": false,
-  "version": "1.0.6",
-  "publisher": "lyuwenhan",
-  "description": "A VS Code extension to do compression.",
-  "engines": {
-    "vscode": "^1.80.0"
-  },
-  "main": "./out/extension.js",
-  "activationEvents": [],
-  "icon": "media/icon.png",
-  "scripts": {
-    "vscode:prepublish": "node build.js",
-    "package": "vsce package --allow-missing-repository"
-  },
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/lyuwenhan/vscode-extensions",
-    "directory": "zipper"
-  },
-  "bugs": {
-    "url": "https://github.com/lyuwenhan/vscode-extensions/issues"
-  },
-  "dependencies": {
-    "archiver": "^7.0.1",
-    "unzipper": "^0.12.3"
-  },
-  "homepage": "https://lyuwenhan.github.io",
-  "categories": [
-    "Other"
-  ],
-  "keywords": [],
-  "contributes": {
-    "commands": [
-      {
-        "category": "Zipper",
-        "command": "zipper.compress",
-        "title": "Compress"
-      },
-      {
-        "category": "Zipper",
-        "command": "zipper.extract",
-        "title": "Extract"
-      }
-    ],
-    "menus": {
-      "commandPalette": [
-        {
-          "command": "zipper.compress",
-          "when": "false"
-        },
-        {
-          "command": "zipper.extract",
-          "when": "false"
-        }
-      ],
-      "explorer/context": [
-        {
-          "group": "navigation@79",
-          "command": "zipper.compress",
-          "when": "true"
-        },
-        {
-          "group": "navigation@80",
-          "command": "zipper.extract",
-          "when": "resourceExtname == .zip"
-        }
-      ]
-    },
-    "customEditors": [
-      {
-        "viewType": "zipPreview.editor",
-        "displayName": "ZIP Preview",
-        "selector": [
-          {
-            "filenamePattern": "*.zip"
-          },
-          {
-            "filenamePattern": "*.jar"
-          },
-          {
-            "filenamePattern": "*.apk"
-          },
-          {
-            "filenamePattern": "*.vsix"
-          },
-          {
-            "filenamePattern": "*.mcpack"
-          },
-          {
-            "filenamePattern": "*.mcworld"
-          },
-          {
-            "filenamePattern": "*.mcaddon"
-          }
-        ]
-      }
-    ]
-  }
+	"name": "zipper",
+	"displayName": "Zipper",
+	"private": false,
+	"version": "1.0.7",
+	"publisher": "lyuwenhan",
+	"description": "A VS Code extension to do compression.",
+	"engines": {
+		"vscode": "^1.80.0"
+	},
+	"main": "./out/extension.js",
+	"activationEvents": [],
+	"icon": "media/icon.png",
+	"scripts": {
+		"vscode:prepublish": "node build.js",
+		"package": "vsce package --allow-missing-repository"
+	},
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/lyuwenhan/vscode-extensions",
+		"directory": "zipper"
+	},
+	"bugs": {
+		"url": "https://github.com/lyuwenhan/vscode-extensions/issues"
+	},
+	"dependencies": {
+		"archiver": "^7.0.1",
+		"unzipper": "^0.12.3"
+	},
+	"homepage": "https://lyuwenhan.github.io",
+	"categories": [
+		"Other"
+	],
+	"keywords": [],
+	"contributes": {
+		"commands": [
+			{
+				"category": "Zipper",
+				"command": "zipper.compress",
+				"title": "Compress"
+			},
+			{
+				"category": "Zipper",
+				"command": "zipper.extract",
+				"title": "Extract"
+			}
+		],
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "zipper.compress",
+					"when": "false"
+				},
+				{
+					"command": "zipper.extract",
+					"when": "false"
+				}
+			],
+			"explorer/context": [
+				{
+					"group": "navigation@79",
+					"command": "zipper.compress",
+					"when": "true"
+				},
+				{
+					"group": "navigation@80",
+					"command": "zipper.extract",
+					"when": "resourceExtname == .zip"
+				}
+			]
+		},
+		"customEditors": [
+			{
+				"viewType": "zipPreview.editor",
+				"displayName": "ZIP Preview",
+				"selector": [
+					{
+						"filenamePattern": "*.zip"
+					},
+					{
+						"filenamePattern": "*.jar"
+					},
+					{
+						"filenamePattern": "*.apk"
+					},
+					{
+						"filenamePattern": "*.vsix"
+					},
+					{
+						"filenamePattern": "*.mcpack"
+					},
+					{
+						"filenamePattern": "*.mcworld"
+					},
+					{
+						"filenamePattern": "*.mcaddon"
+					}
+				]
+			}
+		]
+	}
 }
