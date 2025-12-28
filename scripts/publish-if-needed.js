@@ -49,6 +49,7 @@ if (fs.existsSync(versionsPath)) {
 }(async function() {
 	let erro = false;
 	for (const dir of dirs) {
+		let oldPkg = {};
 		try {
 			console.log(`Loading files in ${dir}...`);
 			const extPath = path.join(root, dir);
@@ -65,6 +66,7 @@ if (fs.existsSync(versionsPath)) {
 			if (status.needsPublish) {
 				console.log(`Building & publishing ${dir}...`);
 				const pkg = JSON.parse(fs.readFileSync(pkgFile, "utf8"));
+				oldPkg = JSON.parse(JSON.stringify(pkg));
 				const [major, minor, patch] = pkg.version.split(".").map(Number);
 				if (status.useVersion && typeof status.useVersion === "string") {
 					pkg.version = status.useVersion;
@@ -79,7 +81,7 @@ if (fs.existsSync(versionsPath)) {
 					pkg.version = `${major}.${minor}.${patch+1}`;
 					console.log(`Patch version bumped to ${pkg.version}`)
 				}
-				fs.writeFileSync(pkgFile, JSON.stringify(pkg, null, 2));
+				fs.writeFileSync(pkgFile, JSON.stringify(pkg, null, "\t"));
 				execSync(`npm install`, {
 					cwd: extPath,
 					stdio: "inherit"
@@ -114,6 +116,7 @@ if (fs.existsSync(versionsPath)) {
 		} catch (err) {
 			erro = true;
 			console.error(`Failed to publish ${dir}: ${err.message}`)
+			fs.writeFileSync(pkgFile, JSON.stringify(oldPkg, null, "\t"));
 		}
 	}
 	fs.writeFileSync(versionsPath, JSON.stringify(versions) + "\n");
