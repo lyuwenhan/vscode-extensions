@@ -116,9 +116,8 @@ if (fs.existsSync(versionsPath)) {
 			console.error(`Failed to publish ${dir}: ${err.message}`)
 		}
 	}
+	fs.writeFileSync(versionsPath, JSON.stringify(versions) + "\n");
 	if (erro) {
 		process.exit(1)
-	}else{
-		fs.writeFileSync(versionsPath, JSON.stringify(versions) + "\n");
 	}
 })();
