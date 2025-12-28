@@ -287,7 +287,7 @@ function activate(context) {
 				} = await getPaths(inputPaths);
 				const zipName = inputPaths.length === 1 ? `${path.parse(inputPaths[0]).name}` : "archive";
 				let outputZip;
-				[finalName, outputZip] = tryName(commonRoot, zipName, ".zip");
+				[outputZip, finalName] = tryName(commonRoot, zipName, ".zip");
 				const output = fs.createWriteStream(outputZip);
 				const archive = archiver("zip", {
 					zlib: {
@@ -341,7 +341,7 @@ function activate(context) {
 				const baseDir = path.resolve(path.dirname(zipPath));
 				const targetName = path.parse(zipPath).name;
 				let targetDir;
-				[finalDir, targetDir] = tryName(baseDir, targetName);
+				[targetDir, finalDir] = tryName(baseDir, targetName);
 				await fs.promises.mkdir(targetDir, {
 					recursive: true
 				});
