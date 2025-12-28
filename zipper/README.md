@@ -40,6 +40,10 @@ Zipper provides a **read-only ZIP preview** inside VS Code, allowing you to **br
 - Tree-based folder structure view
 - Expand / collapse directories
 - No automatic extraction
+- This was tested on 
+  - Windows 11 25H2
+  - Ubuntu 22.04 LTS
+  - Macos
 
 ---
 
@@ -75,8 +79,6 @@ Progress and results are shown via VS Code notifications.
 
 - Only **ZIP** format is supported
 - No password-protected archives
-- This was only tested on `windows` and `wsl`
-- This might not work on `linux` and `mac`
 
 ---
 
