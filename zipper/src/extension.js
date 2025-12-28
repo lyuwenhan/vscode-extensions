@@ -16,7 +16,7 @@ function tryName(faDir, name, ext = "") {
 		filename = name + " (" + addition + ")" + ext;
 		dir = path.join(faDir, filename)
 	}
-	return [filename, dir]
+	return [dir, filename]
 }
 async function getPaths(paths) {
 	let pa = paths[0][0];
@@ -132,7 +132,7 @@ class ZipDocument {
 								}
 								const unsafePath = entry.path.slice(targetEntryPath.length);
 								const resolvedPath = path.resolve(outputDir, unsafePath);
-								if (!resolvedPath.startsWith(outputDir + path.sep)) {
+								if (!resolvedPath.startsWith(outputDir + path.sep) && resolvedPath !== outputDir) {
 									entry.autodrain();
 									reject(new Error(`Zip Slip detected: "${unsafePath}"`));
 									return
