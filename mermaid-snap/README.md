@@ -6,6 +6,8 @@ A lightweight **VS Code extension** that provides live **Mermaid diagram renderi
 
 ## Features
 
+![Demo](https://raw.githubusercontent.com/lyuwenhan/vscode-extensions/refs/heads/main/mermaid-snap/images/1.png)
+
 ### 1. Real-Time Mermaid Preview
 - Opens directly in the **VS Code sidebar**.  
 - Type Mermaid syntax in the **textarea** and instantly see the rendered **diagram** below.  
