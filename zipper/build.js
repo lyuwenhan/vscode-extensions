@@ -17,3 +17,4 @@ fs.promises.mkdir("out", {
 		})
 	}
 });
+#must-fail
