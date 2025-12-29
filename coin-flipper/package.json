@@ -2,7 +2,7 @@
 	"name": "coin-flipper",
 	"displayName": "Coin Flipper",
 	"private": false,
-	"version": "1.0.9",
+	"version": "1.0.10",
 	"publisher": "lyuwenhan",
 	"description": "A VS Code extension to make a coin flip with one click.",
 	"engines": {
