@@ -50,11 +50,11 @@ if (fs.existsSync(versionsPath)) {
 	let erro = false;
 	for (const dir of dirs) {
 		let oldPkg = {};
+		console.log(`Loading files in ${dir}...`);
+		const extPath = path.join(root, dir);
+		const statusFile = path.join(extPath, "status.json");
+		const pkgFile = path.join(extPath, "package.json");
 		try {
-			console.log(`Loading files in ${dir}...`);
-			const extPath = path.join(root, dir);
-			const statusFile = path.join(extPath, "status.json");
-			const pkgFile = path.join(extPath, "package.json");
 			let status;
 			try {
 				const raw = fs.readFileSync(statusFile, "utf8") || "{}";

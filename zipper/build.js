@@ -10,7 +10,7 @@ fs.promises.mkdir("out", {
 			entryPoints: ["./src/extension.js"],
 			bundle: true,
 			outfile: "out/extension.js",
-			external: ["vscode"],
+			external: ["vscode", "@aws-sdk/client-s3"],
 			format: "cjs",
 			platform: "node",
 			minify: true
