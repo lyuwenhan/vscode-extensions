@@ -110,7 +110,7 @@ const ret = {
 						properties: {
 							minify: {
 								type: "object",
-								description: "Options for CSS minification(cssnano)"
+								description: "Options for CSS minification(clean-css)"
 							},
 							beautify: {
 								type: "object",
@@ -217,26 +217,20 @@ function addGroup(e, i, arr) {
 });
 pkg.contributes = ret;
 fs.writeFileSync("package.json", JSON.stringify(pkg, null, "\t"));
-if (process.argv.slice(2).includes("--noMin")) {
-	fs.promises.rm("out", {
-		recursive: true,
-		force: true
-	}).then(() => fs.promises.cp("src", "out", {
-		recursive: true
-	}))
-} else {
-	fs.promises.rm("out", {
-		recursive: true,
-		force: true
-	}).then(() => fs.promises.mkdir("out", {
-		recursive: true
-	})).then(() => esbuild.build({
-		entryPoints: ["./src/extension.js"],
-		bundle: true,
-		outfile: "out/extension.js",
-		external: ["vscode"],
-		format: "cjs",
-		platform: "node",
-		minify: true
-	}))
-}
+fs.promises.mkdir("out", {
+	recursive: true
+}).then(() => {
+	if (process.argv.slice(2).includes("--noMin")) {
+		fs.writeFileSync("out/extension.js", 'module.exports=require("../src/extension.js")', "utf8")
+	} else {
+		esbuild.build({
+			entryPoints: ["./src/extension.js"],
+			bundle: true,
+			outfile: "out/extension.js",
+			external: ["vscode"],
+			format: "cjs",
+			platform: "node",
+			minify: true
+		})
+	}
+});

@@ -258,7 +258,7 @@ Minifier: Code Setting
 		},
 		"css": {
 			"minify": {
-				/* cssnano options */
+				/* clean-css options */
 			},
 			"beautify": {
 				/* js-beautify options */
@@ -360,23 +360,7 @@ These are the built-in defaults used by the extension:
 		},
 		"css": {
 			"minify": {
-				"preset": [
-					"default",
-					{
-						"mergeRules": false,
-						"mergeLonghand": false,
-						"discardDuplicates": false,
-						"discardUnused": false,
-						"reduceIdents": false,
-						"normalizeUnicode": false,
-						"normalizeUrl": false,
-						"colormin": false,
-						"minifySelectors": false,
-						"minifyParams": false,
-						"discardComments": true,
-						"normalizeWhitespace": true
-					}
-				]
+				"level": 2
 			},
 			"beautify": {
 				"indent_size": 4,
@@ -464,7 +448,7 @@ The configuration system allows you to:
 ## Notes
 - **JavaScript** minification uses [terser](https://github.com/terser/terser).
 - **HTML** minification uses [html-minifier-terser](https://github.com/terser/html-minifier-terser).
-- **CSS** minification uses [cssnano](https://github.com/cssnano/cssnano) and [postcss](https://github.com/postcss/postcss).
+- **CSS** minification uses [clean-css](https://github.com/jakubpawlowicz/clean-css).
 - **JavaScript**, **HTML**, **CSS** beautification uses [js-beautify](https://github.com/beautify-web/js-beautify).
 - **JSON** parsing uses [jsonc-parser](https://github.com/microsoft/node-jsonc-parser).
 - **JSON Lines** parsing uses [jsonparse](https://github.com/creationix/jsonparse).

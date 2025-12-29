@@ -21,12 +21,11 @@
 		"package": "vsce package --allow-missing-repository"
 	},
 	"dependencies": {
-		"cssnano": "^7.1.2",
+		"clean-css": "^5.3.3",
 		"html-minifier-terser": "^7.2.0",
 		"js-beautify": "^1.15.4",
 		"jsonc-parser": "^3.3.1",
 		"jsonparse": "^1.3.1",
-		"postcss": "^8.5.6",
 		"terser": "^5.44.0"
 	},
 	"license": "MIT",
@@ -378,23 +377,7 @@
 						},
 						"css": {
 							"minify": {
-								"preset": [
-									"default",
-									{
-										"mergeRules": false,
-										"mergeLonghand": false,
-										"discardDuplicates": false,
-										"discardUnused": false,
-										"reduceIdents": false,
-										"normalizeUnicode": false,
-										"normalizeUrl": false,
-										"colormin": false,
-										"minifySelectors": false,
-										"minifyParams": false,
-										"discardComments": true,
-										"normalizeWhitespace": true
-									}
-								]
+								"level": 2
 							},
 							"beautify": {
 								"indent_size": 4,
@@ -476,7 +459,7 @@
 							"properties": {
 								"minify": {
 									"type": "object",
-									"description": "Options for CSS minification(cssnano)"
+									"description": "Options for CSS minification(clean-css)"
 								},
 								"beautify": {
 									"type": "object",

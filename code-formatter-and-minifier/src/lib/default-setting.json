@@ -69,23 +69,7 @@
 	},
 	"css": {
 		"minify": {
-			"preset": [
-				"default",
-				{
-					"mergeRules": false,
-					"mergeLonghand": false,
-					"discardDuplicates": false,
-					"discardUnused": false,
-					"reduceIdents": false,
-					"normalizeUnicode": false,
-					"normalizeUrl": false,
-					"colormin": false,
-					"minifySelectors": false,
-					"minifyParams": false,
-					"discardComments": true,
-					"normalizeWhitespace": true
-				}
-			]
+			"level": 2
 		},
 		"beautify": {
 			"indent_size": 4,

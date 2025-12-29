@@ -3,13 +3,13 @@ const {
 	randomUUID
 } = require("crypto");
 const htmlMinify = require("html-minifier-terser").minify;
-const postcss = require("postcss");
-const cssnano = require("cssnano");
+const cleanCSS = require("clean-css");
 const terser = require("terser");
 const beautify = require("js-beautify");
 const JSONParse = require("jsonparse");
 const jsonc = require("./lib/jsonc-parser.js");
 const oldOpts = require("./lib/default-setting.json");
+let cleanCSSRunner = new cleanCSS(oldOpts.css.minify);
 let opts = oldOpts;
 
 function toJson(input) {
@@ -34,6 +34,7 @@ function readSettings() {
 			minify: {
 				...oldOpts.html.minify,
 				...toJson(settings.html?.minify),
+				minifyCSS: minifyCss,
 				minifyJS: minifyFile
 			},
 			beautify: {
@@ -66,6 +67,9 @@ function readSettings() {
 			}
 		}
 	};
+	if (JSON.stringify(newOpts.css.minify) !== JSON.stringify(opts.css.minify)) {
+		cleanCSSRunner = new cleanCSS(newOpts.css.minify)
+	}
 	opts = newOpts
 }
 
@@ -117,8 +121,8 @@ function jsonStringify1L(data, usingSpace) {
 		return "{" + out + "}"
 	}(data)
 }
-async function minifyHtml(content) {
-	return await htmlMinify(content, opts.html.minify)
+function minifyHtml(content) {
+	return htmlMinify(content, opts.html.minify)
 }
 
 function beautifyHtml(content) {
@@ -129,16 +133,15 @@ async function mitifyHtml(content) {
 }
 
 function minifyCss(content) {
-	return postcss([cssnano(opts.css.minify)]).process(content, {
-		from: undefined
-	}).then(e => e.css)
+	return cleanCSSRunner.minify(content).styles
 }
 
 function beautifyCss(content) {
 	return beautify.css(content, opts.css.beautify)
 }
-async function mitifyCss(content) {
-	return beautifyCss(await minifyCss(content))
+
+function mitifyCss(content) {
+	return beautifyCss(minifyCss(content))
 }
 
 function minifyFile(content) {
