@@ -159,12 +159,12 @@
 				{
 					"group": "navigation@92",
 					"command": "minifier.sortListSel",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (config.minifier.enableSortList && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl))"
 				},
 				{
 					"group": "navigation@93",
 					"command": "minifier.sortListByKeySel",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (config.minifier.enableSortList && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl))"
 				},
 				{
 					"group": "navigation@94",
@@ -189,12 +189,12 @@
 				{
 					"group": "navigation@98",
 					"command": "minifier.sortList",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (config.minifier.enableSortList && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl))"
 				},
 				{
 					"group": "navigation@99",
 					"command": "minifier.sortListByKey",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (config.minifier.enableSortList && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl))"
 				}
 			],
 			"commandPalette": [
@@ -216,11 +216,11 @@
 				},
 				{
 					"command": "minifier.sortListSel",
-					"when": "resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
+					"when": "config.minifier.enableSortList && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
 				},
 				{
 					"command": "minifier.sortListByKeySel",
-					"when": "resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
+					"when": "config.minifier.enableSortList && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
 				},
 				{
 					"command": "minifier.minify",
@@ -240,11 +240,11 @@
 				},
 				{
 					"command": "minifier.sortList",
-					"when": "resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
+					"when": "config.minifier.enableSortList && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
 				},
 				{
 					"command": "minifier.sortListByKey",
-					"when": "resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
+					"when": "config.minifier.enableSortList && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
 				}
 			],
 			"explorer/context": [
@@ -299,6 +299,11 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Enable or disable mitify."
+				},
+				"minifier.enableSortList": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable or disable sort list."
 				},
 				"minifier.codeSetting": {
 					"type": "object",

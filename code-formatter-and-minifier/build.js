@@ -26,11 +26,11 @@ const contr = [{
 }, {
 	command: "sortList",
 	title: "Sort lists from",
-	when: [false, true, ["jsons"]]
+	when: [false, true, ["jsons"], "config.minifier.enableSortList"]
 }, {
 	command: "sortListByKey",
 	title: "Sort lists by keys from",
-	when: [false, true, ["jsons"]]
+	when: [false, true, ["jsons"], "config.minifier.enableSortList"]
 }];
 const ret = {
 	commands: [{
@@ -59,6 +59,11 @@ const ret = {
 				type: "boolean",
 				default: true,
 				description: "Enable or disable mitify."
+			},
+			"minifier.enableSortList": {
+				type: "boolean",
+				default: true,
+				description: "Enable or disable sort list."
 			},
 			"minifier.codeSetting": {
 				type: "object",
