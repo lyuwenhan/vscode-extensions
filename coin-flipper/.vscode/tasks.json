@@ -9,7 +9,12 @@
 				"build.js",
 				"--noMin"
 			],
-			"problemMatcher": []
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "silent",
+				"focus": false,
+				"panel": "shared"
+			}
 		}
 	]
 }

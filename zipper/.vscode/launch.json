@@ -10,6 +10,7 @@
 				"--extensionDevelopmentPath=${workspaceFolder}",
 				"--new-window"
 			],
+			"internalConsoleOptions": "openOnSessionStart",
 			"outFiles": [
 				"${workspaceFolder}/src/**/*.js"
 			],

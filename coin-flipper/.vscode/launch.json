@@ -10,8 +10,9 @@
 				"--extensionDevelopmentPath=${workspaceFolder}",
 				"--new-window"
 			],
+			"internalConsoleOptions": "openOnSessionStart",
 			"outFiles": [
-				"${workspaceFolder}/out/**/*.js"
+				"${workspaceFolder}/src/**/*.js"
 			],
 			"preLaunchTask": "esbuild extension"
 		}
