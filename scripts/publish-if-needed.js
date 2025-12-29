@@ -116,7 +116,11 @@ if (fs.existsSync(versionsPath)) {
 		} catch (err) {
 			erro = true;
 			console.error(`Failed to publish ${dir}: ${err.message}`);
-			fs.writeFileSync(pkgFile, JSON.stringify(oldPkg, null, "\t") + "\n")
+			fs.writeFileSync(pkgFile, JSON.stringify(oldPkg, null, "\t") + "\n");
+			execSync(`npm install`, {
+				cwd: extPath,
+				stdio: "inherit"
+			})
 		}
 	}
 	fs.writeFileSync(versionsPath, JSON.stringify(versions) + "\n");
