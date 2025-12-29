@@ -1,62 +1,62 @@
 {
-  "name": "sidebar-notes",
-  "displayName": "Sidebar Notes",
-  "private": false,
-  "version": "1.0.13",
-  "publisher": "lyuwenhan",
-  "description": "A VS Code extension for taking quick notes in the sidebar.",
-  "engines": {
-    "vscode": "^1.80.0"
-  },
-  "main": "./out/extension.js",
-  "activationEvents": [
-    "onStartupFinished"
-  ],
-  "icon": "media/icon.png",
-  "scripts": {
-    "vscode:prepublish": "node build.js",
-    "package": "vsce package --allow-missing-repository"
-  },
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/lyuwenhan/vscode-extensions",
-    "directory": "sidebar-notes"
-  },
-  "bugs": {
-    "url": "https://github.com/lyuwenhan/vscode-extensions/issues"
-  },
-  "homepage": "https://lyuwenhan.github.io",
-  "categories": [
-    "Other"
-  ],
-  "keywords": [
-    "notes",
-    "sidebar",
-    "notepad",
-    "memo",
-    "scratchpad",
-    "productivity"
-  ],
-  "contributes": {
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "sidebarNotes",
-          "title": "Notes",
-          "icon": "media/icon.svg"
-        }
-      ]
-    },
-    "views": {
-      "sidebarNotes": [
-        {
-          "type": "webview",
-          "id": "notesView",
-          "name": "Notes",
-          "icon": "media/icon.svg"
-        }
-      ]
-    }
-  }
+	"name": "sidebar-notes",
+	"displayName": "Sidebar Notes",
+	"private": false,
+	"version": "1.0.14",
+	"publisher": "lyuwenhan",
+	"description": "A VS Code extension for taking quick notes in the sidebar.",
+	"engines": {
+		"vscode": "^1.80.0"
+	},
+	"main": "./out/extension.js",
+	"activationEvents": [
+		"onStartupFinished"
+	],
+	"icon": "media/icon.png",
+	"scripts": {
+		"vscode:prepublish": "node build.js",
+		"package": "vsce package --allow-missing-repository"
+	},
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/lyuwenhan/vscode-extensions",
+		"directory": "sidebar-notes"
+	},
+	"bugs": {
+		"url": "https://github.com/lyuwenhan/vscode-extensions/issues"
+	},
+	"homepage": "https://lyuwenhan.github.io",
+	"categories": [
+		"Other"
+	],
+	"keywords": [
+		"notes",
+		"sidebar",
+		"notepad",
+		"memo",
+		"scratchpad",
+		"productivity"
+	],
+	"contributes": {
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "sidebarNotes",
+					"title": "Notes",
+					"icon": "media/icon.svg"
+				}
+			]
+		},
+		"views": {
+			"sidebarNotes": [
+				{
+					"type": "webview",
+					"id": "notesView",
+					"name": "Notes",
+					"icon": "media/icon.svg"
+				}
+			]
+		}
+	}
 }
