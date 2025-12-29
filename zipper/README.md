@@ -20,6 +20,8 @@ Designed for quick, local file operations without leaving the editor.
 - Multiple selections:
   → `archive.zip`
 
+![Demo](images/1.png)
+
 ### 2. Unzip Archives
 
 - Right-click a `.zip` file in the **Explorer**
@@ -29,9 +31,13 @@ Designed for quick, local file operations without leaving the editor.
 **Behavior**
   `example.zip` → `example/`
 
+![Demo](images/2.png)
+
 ### 3. ZIP Preview
 
 Zipper provides a **read-only ZIP preview** inside VS Code, allowing you to **browse archive contents without extracting**.
+
+![Demo](images/3.png)
 
 ---
 
