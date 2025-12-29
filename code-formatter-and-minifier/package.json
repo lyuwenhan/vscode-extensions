@@ -343,7 +343,7 @@
 								"collapseWhitespace": true,
 								"removeComments": true,
 								"removeEmptyAttributes": true,
-								"removeTagWhitespace": true,
+								"removeTagWhitespace": false,
 								"removeAttributeQuotes": false,
 								"removeEmptyElements": false,
 								"removeRedundantAttributes": false,
