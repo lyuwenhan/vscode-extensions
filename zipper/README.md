@@ -20,7 +20,7 @@ Designed for quick, local file operations without leaving the editor.
 - Multiple selections:
   → `archive.zip`
 
-![Demo](images/1.png)
+![Demo](https://raw.githubusercontent.com/lyuwenhan/vscode-extensions/refs/heads/main/zipper/images/1.png)
 
 ### 2. Unzip Archives
 
@@ -31,13 +31,13 @@ Designed for quick, local file operations without leaving the editor.
 **Behavior**
   `example.zip` → `example/`
 
-![Demo](images/2.png)
+![Demo](https://raw.githubusercontent.com/lyuwenhan/vscode-extensions/refs/heads/main/zipper/images/2.png)
 
 ### 3. ZIP Preview
 
 Zipper provides a **read-only ZIP preview** inside VS Code, allowing you to **browse archive contents without extracting**.
 
-![Demo](images/3.png)
+![Demo](https://raw.githubusercontent.com/lyuwenhan/vscode-extensions/refs/heads/main/zipper/images/3.png)
 
 ---
 
