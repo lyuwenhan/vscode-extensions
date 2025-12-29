@@ -62,118 +62,7 @@ const ret = {
 			},
 			"minifier.codeSetting": {
 				type: "object",
-				default: {
-					javascript: {
-						minify: {
-							compress: false,
-							mangle: false,
-							format: {
-								beautify: false,
-								semicolons: true,
-								shorthand: true
-							}
-						},
-						beautify: {
-							indent_size: 4,
-							indent_char: "\t",
-							indent_level: 0,
-							brace_style: "collapse",
-							eol: "\n",
-							end_with_newline: true,
-							preserve_newlines: false,
-							indent_with_tabs: true,
-							max_preserve_newlines: 1,
-							jslint_happy: false,
-							space_after_named_function: false,
-							space_after_anon_function: false,
-							keep_array_indentation: false,
-							keep_function_indentation: false,
-							space_before_conditional: true,
-							break_chained_methods: false,
-							eval_code: false,
-							unescape_strings: false,
-							wrap_line_length: 0,
-							indent_empty_lines: false,
-							templating: ["auto"]
-						}
-					},
-					html: {
-						minify: {
-							collapseWhitespace: true,
-							removeComments: true,
-							removeEmptyAttributes: true,
-							removeTagWhitespace: false,
-							removeAttributeQuotes: false,
-							removeEmptyElements: false,
-							removeRedundantAttributes: false,
-							removeOptionalTags: false,
-							sortAttributes: false,
-							sortClassName: false,
-							keepClosingSlash: true,
-							processConditionalComments: false,
-							ignoreCustomComments: [],
-							ignoreCustomFragments: [],
-							caseSensitive: false,
-							html5: true
-						},
-						beautify: {
-							indent_size: 4,
-							indent_char: "\t",
-							indent_with_tabs: true,
-							eol: "\n",
-							end_with_newline: true,
-							preserve_newlines: false,
-							max_preserve_newlines: 1,
-							wrap_line_length: 0,
-							indent_inner_html: true,
-							indent_empty_lines: false
-						}
-					},
-					css: {
-						minify: {
-							preset: ["default", {
-								mergeRules: false,
-								mergeLonghand: false,
-								discardDuplicates: false,
-								discardUnused: false,
-								reduceIdents: false,
-								normalizeUnicode: false,
-								normalizeUrl: false,
-								colormin: false,
-								minifySelectors: false,
-								minifyParams: false,
-								discardComments: true,
-								normalizeWhitespace: true
-							}]
-						},
-						beautify: {
-							indent_size: 4,
-							indent_char: "\t",
-							indent_with_tabs: true,
-							eol: "\n",
-							end_with_newline: true,
-							newline_between_rules: false,
-							selector_separator_newline: false,
-							preserve_newlines: false,
-							max_preserve_newlines: 1,
-							wrap_line_length: 0,
-							space_around_combinator: true,
-							space_around_selector_separator: true,
-							indent_empty_lines: false
-						}
-					},
-					json: {
-						minify: {
-							singleLineSpacing: false
-						},
-						jsonLMinify: {
-							singleLineSpacing: true
-						},
-						beautify: {
-							indent: "\t"
-						}
-					}
-				},
+				default: require("./src/lib/default-setting.json"),
 				description: "Formatter and Minifier Settings.",
 				required: ["javascript", "html", "css"],
 				additionalProperties: false,
@@ -331,7 +220,12 @@ if (process.argv.slice(2).includes("--noMin")) {
 		recursive: true
 	}))
 } else {
-	esbuild.build({
+	fs.promises.rm("out", {
+		recursive: true,
+		force: true
+	}).then(() => fs.promises.mkdir("out", {
+		recursive: true
+	})).then(() => esbuild.build({
 		entryPoints: ["./src/extension.js"],
 		bundle: true,
 		outfile: "out/extension.js",
@@ -339,5 +233,5 @@ if (process.argv.slice(2).includes("--noMin")) {
 		format: "cjs",
 		platform: "node",
 		minify: true
-	})
+	}))
 }

@@ -9,120 +9,7 @@ const terser = require("terser");
 const beautify = require("js-beautify");
 const JSONParse = require("jsonparse");
 const jsonc = require("./lib/jsonc-parser.js");
-const oldOpts = {
-	javascript: {
-		minify: {
-			compress: false,
-			mangle: false,
-			format: {
-				beautify: false,
-				semicolons: true,
-				shorthand: true
-			}
-		},
-		beautify: {
-			indent_size: 4,
-			indent_char: "\t",
-			indent_level: 0,
-			brace_style: "collapse",
-			eol: "\n",
-			end_with_newline: true,
-			preserve_newlines: false,
-			indent_with_tabs: true,
-			max_preserve_newlines: 1,
-			jslint_happy: false,
-			space_after_named_function: false,
-			space_after_anon_function: false,
-			keep_array_indentation: false,
-			keep_function_indentation: false,
-			space_before_conditional: true,
-			break_chained_methods: false,
-			eval_code: false,
-			unescape_strings: false,
-			wrap_line_length: 0,
-			indent_empty_lines: false,
-			templating: ["auto"]
-		}
-	},
-	html: {
-		minify: {
-			collapseWhitespace: true,
-			removeComments: true,
-			removeEmptyAttributes: true,
-			removeTagWhitespace: false,
-			minifyCSS: minifyCss,
-			minifyJS: minifyFile,
-			removeAttributeQuotes: false,
-			removeEmptyElements: false,
-			removeRedundantAttributes: false,
-			removeOptionalTags: false,
-			sortAttributes: false,
-			sortClassName: false,
-			keepClosingSlash: true,
-			processConditionalComments: false,
-			ignoreCustomComments: [],
-			ignoreCustomFragments: [],
-			caseSensitive: false,
-			html5: true
-		},
-		beautify: {
-			indent_size: 4,
-			indent_char: "\t",
-			indent_with_tabs: true,
-			eol: "\n",
-			end_with_newline: true,
-			preserve_newlines: false,
-			max_preserve_newlines: 1,
-			wrap_line_length: 0,
-			indent_inner_html: true,
-			indent_empty_lines: false
-		}
-	},
-	css: {
-		minify: {
-			preset: ["default", {
-				mergeRules: false,
-				mergeLonghand: false,
-				discardDuplicates: false,
-				discardUnused: false,
-				reduceIdents: false,
-				normalizeUnicode: false,
-				normalizeUrl: false,
-				colormin: false,
-				minifySelectors: false,
-				minifyParams: false,
-				discardComments: true,
-				normalizeWhitespace: true
-			}]
-		},
-		beautify: {
-			indent_size: 4,
-			indent_char: "\t",
-			indent_with_tabs: true,
-			eol: "\n",
-			end_with_newline: true,
-			newline_between_rules: false,
-			selector_separator_newline: false,
-			preserve_newlines: false,
-			max_preserve_newlines: 1,
-			wrap_line_length: 0,
-			space_around_combinator: true,
-			space_around_selector_separator: true,
-			indent_empty_lines: false
-		}
-	},
-	json: {
-		minify: {
-			singleLineSpacing: false
-		},
-		jsonLMinify: {
-			singleLineSpacing: true
-		},
-		beautify: {
-			indent: "\t"
-		}
-	}
-};
+const oldOpts = require("./lib/default-setting.json");
 let opts = oldOpts;
 
 function toJson(input) {
@@ -146,7 +33,8 @@ function readSettings() {
 		html: {
 			minify: {
 				...oldOpts.html.minify,
-				...toJson(settings.html?.minify)
+				...toJson(settings.html?.minify),
+				minifyJS: minifyFile
 			},
 			beautify: {
 				...oldOpts.html.beautify,
@@ -237,8 +125,7 @@ function beautifyHtml(content) {
 	return beautify.html(content, opts.html.beautify)
 }
 async function mitifyHtml(content) {
-	const min = await minifyHtml(content);
-	return beautifyHtml(min)
+	return beautifyHtml(await minifyHtml(content))
 }
 
 function minifyCss(content) {
@@ -538,9 +425,9 @@ function activate(context) {
 				await saveDocContent(doc, result);
 				vscode.window.showInformationMessage(sucMsg + " successfully.")
 			} catch (e) {
-				vscode.window.showErrorMessage(e.message || String(e))
+				vscode.window.showErrorMessage(e.message || String(e));
 				console.error(e);
-				console.error(e.stack);
+				console.error(e.stack)
 			}
 		}), vscode.commands.registerCommand("minifier." + action + "Sel", async () => {
 			try {
@@ -584,9 +471,9 @@ function activate(context) {
 				});
 				vscode.window.showInformationMessage(sucMsg + " successfully.")
 			} catch (e) {
-				vscode.window.showErrorMessage(e.message || String(e))
+				vscode.window.showErrorMessage(e.message || String(e));
 				console.error(e);
-				console.error(e.stack);
+				console.error(e.stack)
 			}
 		}))
 	});
@@ -609,9 +496,9 @@ function activate(context) {
 			});
 			vscode.window.showInformationMessage("UUID Generator: Generated successfully.")
 		} catch (e) {
-			vscode.window.showErrorMessage(e.message || String(e))
+			vscode.window.showErrorMessage(e.message || String(e));
 			console.error(e);
-			console.error(e.stack);
+			console.error(e.stack)
 		}
 	});
 	[{
@@ -697,9 +584,9 @@ function activate(context) {
 				await runAct(editor, action.actionName, actByLang);
 				vscode.window.showInformationMessage(action.sucMsg + " successfully.")
 			} catch (e) {
-				vscode.window.showErrorMessage(e.message || String(e))
+				vscode.window.showErrorMessage(e.message || String(e));
 				console.error(e);
-				console.error(e.stack);
+				console.error(e.stack)
 			}
 		})
 	});
