@@ -2,7 +2,7 @@
 	"name": "code-formatter-and-minifier",
 	"displayName": "Code Formatter & Minifier",
 	"private": false,
-	"version": "1.1.5",
+	"version": "1.1.6",
 	"publisher": "lyuwenhan",
 	"description": "A VS Code extension to minify and beautify JavaScript, and sort JSON files with one click.",
 	"engines": {
@@ -343,7 +343,7 @@
 								"collapseWhitespace": true,
 								"removeComments": true,
 								"removeEmptyAttributes": true,
-								"removeTagWhitespace": false,
+								"removeTagWhitespace": true,
 								"removeAttributeQuotes": false,
 								"removeEmptyElements": false,
 								"removeRedundantAttributes": false,
