@@ -48,7 +48,7 @@ const oldOpts = {
 			collapseWhitespace: true,
 			removeComments: true,
 			removeEmptyAttributes: true,
-			removeTagWhitespace: true,
+			removeTagWhitespace: false,
 			minifyCSS: minifyCss,
 			minifyJS: minifyFile,
 			removeAttributeQuotes: false,
