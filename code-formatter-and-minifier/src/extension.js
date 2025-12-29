@@ -80,7 +80,7 @@ function jsonStringify1L(data, usingSpace) {
 		if (node === undefined) {
 			return
 		}
-		if (typeof node == "number") {
+		if (typeof node === "number") {
 			return isFinite(node) ? "" + node : "null"
 		}
 		if (typeof node !== "object") {
@@ -121,6 +121,7 @@ function jsonStringify1L(data, usingSpace) {
 		return "{" + out + "}"
 	}(data)
 }
+
 function minifyHtml(content) {
 	return htmlMinify(content, opts.html.minify)
 }
@@ -298,17 +299,21 @@ async function getDoc(uri) {
 	if (!uri || !uri.fsPath) {
 		return vscode.window.activeTextEditor?.document
 	}
-	const filePath = uri.fsPath;
 	let found;
 	if (uri.scheme !== "untitled") {
-		for (const doc of vscode.workspace.textDocuments.filter(d => d.uri.fsPath === filePath)) {
+		for (const doc of vscode.workspace.textDocuments.filter(d => d.uri.toString() === uri.toString())) {
 			found ??= doc;
-			if (doc.isDirty) {
+			if (uri.scheme === "file" && doc.isDirty) {
 				await doc.save()
 			}
 		}
 	}
-	return found ?? await vscode.workspace.openTextDocument(uri)
+	try {
+		found ??= await vscode.workspace.openTextDocument(uri)
+	} catch (e) {
+		console.error(e)
+	}
+	return found
 }
 
 function normEol(content) {
@@ -358,7 +363,9 @@ const actions = {
 		opers: {
 			javascript: mitifyFile,
 			html: mitifyHtml,
-			css: mitifyCss
+			css: mitifyCss,
+			json: beautifyJson,
+			jsonl: beautifyJsonL
 		}
 	},
 	sort: {
@@ -388,10 +395,10 @@ const actions = {
 };
 async function runAction(oper, content) {
 	content = content.trim();
-	oper ??= e => e;
 	if (content === "") {
 		return ""
 	}
+	oper ??= e => e;
 	readSettings();
 	return (await oper(content)).trim()
 }
@@ -405,28 +412,39 @@ function activate(context) {
 		if (!opers) {
 			return
 		}
-		context.subscriptions.push(vscode.commands.registerCommand("minifier." + action, async uri => {
+		context.subscriptions.push(vscode.commands.registerCommand("minifier." + action, async (uri, selectedUris) => {
 			try {
-				const doc = await getDoc(uri);
-				if (!doc) {
+				const uris = Array.isArray(selectedUris) && selectedUris.length > 0 ? selectedUris : uri ? [uri] : [];
+				const docs = (await Promise.all(uris.map(getDoc))).filter(Boolean);
+				if (!docs.length) {
 					throw new Error(actionName + ": No file selected.")
 				}
-				const {
-					lang,
-					content
-				} = getDocInfo(doc);
-				const actByLang = opers[lang];
-				if (!actByLang) {
-					vscode.window.showErrorMessage("Invalid file type.");
-					return
+				let NC = false,
+					suc = false;
+				await Promise.all(docs.map(async doc => {
+					const {
+						lang,
+						content
+					} = getDocInfo(doc);
+					const actByLang = opers[lang];
+					if (!actByLang) {
+						return
+					}
+					let result = await runAction(actByLang, content) + "\n";
+					if (content === result) {
+						NC = true;
+						return
+					}
+					await saveDocContent(doc, result);
+					suc = true
+				}));
+				if (suc) {
+					vscode.window.showInformationMessage(sucMsg + " successfully.")
+				} else if (NC) {
+					vscode.window.showWarningMessage(actionName + ": Nothing changed.")
+				} else {
+					vscode.window.showErrorMessage("Invalid file type.")
 				}
-				let result = await runAction(actByLang, content) + "\n";
-				if (content === result) {
-					vscode.window.showWarningMessage(actionName + ": Nothing changed.");
-					return
-				}
-				await saveDocContent(doc, result);
-				vscode.window.showInformationMessage(sucMsg + " successfully.")
 			} catch (e) {
 				vscode.window.showErrorMessage(e.message || String(e));
 				console.error(e);
