@@ -93,7 +93,16 @@ function displayTree(message) {
 
 	function dfs(node, father, path) {
 		const ul = document.createElement("ul");
-		for (const [name, child] of Object.entries(node.next)) {
+		const ent = Object.entries(node.next);
+		if (!ent.length) {
+			const li = document.createElement("li");
+			const span = document.createElement("span");
+			span.classList.add("downloadFa");
+			span.innerText = "This directory is empty.";
+			li.append(span);
+			ul.append(li)
+		}
+		for (const [name, child] of ent) {
 			const nPath = path + name + (child.isFolder ? "/" : "");
 			const li = document.createElement("li");
 			const span = document.createElement("span");
