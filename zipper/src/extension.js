@@ -261,6 +261,18 @@ class ZipPreviewEditor {
 		})
 	}
 }
+async function walkDir(dir, onData, baseDir = dir) {
+	const entries = await fs.promises.readdir(dir, {
+		withFileTypes: true
+	});
+	for (const entry of entries) {
+		const full = path.join(dir, entry.name);
+		if (entry.isDirectory()) {
+			await onData(path.relative(baseDir, full));
+			await walkDir(full, onData, baseDir)
+		}
+	}
+}
 
 function activate(context) {
 	const zipDisposable = vscode.commands.registerCommand("zipper.compress", async (uri, selectedUris) => {
@@ -311,6 +323,14 @@ function activate(context) {
 					}
 					of paths) {
 					if (isFolder) {
+						archive.append("", {
+							name: pa
+						});
+						await walkDir(realPa, dir => {
+							archive.append("", {
+								name: path.join(pa, dir) + "/"
+							})
+						});
 						archive.directory(realPa, pa)
 					} else {
 						archive.file(realPa, {
