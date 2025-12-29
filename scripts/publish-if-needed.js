@@ -30,7 +30,7 @@ async function retryExec(command, options = {}, maxRetries = 5, initialDelay = 1
 const openVsxToken = process.env.OPEN_VSX_TOKEN;
 const vsMarketToken = process.env.VS_MARKETPLACE_TOKEN;
 const root = process.cwd();
-const excluded = ["scripts", ".git", "node_modules"];
+const excluded = [".git", ".github", "extensions", "lib", "node_modules", "scripts"];
 const dirs = fs.readdirSync(root).filter(d => !excluded.includes(d) && fs.existsSync(path.join(root, d, "status.json")));
 const defaultStatus = {
 	needsPublish: false,
