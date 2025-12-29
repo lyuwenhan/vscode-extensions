@@ -15,7 +15,7 @@
 	"icon": "media/icon.png",
 	"scripts": {
 		"vscode:prepublish": "node build.js",
-		"package": "vsce package --allow-missing-repository"
+		"package": "vsce package"
 	},
 	"license": "MIT",
 	"repository": {

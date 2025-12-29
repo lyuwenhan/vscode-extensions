@@ -13,12 +13,14 @@
 		"onLanguage:javascript",
 		"onLanguage:json",
 		"onLanguage:jsonc",
-		"onLanguage:jsonl"
+		"onLanguage:jsonl",
+		"onLanguage:html",
+		"onLanguage:css"
 	],
 	"icon": "media/icon.png",
 	"scripts": {
 		"vscode:prepublish": "node build.js",
-		"package": "vsce package --allow-missing-repository"
+		"package": "vsce package"
 	},
 	"dependencies": {
 		"clean-css": "^5.3.3",

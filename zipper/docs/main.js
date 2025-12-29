@@ -133,7 +133,7 @@ function displayTree(message) {
 }
 window.addEventListener("message", event => {
 	const message = event.data;
-	if (message.type == "setup") {
+	if (message.type === "setup") {
 		if (loadInter) {
 			clearInterval(loadInter);
 			loadInter = 0

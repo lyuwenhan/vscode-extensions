@@ -49,11 +49,11 @@ class LeftPanelWebviewProvider {
 	}
 	activateMessageListener(webviewView) {
 		webviewView.webview.onDidReceiveMessage(async message => {
-			if (message.type == "edit") {
+			if (message.type === "edit") {
 				this.content = message.content ?? ""
-			} else if (message.type == "get") {
+			} else if (message.type === "get") {
 				this.sendSetup(webviewView)
-			} else if (message.type == "export") {
+			} else if (message.type === "export") {
 				this.showExports(message.content ?? "")
 			}
 		})

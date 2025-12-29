@@ -13,7 +13,7 @@
 	"icon": "media/icon.png",
 	"scripts": {
 		"vscode:prepublish": "node build.js",
-		"package": "vsce package --allow-missing-repository"
+		"package": "vsce package"
 	},
 	"license": "MIT",
 	"repository": {
@@ -30,9 +30,17 @@
 	},
 	"homepage": "https://lyuwenhan.github.io",
 	"categories": [
+		"Visualization",
 		"Other"
 	],
-	"keywords": [],
+	"keywords": [
+		"zip",
+		"unzip",
+		"archive",
+		"compression",
+		"visualization",
+		"preview"
+	],
 	"contributes": {
 		"commands": [
 			{

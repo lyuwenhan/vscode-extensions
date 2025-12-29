@@ -57,7 +57,7 @@ if (window.acquireVsCodeApi) {
 	};
 	window.addEventListener("message", event => {
 		const message = event.data;
-		if (message.type == "setup" && message.content) {
+		if (message.type === "setup" && message.content) {
 			notepadEle.value = message.content;
 			renderMermaid()
 		}

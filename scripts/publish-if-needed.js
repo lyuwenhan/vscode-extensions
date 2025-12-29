@@ -81,7 +81,7 @@ if (fs.existsSync(versionsPath)) {
 					pkg.version = `${major}.${minor}.${patch+1}`;
 					console.log(`Patch version bumped to ${pkg.version}`)
 				}
-				fs.writeFileSync(pkgFile, JSON.stringify(pkg, null, "\t"));
+				fs.writeFileSync(pkgFile, JSON.stringify(pkg, null, "\t") + "\n");
 				execSync(`npm install`, {
 					cwd: extPath,
 					stdio: "inherit"
@@ -115,8 +115,8 @@ if (fs.existsSync(versionsPath)) {
 			fs.writeFileSync(statusFile, JSON.stringify(defaultStatus, null, "\t") + "\n", "utf8")
 		} catch (err) {
 			erro = true;
-			console.error(`Failed to publish ${dir}: ${err.message}`)
-			fs.writeFileSync(pkgFile, JSON.stringify(oldPkg, null, "\t"));
+			console.error(`Failed to publish ${dir}: ${err.message}`);
+			fs.writeFileSync(pkgFile, JSON.stringify(oldPkg, null, "\t") + "\n")
 		}
 	}
 	fs.writeFileSync(versionsPath, JSON.stringify(versions) + "\n");

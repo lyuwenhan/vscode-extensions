@@ -35,11 +35,11 @@ class LeftPanelWebviewProvider {
 	}
 	activateMessageListener (webviewView) {
 		webviewView.webview.onDidReceiveMessage(async message => {
-			if (message.type == "edit") {
+			if (message.type === "edit") {
 				this.content = message.content ?? "";
 				this.fontSize = +(message.fontSize ?? "16");
 				this.lang = message.lang ?? "plain text"
-			} else if (message.type == "get") {
+			} else if (message.type === "get") {
 				this.sendSetup(webviewView)
 			}
 		})

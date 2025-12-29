@@ -121,7 +121,7 @@ if (window.acquireVsCodeApi) {
 	};
 	window.addEventListener("message", event => {
 		const message = event.data;
-		if (message.type == "setup") {
+		if (message.type === "setup") {
 			lang = message.lang ?? "plain text";
 			previewButEle.hidden = lang !== "markdown" && lang !== "html";
 			if(previewButEle.hidden){
@@ -146,7 +146,7 @@ renderer.code = function (code) {
 	if (!code.lang) {
 		code.lang = "none"
 	}
-	if (code.lang == "c++") {
+	if (code.lang === "c++") {
 		code.lang = "cpp"
 	}
 	return `<pre class="line-numbers language-${code.lang}"><code class="language-${code.lang}">${escapeHtml(code.text)}</code></pre>`
@@ -170,7 +170,7 @@ previewButEle.addEventListener("click", () => {
 			previewEle.hidden = false;
 			editor.getWrapperElement().hidden = true;
 			let text = editor.getValue();
-			if (lang == "markdown") {
+			if (lang === "markdown") {
 				text = marked.parse(text)
 			}
 			text = DOMPurify.sanitize(text, {
@@ -184,7 +184,7 @@ previewButEle.addEventListener("click", () => {
 				FORBID_CONTENTS: ["script", "iframe"]
 			});
 			previewEle.innerHTML = text;
-			if (lang == "markdown") {
+			if (lang === "markdown") {
 				MathJax.typesetPromise([previewEle]);
 				Prism.highlightAllUnder(previewEle)
 			}
