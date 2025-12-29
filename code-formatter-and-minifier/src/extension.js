@@ -3,11 +3,12 @@ const {
 	randomUUID
 } = require("crypto");
 const htmlMinify = require("html-minifier-terser").minify;
-const cleanCSS = require("clean-css");
+const postcss = require("postcss");
+const cssnano = require("cssnano");
 const terser = require("terser");
 const beautify = require("js-beautify");
 const JSONParse = require("jsonparse");
-const jsonc = require("jsonc-parser/lib/esm/main.js");
+const jsonc = require("./lib/jsonc-parser.js");
 const oldOpts = {
 	javascript: {
 		minify: {
@@ -79,7 +80,20 @@ const oldOpts = {
 	},
 	css: {
 		minify: {
-			level: 0
+			preset: ["default", {
+				mergeRules: false,
+				mergeLonghand: false,
+				discardDuplicates: false,
+				discardUnused: false,
+				reduceIdents: false,
+				normalizeUnicode: false,
+				normalizeUrl: false,
+				colormin: false,
+				minifySelectors: false,
+				minifyParams: false,
+				discardComments: true,
+				normalizeWhitespace: true
+			}]
 		},
 		beautify: {
 			indent_size: 4,
@@ -109,7 +123,6 @@ const oldOpts = {
 		}
 	}
 };
-let cleanCSSRunner = new cleanCSS(oldOpts.css.minify);
 let opts = oldOpts;
 
 function toJson(input) {
@@ -165,9 +178,6 @@ function readSettings() {
 			}
 		}
 	};
-	if (JSON.stringify(newOpts.css.minify) !== JSON.stringify(opts.css.minify)) {
-		cleanCSSRunner = new cleanCSS(newOpts.css.minify)
-	}
 	opts = newOpts
 }
 
@@ -232,14 +242,16 @@ async function mitifyHtml(content) {
 }
 
 function minifyCss(content) {
-	return cleanCSSRunner.minify(content).styles
+	return postcss([cssnano(opts.css.minify)]).process(content, {
+		from: undefined
+	}).then(e => e.css)
 }
 
 function beautifyCss(content) {
 	return beautify.css(content, opts.css.beautify)
 }
 async function mitifyCss(content) {
-	return beautifyCss(minifyCss(content))
+	return beautifyCss(await minifyCss(content))
 }
 
 function minifyFile(content) {
@@ -527,6 +539,8 @@ function activate(context) {
 				vscode.window.showInformationMessage(sucMsg + " successfully.")
 			} catch (e) {
 				vscode.window.showErrorMessage(e.message || String(e))
+				console.error(e);
+				console.error(e.stack);
 			}
 		}), vscode.commands.registerCommand("minifier." + action + "Sel", async () => {
 			try {
@@ -571,6 +585,8 @@ function activate(context) {
 				vscode.window.showInformationMessage(sucMsg + " successfully.")
 			} catch (e) {
 				vscode.window.showErrorMessage(e.message || String(e))
+				console.error(e);
+				console.error(e.stack);
 			}
 		}))
 	});
@@ -594,6 +610,8 @@ function activate(context) {
 			vscode.window.showInformationMessage("UUID Generator: Generated successfully.")
 		} catch (e) {
 			vscode.window.showErrorMessage(e.message || String(e))
+			console.error(e);
+			console.error(e.stack);
 		}
 	});
 	[{
@@ -680,6 +698,8 @@ function activate(context) {
 				vscode.window.showInformationMessage(action.sucMsg + " successfully.")
 			} catch (e) {
 				vscode.window.showErrorMessage(e.message || String(e))
+				console.error(e);
+				console.error(e.stack);
 			}
 		})
 	});

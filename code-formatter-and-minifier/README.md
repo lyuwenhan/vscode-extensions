@@ -258,7 +258,7 @@ Minifier: Code Setting
 		},
 		"css": {
 			"minify": {
-				/* clean-css options */
+				/* cssnano options */
 			},
 			"beautify": {
 				/* js-beautify options */
@@ -321,16 +321,17 @@ These are the built-in defaults used by the extension:
 				"unescape_strings": false,
 				"wrap_line_length": 0,
 				"indent_empty_lines": false,
-				"templating": ["auto"]
+				"templating": [
+					"auto"
+				]
 			}
 		},
-
 		"html": {
 			"minify": {
 				"collapseWhitespace": true,
 				"removeComments": true,
 				"removeEmptyAttributes": true,
-				"removeTagWhitespace": true,
+				"removeTagWhitespace": false,
 				"removeAttributeQuotes": false,
 				"removeEmptyElements": false,
 				"removeRedundantAttributes": false,
@@ -357,10 +358,25 @@ These are the built-in defaults used by the extension:
 				"indent_empty_lines": false
 			}
 		},
-
 		"css": {
 			"minify": {
-				"level": 0
+				"preset": [
+					"default",
+					{
+						"mergeRules": false,
+						"mergeLonghand": false,
+						"discardDuplicates": false,
+						"discardUnused": false,
+						"reduceIdents": false,
+						"normalizeUnicode": false,
+						"normalizeUrl": false,
+						"colormin": false,
+						"minifySelectors": false,
+						"minifyParams": false,
+						"discardComments": true,
+						"normalizeWhitespace": true
+					}
+				]
 			},
 			"beautify": {
 				"indent_size": 4,
@@ -378,18 +394,17 @@ These are the built-in defaults used by the extension:
 				"indent_empty_lines": false
 			}
 		},
-
-        "json": {
-            "minify": {
-                "singleLineSpacing": false
-            },
-            "jsonLMinify": {
-                "singleLineSpacing": true
-            },
-            "beautify": {
-                "indent": "\t"
-            }
-        }
+		"json": {
+			"minify": {
+				"singleLineSpacing": false
+			},
+			"jsonLMinify": {
+				"singleLineSpacing": true
+			},
+			"beautify": {
+				"indent": "\t"
+			}
+		}
 	}
 }
 ```
@@ -449,7 +464,7 @@ The configuration system allows you to:
 ## Notes
 - **JavaScript** minification uses [terser](https://github.com/terser/terser).
 - **HTML** minification uses [html-minifier-terser](https://github.com/terser/html-minifier-terser).
-- **CSS** minification uses [clean-css](https://github.com/jakubpawlowicz/clean-css).
+- **CSS** minification uses [cssnano](https://github.com/cssnano/cssnano) and [postcss](https://github.com/postcss/postcss).
 - **JavaScript**, **HTML**, **CSS** beautification uses [js-beautify](https://github.com/beautify-web/js-beautify).
 - **JSON** parsing uses [jsonc-parser](https://github.com/microsoft/node-jsonc-parser).
 - **JSON Lines** parsing uses [jsonparse](https://github.com/creationix/jsonparse).

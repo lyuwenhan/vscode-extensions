@@ -102,7 +102,7 @@ const ret = {
 							collapseWhitespace: true,
 							removeComments: true,
 							removeEmptyAttributes: true,
-							removeTagWhitespace: true,
+							removeTagWhitespace: false,
 							removeAttributeQuotes: false,
 							removeEmptyElements: false,
 							removeRedundantAttributes: false,
@@ -131,7 +131,20 @@ const ret = {
 					},
 					css: {
 						minify: {
-							level: 0
+							preset: ["default", {
+								mergeRules: false,
+								mergeLonghand: false,
+								discardDuplicates: false,
+								discardUnused: false,
+								reduceIdents: false,
+								normalizeUnicode: false,
+								normalizeUrl: false,
+								colormin: false,
+								minifySelectors: false,
+								minifyParams: false,
+								discardComments: true,
+								normalizeWhitespace: true
+							}]
 						},
 						beautify: {
 							indent_size: 4,
@@ -203,7 +216,7 @@ const ret = {
 						properties: {
 							minify: {
 								type: "object",
-								description: "Options for CSS minification(clean-css)"
+								description: "Options for CSS minification(cssnano)"
 							},
 							beautify: {
 								type: "object",
@@ -311,11 +324,12 @@ function addGroup(e, i, arr) {
 pkg.contributes = ret;
 fs.writeFileSync("package.json", JSON.stringify(pkg, null, "\t"));
 if (process.argv.slice(2).includes("--noMin")) {
-	fs.promises.mkdir("out", {
+	fs.promises.rm("out", {
+		recursive: true,
+		force: true
+	}).then(() => fs.promises.cp("src", "out", {
 		recursive: true
-	}).then(() => {
-		fs.promises.copyFile("./src/extension.js", "out/extension.js")
-	})
+	}))
 } else {
 	esbuild.build({
 		entryPoints: ["./src/extension.js"],

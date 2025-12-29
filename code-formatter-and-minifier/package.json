@@ -21,11 +21,12 @@
 		"package": "vsce package --allow-missing-repository"
 	},
 	"dependencies": {
-		"clean-css": "^5.3.3",
+		"cssnano": "^7.1.2",
 		"html-minifier-terser": "^7.2.0",
 		"js-beautify": "^1.15.4",
 		"jsonc-parser": "^3.3.1",
 		"jsonparse": "^1.3.1",
+		"postcss": "^8.5.6",
 		"terser": "^5.44.0"
 	},
 	"license": "MIT",
@@ -343,7 +344,7 @@
 								"collapseWhitespace": true,
 								"removeComments": true,
 								"removeEmptyAttributes": true,
-								"removeTagWhitespace": true,
+								"removeTagWhitespace": false,
 								"removeAttributeQuotes": false,
 								"removeEmptyElements": false,
 								"removeRedundantAttributes": false,
@@ -372,7 +373,23 @@
 						},
 						"css": {
 							"minify": {
-								"level": 0
+								"preset": [
+									"default",
+									{
+										"mergeRules": false,
+										"mergeLonghand": false,
+										"discardDuplicates": false,
+										"discardUnused": false,
+										"reduceIdents": false,
+										"normalizeUnicode": false,
+										"normalizeUrl": false,
+										"colormin": false,
+										"minifySelectors": false,
+										"minifyParams": false,
+										"discardComments": true,
+										"normalizeWhitespace": true
+									}
+								]
 							},
 							"beautify": {
 								"indent_size": 4,
@@ -454,7 +471,7 @@
 							"properties": {
 								"minify": {
 									"type": "object",
-									"description": "Options for CSS minification(clean-css)"
+									"description": "Options for CSS minification(cssnano)"
 								},
 								"beautify": {
 									"type": "object",
