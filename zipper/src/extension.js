@@ -265,12 +265,16 @@ async function walkDir(dir, onData, baseDir = dir) {
 	const entries = await fs.promises.readdir(dir, {
 		withFileTypes: true
 	});
+	var hasDir = false;
 	for (const entry of entries) {
 		const full = path.join(dir, entry.name);
 		if (entry.isDirectory()) {
-			await onData(path.relative(baseDir, full));
+			hasDir = true;
 			await walkDir(full, onData, baseDir)
 		}
+	}
+	if (!hasDir) {
+		await onData(path.relative(baseDir, dir))
 	}
 }
 
@@ -323,9 +327,6 @@ function activate(context) {
 					}
 					of paths) {
 					if (isFolder) {
-						archive.append("", {
-							name: pa + "/"
-						});
 						await walkDir(realPa, dir => {
 							archive.append("", {
 								name: path.join(pa, dir) + "/"
