@@ -124,17 +124,15 @@ class ZipDocument {
 					const dirName = targetEntryPath.replace(/\/$/, "").split("/").at(-1);
 					const [outputDir] = tryName(this.exportDir, dirName || "root");
 					await new Promise((resolve, reject) => {
-						let exit = false;
 						fs.createReadStream(this.filePath).pipe(parser).on("entry", async entry => {
 							try {
-								if (exit || !entry.path.startsWith(targetEntryPath)) {
+								if (!entry.path.startsWith(targetEntryPath)) {
 									entry.autodrain();
 									return
 								}
 								const unsafePath = entry.path.slice(targetEntryPath.length);
 								const resolvedPath = path.resolve(outputDir, unsafePath);
 								if (!resolvedPath.startsWith(outputDir + path.sep) && resolvedPath !== outputDir) {
-									exit = true;
 									entry.autodrain();
 									reject(new Error(`Zip Slip detected: "${unsafePath}"`));
 									return
@@ -153,7 +151,6 @@ class ZipDocument {
 									entry.autodrain()
 								}
 							} catch (err) {
-								exit = true;
 								reject(err)
 							}
 						}).once("close", resolve).once("error", reject)
