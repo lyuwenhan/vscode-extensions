@@ -159,11 +159,7 @@ class ZipDocument {
 					await new Promise((resolve, reject) => {
 						let found = false;
 						const stream = fs.createReadStream(this.filePath).pipe(parser).on("entry", entry => {
-							if (found) {
-								entry.autodrain();
-								return
-							}
-							if (entry.path === targetEntryPath && entry.type === "File") {
+							if (!found && entry.path === targetEntryPath && entry.type === "File") {
 								found = true;
 								const {
 									name: zipName,
