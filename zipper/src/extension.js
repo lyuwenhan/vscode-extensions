@@ -324,7 +324,7 @@ function activate(context) {
 					of paths) {
 					if (isFolder) {
 						archive.append("", {
-							name: pa
+							name: pa + "/"
 						});
 						await walkDir(realPa, dir => {
 							archive.append("", {
