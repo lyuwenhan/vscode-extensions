@@ -94,6 +94,16 @@ async function getPaths(paths) {
 		commonRoot: pa + path.join(...common)
 	}
 }
+
+function testPath(root, nPath) {
+	const resolvedPath = path.resolve(root, nPath);
+	return resolvedPath.startsWith(root + path.sep) ? {
+		ok: true,
+		resolvedPath
+	} : {
+		ok: false
+	}
+}
 class ZipDocument {
 	constructor(uri) {
 		this.uri = uri;
@@ -111,82 +121,70 @@ class ZipDocument {
 			size: f.uncompressedSize
 		}))
 	}
-	async extractSingleFile(targetEntryPath, isFolder) {
+	async extractFiles(targetFiles) {
 		try {
 			await this.getExport();
 			await vscode.window.withProgress({
 				location: vscode.ProgressLocation.Notification,
-				title: `Zipper: Extracting "${this.exportName}/${targetEntryPath}"`,
+				title: `Zipper: Extracting "${this.exportName}/${targetFiles.folderName}"`,
 				cancellable: false
 			}, async () => {
-				const parser = unzipper.Parse();
-				if (isFolder) {
-					const dirName = targetEntryPath.replace(/\/$/, "").split("/").at(-1);
-					const [outputDir] = tryName(this.exportDir, dirName || "root");
-					await new Promise((resolve, reject) => {
-						fs.createReadStream(this.filePath).pipe(parser).on("entry", async entry => {
-							try {
-								if (!entry.path.startsWith(targetEntryPath)) {
-									entry.autodrain();
-									return
-								}
-								const unsafePath = entry.path.slice(targetEntryPath.length);
-								const resolvedPath = path.resolve(outputDir, unsafePath);
-								if (!resolvedPath.startsWith(outputDir + path.sep) && resolvedPath !== outputDir) {
-									entry.autodrain();
-									reject(new Error(`Zip Slip detected: "${unsafePath}"`));
-									return
-								}
-								if (entry.type === "Directory") {
-									await fs.promises.mkdir(resolvedPath, {
-										recursive: true
-									});
-									entry.autodrain()
-								} else if (entry.type === "File") {
-									await fs.promises.mkdir(path.dirname(resolvedPath), {
-										recursive: true
-									});
-									await pipeline(entry, fs.createWriteStream(resolvedPath))
-								} else {
-									entry.autodrain()
-								}
-							} catch (err) {
-								reject(err)
-							}
-						}).once("close", resolve).once("error", reject)
+				const directory = await unzipper.Open.file(this.filePath);
+				const files = directory.files;
+				const rootPath = targetFiles.rootPath;
+				let outRoot = this.exportDir;
+				if (targetFiles.folderName) {
+					const {
+						resolvedPath,
+						ok
+					} = testPath(outRoot, targetFiles.folderName);
+					if (!ok) {
+						throw new Error(`Zip Slip detected: "${targetFiles.folderName}"`)
+					}
+					outRoot = resolvedPath
+				}
+				await fs.promises.mkdir(outRoot, {
+					recursive: true
+				});
+				let slip = false;
+				await Promise.all([Promise.all(targetFiles.folders.map(async pa => {
+					const {
+						resolvedPath,
+						ok
+					} = testPath(outRoot, pa);
+					if (!ok) {
+						slip = true;
+						return
+					}
+					await fs.promises.mkdir(resolvedPath, {
+						recursive: true
 					})
-				} else {
-					await new Promise((resolve, reject) => {
-						let found = false;
-						const stream = fs.createReadStream(this.filePath).pipe(parser).on("entry", entry => {
-							if (!found && entry.path === targetEntryPath && entry.type === "File") {
-								found = true;
-								const {
-									name: zipName,
-									ext
-								} = path.parse(targetEntryPath.split("/").pop());
-								const [outputFile] = tryName(this.exportDir, zipName, ext);
-								fs.promises.mkdir(this.exportDir, {
-									recursive: true
-								}).then(() => pipeline(entry, fs.createWriteStream(outputFile))).then(() => {
-									stream.destroy();
-									resolve()
-								}).catch(err => {
-									stream.destroy();
-									reject(err)
-								})
-							} else {
-								entry.autodrain()
-							}
-						}).on("error", reject).on("close", () => {
-							if (!found) {
-								reject(new Error(`File not found: ${targetEntryPath}`))
-							}
-						})
-					})
+				})), Promise.all(targetFiles.files.map(i => files[i]).filter(Boolean).map(async file => {
+					if (file.type !== "File" || file.path.length <= rootPath.length || !file.path.startsWith(rootPath)) {
+						return
+					}
+					const unsafePath = file.path.slice(rootPath.length);
+					if (!testPath(outRoot, unsafePath).ok) {
+						slip = true;
+						return
+					}
+					const {
+						dir,
+						name,
+						ext
+					} = path.parse(unsafePath);
+					const outDir = path.join(outRoot, dir);
+					await fs.promises.mkdir(outDir, {
+						recursive: true
+					});
+					const [outputFile] = tryName(outDir, name, ext);
+					await pipeline(file.stream(), fs.createWriteStream(outputFile))
+				}))]);
+				if (slip) {
+					throw new Error(`Zip Slip detected`)
 				}
 			});
-			vscode.window.showInformationMessage(`Zipper: Extracted "${this.exportName}/${targetEntryPath}"`)
+			vscode.window.showInformationMessage(`Zipper: Extracted "${this.exportName}/${targetFiles.rootPath}"`)
 		} catch (e) {
 			vscode.window.showErrorMessage(e.message || String(e));
 			console.error(e);
@@ -247,7 +245,7 @@ class ZipPreviewEditor {
 					break
 				}
 				case "download": {
-					await document.extractSingleFile(message.path, message.isFolder);
+					await document.extractFiles(message.files);
 					break
 				}
 			}
@@ -366,12 +364,12 @@ function activate(context) {
 				await new Promise((resolve, reject) => {
 					fs.createReadStream(zipPath).pipe(parser).on("entry", async entry => {
 						try {
-							const unsafePath = entry.path;
-							const resolvedPath = path.resolve(targetDir, unsafePath);
-							if (!resolvedPath.startsWith(targetDir + path.sep)) {
-								entry.autodrain();
-								reject(new Error(`Zip Slip detected: "${unsafePath}"`));
-								return
+							const {
+								ok,
+								resolvedPath
+							} = testPath(targetDir, entry.path);
+							if (!ok) {
+								reject(new Error(`Zip Slip detected: "${entry.path}"`))
 							}
 							if (entry.type === "Directory") {
 								await fs.promises.mkdir(resolvedPath, {

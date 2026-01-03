@@ -1,3 +1,4 @@
+"use strict";
 const titleEle = document.getElementById("title");
 const mainEle = document.getElementById("main");
 let loadCount = 0;
@@ -10,22 +11,21 @@ vscode.postMessage({
 	type: "get"
 });
 
-function extractFile(pathInZip, isFolder) {
+function extractFile(files) {
 	vscode.postMessage({
 		type: "download",
-		path: pathInZip,
-		isFolder
+		files
 	})
 }
 
 function getTree(paths) {
-	console.log(paths);
 	const tree = {
 		size: 0,
 		next: {},
-		file: []
+		files: []
 	};
-	for (const p of paths) {
+	for (let i = 0; i < paths.length; i++) {
+		const p = paths[i];
 		let isF;
 		if (p.type === "Directory") {
 			isF = true
@@ -42,23 +42,24 @@ function getTree(paths) {
 				cur.next[link] = {
 					size: 0,
 					next: {},
-					file: []
+					files: []
 				}
 			}
 			cur = cur.next[link]
 		}
 		if (!isF) {
-			cur.file.push({
+			cur.files.push({
 				name: fn,
-				size: p.size
+				size: p.size,
+				i
 			})
 		}
 	}
 
 	function dfs(node) {
-		node.file = node.file.sort();
+		node.files = node.files.sort();
 		node.next = Object.fromEntries(Object.entries(node.next).sort(([a], [b]) => a.localeCompare(b)));
-		node.size = node.file.reduce((a, b) => a + b.size, 0);
+		node.size = node.files.reduce((a, b) => a + b.size, 0);
 		for (const [name, child] of Object.entries(node.next)) {
 			dfs(child);
 			node.size += child.size
@@ -66,6 +67,34 @@ function getTree(paths) {
 	}
 	dfs(tree);
 	return tree
+}
+
+function getFilesFromTree(root) {
+	const files = [];
+	const folders = [];
+
+	function dfs(node, path) {
+		for (const f of node.files) {
+			files.push(f.i)
+		}
+		const nextKeys = Object.keys(node.next);
+		if (node.files.length === 0 && nextKeys.length === 0) {
+			if (path !== "") {
+				folders.push(path)
+			}
+			return
+		}
+		for (const name of nextKeys) {
+			const child = node.next[name];
+			const childPath = path ? `${path}/${name}` : name;
+			dfs(child, childPath)
+		}
+	}
+	dfs(root, "");
+	return {
+		files,
+		folders
+	}
 }
 
 function formatSize(bytes, decimals = 2) {
@@ -84,7 +113,7 @@ function displayTree(message) {
 	mainEle.innerHTML = "";
 	const tree = getTree(message.content);
 
-	function getSpan(name, size, isFolder, path) {
+	function getSpan(name, size, files) {
 		const span = document.createElement("span");
 		span.classList.add("downloadFa");
 		const spanL = document.createElement("span");
@@ -95,7 +124,7 @@ function displayTree(message) {
 		aR.innerText = "Download";
 		aR.classList.add("download");
 		aR.addEventListener("click", () => {
-			extractFile(path, isFolder)
+			extractFile(files)
 		});
 		span.append(spanL);
 		span.append(aR);
@@ -105,7 +134,7 @@ function displayTree(message) {
 	function dfs(node, father, path) {
 		const ul = document.createElement("ul");
 		const ent = Object.entries(node.next);
-		if (!ent.length && !node.file.length) {
+		if (!ent.length && !node.files.length) {
 			const li = document.createElement("li");
 			const span = document.createElement("span");
 			span.classList.add("downloadFa");
@@ -119,7 +148,11 @@ function displayTree(message) {
 			const li = document.createElement("li");
 			const det = document.createElement("details");
 			const sum = document.createElement("summary");
-			sum.append(getSpan(name, child.size, true, nPath));
+			sum.append(getSpan(name, child.size, {
+				folderName: name,
+				rootPath: nPath,
+				...getFilesFromTree(child)
+			}));
 			det.append(sum);
 			li.classList.add("lisum");
 			li.append(det);
@@ -132,11 +165,17 @@ function displayTree(message) {
 		}
 		for (const {
 				name,
-				size
+				size,
+				i
 			}
-			of node.file) {
+			of node.files) {
 			const li = document.createElement("li");
-			li.append(getSpan(name, size, false, path + name));
+			li.append(getSpan(name, size, {
+				folderName: "",
+				files: [i],
+				folders: [],
+				rootPath: path
+			}));
 			ul.append(li)
 		}
 		father.append(ul)
