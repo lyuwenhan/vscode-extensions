@@ -216,19 +216,6 @@ function displayTree(message) {
 		ckb.type = "checkbox";
 		ckb.checked = needChk;
 		ckb.dataset.path = path;
-		ckb.addEventListener("change", e => {
-			if (e.target.checked) {
-				faCho.forEach(([ele]) => {
-					ele.checked = false;
-					ele.indeterminate = true
-				})
-			} else {
-				faCho.forEach(([ele, faEle]) => {
-					ele.checked = false;
-					ele.indeterminate = Boolean(faEle.querySelector(":scope>:not(:first-child) input[type=checkbox]:checked"))
-				})
-			}
-		});
 		cho.append(ckb);
 		spanL.innerText = `${name} (${formatSize(size)})`;
 		spanL.title = size + "B";
@@ -273,6 +260,27 @@ function displayTree(message) {
 				rootPath: nPath,
 				...getFilesFromTree(child)
 			});
+			ckb.addEventListener("change", e => {
+				if (e.target.checked) {
+					det.querySelectorAll("input[type=checkbox]:not(:checked)").forEach(ele => {
+						ele.checked = true;
+						ele.indeterminate = false
+					});
+					faCho.forEach(([ele]) => {
+						ele.checked = false;
+						ele.indeterminate = true
+					})
+				} else {
+					det.querySelectorAll("input[type=checkbox]:checked").forEach(ele => {
+						ele.checked = false;
+						ele.indeterminate = false
+					});
+					faCho.forEach(([ele, faEle]) => {
+						ele.checked = false;
+						ele.indeterminate = Boolean(faEle.querySelector(":scope>:not(:first-child) input[type=checkbox]:checked"))
+					})
+				}
+			});
 			ckb.dataset.isFolder = true;
 			ckb.dataset.folder = nPath;
 			sum.append(span);
@@ -285,19 +293,6 @@ function displayTree(message) {
 				])
 			}, {
 				once: true
-			});
-			ckb.addEventListener("change", e => {
-				if (e.target.checked) {
-					det.querySelectorAll("input[type=checkbox]:not(:checked)").forEach(ele => {
-						ele.checked = true;
-						ele.indeterminate = false
-					})
-				} else {
-					det.querySelectorAll("input[type=checkbox]:checked").forEach(ele => {
-						ele.checked = false;
-						ele.indeterminate = false
-					})
-				}
 			});
 			ul.append(li)
 		}
@@ -316,6 +311,19 @@ function displayTree(message) {
 				files: [i],
 				folders: [],
 				rootPath: path
+			});
+			ckb.addEventListener("change", e => {
+				if (e.target.checked) {
+					faCho.forEach(([ele]) => {
+						ele.checked = false;
+						ele.indeterminate = true
+					})
+				} else {
+					faCho.forEach(([ele, faEle]) => {
+						ele.checked = false;
+						ele.indeterminate = Boolean(faEle.querySelector(":scope>:not(:first-child) input[type=checkbox]:checked"))
+					})
+				}
 			});
 			ckb.dataset.isFolder = false;
 			ckb.dataset.fileName = name;
