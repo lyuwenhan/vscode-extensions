@@ -1,6 +1,5 @@
 body, html {
-	font-size: 13px;
-	line-height: 1.2em
+	font-size: 13px
 }
 .downloadFa {
 	padding: 10px 10px 10px 34px;
@@ -77,7 +76,11 @@ body:not(.mult) #ddmf {
 	display: none
 }
 #main {
-	margin: 20px -20px 30px -10px
+	margin: 20px -10px 30px 0px;
+	line-height: 1.2em
+}
+#main>ul{
+	margin-left: -10px;
 }
 body:not(:has(#main input[type=checkbox]:checked)) #ddmf, body:not(:has(#main input[type=checkbox]:checked)) #ddmf:active, body:not(:has(#main input[type=checkbox]:checked)) #ddmf:hover {
 	cursor: not-allowed;
