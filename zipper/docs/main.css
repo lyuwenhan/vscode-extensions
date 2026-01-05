@@ -31,8 +31,12 @@ ul {
 	color: color-mix(in srgb, var(--vscode-editor-background) 30%, var(--vscode-editor-foreground) 70%)
 }
 .cho {
-	padding: 12px;
-	margin: -12px -12px -12px 0
+	width: 37px;
+	height: 37px;
+	margin: -12px -12px -12px 0;
+	display:flex;
+    align-items: center;
+    justify-content: center;
 }
 .cho input[type=checkbox] {
 	margin: 0
