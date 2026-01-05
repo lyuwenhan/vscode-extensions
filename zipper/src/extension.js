@@ -97,7 +97,6 @@ async function getPaths(paths) {
 
 function testPath(root, nPath) {
 	const resolvedPath = path.resolve(root, nPath);
-	console.log(resolvedPath.replaceAll(path.sep, "/"), root.replaceAll(path.sep, "/") + "/");
 	return resolvedPath.replaceAll(path.sep, "/").startsWith(root.replaceAll(path.sep, "/") + "/") ? {
 		ok: true,
 		resolvedPath
