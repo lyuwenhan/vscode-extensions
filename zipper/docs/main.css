@@ -1,12 +1,13 @@
 body, html {
-	font-size: 13px
+	font-size: 13px;
+	line-height: 1.2em
 }
 .downloadFa {
 	padding: 10px 10px 10px 34px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	width: 100%;
+	width: calc(100% - 14px);
 	margin-left: -30px
 }
 .downloadFa:hover {
@@ -31,12 +32,18 @@ ul {
 	color: color-mix(in srgb, var(--vscode-editor-background) 30%, var(--vscode-editor-foreground) 70%)
 }
 .cho {
-	width: 37px;
-	height: 37px;
-	margin: -12px -12px -12px 0;
-	display:flex;
-    align-items: center;
-    justify-content: center;
+	width: 35.6px;
+	height: 35.6px;
+	margin: -10px -10px -10px 0;
+	display: flex;
+	align-items: center;
+	justify-content: center
+}
+.cho:hover {
+	background-color: color-mix(in srgb, var(--vscode-editor-foreground) 20%, var(--vscode-editor-background) 80%)
+}
+.cho:active {
+	background-color: color-mix(in srgb, var(--vscode-editor-foreground) 15%, var(--vscode-editor-background) 85%)
 }
 .cho input[type=checkbox] {
 	margin: 0
@@ -70,7 +77,8 @@ body:not(.mult) #ddmf {
 	display: none
 }
 #main {
-	padding: 20px 0 30px
+	padding: 20px 0 30px 0;
+	margin: 0 -20px
 }
 body:not(:has(#main input[type=checkbox]:checked)) #ddmf, body:not(:has(#main input[type=checkbox]:checked)) #ddmf:active, body:not(:has(#main input[type=checkbox]:checked)) #ddmf:hover {
 	cursor: not-allowed;
