@@ -97,7 +97,8 @@ async function getPaths(paths) {
 
 function testPath(root, nPath) {
 	const resolvedPath = path.resolve(root, nPath);
-	return resolvedPath.startsWith(root + path.sep) ? {
+	console.log(resolvedPath.replaceAll(path.sep, "/"), root.replaceAll(path.sep, "/") + "/");
+	return resolvedPath.replaceAll(path.sep, "/").startsWith(root.replaceAll(path.sep, "/") + "/") ? {
 		ok: true,
 		resolvedPath
 	} : {
@@ -134,25 +135,25 @@ class ZipDocument {
 				const rootPath = targetFiles.rootPath;
 				let outRoot = this.exportDir;
 				if (targetFiles.folderName) {
-					const {
-						resolvedPath,
-						ok
-					} = testPath(outRoot, targetFiles.folderName);
-					if (!ok) {
+					if (!testPath(outRoot, targetFiles.folderName).ok) {
 						throw new Error(`Zip Slip detected: "${targetFiles.folderName}"`)
 					}
-					outRoot = resolvedPath
+					outRoot = tryName(outRoot, targetFiles.folderName)[0]
 				}
 				await fs.promises.mkdir(outRoot, {
 					recursive: true
 				});
 				let slip = false;
 				await Promise.all([Promise.all(targetFiles.folders.map(async pa => {
+					if (!pa) {
+						return
+					}
 					const {
 						resolvedPath,
 						ok
 					} = testPath(outRoot, pa);
 					if (!ok) {
+						console.log("slip", outRoot, pa);
 						slip = true;
 						return
 					}
@@ -165,6 +166,7 @@ class ZipDocument {
 					}
 					const unsafePath = file.path.slice(rootPath.length);
 					if (!testPath(outRoot, unsafePath).ok) {
+						console.log("slip", outRoot, unsafePath);
 						slip = true;
 						return
 					}
@@ -231,7 +233,7 @@ class ZipPreviewEditor {
 	getHtml(webview) {
 		const maincss = webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, "docs", "main.css")));
 		const mainjs = webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, "docs", "main.js")));
-		return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="${maincss}"></head><body><h2 id="title">ZIP preview</h2><div id="main">loading</div><script src="${mainjs}"><\/script></body></html>`
+		return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="${maincss}"></head><body><h2 id="title">ZIP preview</h2><button id="dmf">Download multiple files</button>&nbsp;<button id="ddmf">Download</button><div id="main">loading</div><script src="${mainjs}"><\/script></body></html>`
 	}
 	activateMessageListener(webview, document) {
 		webview.onDidReceiveMessage(async message => {

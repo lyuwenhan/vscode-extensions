@@ -56,6 +56,7 @@ Zipper provides a **read-only ZIP preview** inside VS Code, allowing you to **br
 ## Selective Extraction
 - Download individual files or folders
 - Extracted items are placed into a local `exports/` directory
+- You can select and download multiple files and folders
 - Name conflicts are resolved automatically:
   - `file.txt`
   - `file (1).txt`

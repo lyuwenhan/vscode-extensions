@@ -1,7 +1,13 @@
 "use strict";
 const titleEle = document.getElementById("title");
 const mainEle = document.getElementById("main");
+const dmfEle = document.getElementById("dmf");
+const ddmfEle = document.getElementById("ddmf");
+dmfEle.addEventListener("click", () => {
+	document.body.classList.toggle("mult")
+});
 let loadCount = 0;
+let treeNow;
 let loadInter = setInterval(() => {
 	loadCount = (loadCount + 1) % 4;
 	mainEle.innerText = "loading" + ".".repeat(loadCount)
@@ -17,6 +23,91 @@ function extractFile(files) {
 		files
 	})
 }
+ddmfEle.addEventListener("click", () => {
+	let files = [];
+	const folders = [];
+	const tree = JSON.parse(JSON.stringify(treeNow));
+	const getcur = path => {
+		let cur = tree;
+		for (let pa of path.split("/").filter(Boolean)) {
+			if (!cur.next[pa]) {
+				return
+			}
+			cur = cur.next[pa]
+		}
+		return cur
+	};
+	const checks = mainEle.querySelectorAll("input[type=checkbox]:checked");
+	if (!checks.length) {
+		return
+	}
+	checks.forEach(e => {
+		if (!e.dataset.isFolder) {
+			return
+		}
+		if (e.dataset.isFolder === "true") {
+			if (e.dataset.folder) {
+				const cur = getcur(e.dataset.folder);
+				if (cur) {
+					cur.isSel = true
+				}
+			}
+		} else {
+			if (e.dataset.fileI && e.dataset.filePath && e.dataset.fileName) {
+				files.push(+e.dataset.fileI);
+				const cur = getcur(e.dataset.filePath);
+				if (cur) {
+					cur.hasFile = true
+				}
+			}
+		}
+	});
+
+	function dfs(node, forceBool = false, path = "") {
+		node.next = Object.fromEntries(Object.entries(node.next).sort(([a], [b]) => a.localeCompare(b)));
+		node.isSel ||= forceBool;
+		if (node.isSel) {
+			node.files.forEach(f => files.push(f.i))
+		}
+		let sonSel = node.hasFile;
+		for (const [name, child] of Object.entries(node.next)) {
+			sonSel = dfs(child, node.isSel, path + name + "/") || sonSel
+		}
+		node.sonFile = sonSel;
+		return sonSel || node.isSel
+	}
+	dfs(tree);
+	files = files.sort((a, b) => a - b).filter((v, i, a) => i === 0 || v !== a[i - 1]);
+	let folderName = "root";
+	let rootPath = "";
+	let cur = tree;
+	while (true) {
+		const ent = Object.entries(cur.next).filter(e => e[1].isSel || e[1].sonFile);
+		if (!cur.hasFile && ent.length === 1 && !ent[0][1].isSel) {
+			folderName = ent[0][0];
+			rootPath += folderName + "/";
+			cur = ent[0][1]
+		} else {
+			break
+		}
+	}
+
+	function dfs2(node, path = "") {
+		if (node.isSel && !node.sonFile) {
+			folders.push(path)
+		}
+		for (const [name, child] of Object.entries(node.next)) {
+			dfs2(child, path + name + "/")
+		}
+	}
+	dfs2(cur);
+	extractFile({
+		folderName,
+		files,
+		folders,
+		rootPath
+	})
+});
 
 function getTree(paths) {
 	const tree = {
@@ -86,7 +177,7 @@ function getFilesFromTree(root) {
 		}
 		for (const name of nextKeys) {
 			const child = node.next[name];
-			const childPath = path ? `${path}/${name}` : name;
+			const childPath = `${path}${name}/`;
 			dfs(child, childPath)
 		}
 	}
@@ -112,12 +203,33 @@ function displayTree(message) {
 	titleEle.innerText = message.name;
 	mainEle.innerHTML = "";
 	const tree = getTree(message.content);
+	treeNow = tree;
 
-	function getSpan(name, size, files) {
+	function getSpan(name, size, faCho, needChk, path, files) {
 		const span = document.createElement("span");
 		span.classList.add("downloadFa");
 		const spanL = document.createElement("span");
 		const aR = document.createElement("a");
+		const cho = document.createElement("label");
+		const ckb = document.createElement("input");
+		cho.classList.add("cho");
+		ckb.type = "checkbox";
+		ckb.checked = needChk;
+		ckb.dataset.path = path;
+		ckb.addEventListener("change", e => {
+			if (e.target.checked) {
+				faCho.forEach(([ele]) => {
+					ele.checked = false;
+					ele.indeterminate = true
+				})
+			} else {
+				faCho.forEach(([ele, faEle]) => {
+					ele.checked = false;
+					ele.indeterminate = Boolean(faEle.querySelector(":scope>:not(:first-child) input[type=checkbox]:checked"))
+				})
+			}
+		});
+		cho.append(ckb);
 		spanL.innerText = `${name} (${formatSize(size)})`;
 		spanL.title = size + "B";
 		aR.href = "#";
@@ -128,10 +240,14 @@ function displayTree(message) {
 		});
 		span.append(spanL);
 		span.append(aR);
-		return span
+		span.append(cho);
+		return {
+			span,
+			ckb
+		}
 	}
 
-	function dfs(node, father, path) {
+	function dfs(node, father, path, faCho = []) {
 		const ul = document.createElement("ul");
 		const ent = Object.entries(node.next);
 		if (!ent.length && !node.files.length) {
@@ -143,23 +259,45 @@ function displayTree(message) {
 			li.append(span);
 			ul.append(li)
 		}
+		let needChk = faCho.some(cho => cho[0].checked);
 		for (const [name, child] of ent) {
 			const nPath = path + name + "/";
 			const li = document.createElement("li");
 			const det = document.createElement("details");
 			const sum = document.createElement("summary");
-			sum.append(getSpan(name, child.size, {
+			const {
+				span,
+				ckb
+			} = getSpan(name, child.size, faCho, needChk, nPath, {
 				folderName: name,
 				rootPath: nPath,
 				...getFilesFromTree(child)
-			}));
+			});
+			ckb.dataset.isFolder = true;
+			ckb.dataset.folder = nPath;
+			sum.append(span);
 			det.append(sum);
 			li.classList.add("lisum");
 			li.append(det);
 			det.addEventListener("toggle", () => {
-				dfs(child, det, nPath)
+				dfs(child, det, nPath, [
+					[ckb, det], ...faCho
+				])
 			}, {
 				once: true
+			});
+			ckb.addEventListener("change", e => {
+				if (e.target.checked) {
+					det.querySelectorAll("input[type=checkbox]:not(:checked)").forEach(ele => {
+						ele.checked = true;
+						ele.indeterminate = false
+					})
+				} else {
+					det.querySelectorAll("input[type=checkbox]:checked").forEach(ele => {
+						ele.checked = false;
+						ele.indeterminate = false
+					})
+				}
 			});
 			ul.append(li)
 		}
@@ -170,12 +308,20 @@ function displayTree(message) {
 			}
 			of node.files) {
 			const li = document.createElement("li");
-			li.append(getSpan(name, size, {
+			const {
+				span,
+				ckb
+			} = getSpan(name, size, faCho, needChk, path + name, {
 				folderName: "",
 				files: [i],
 				folders: [],
 				rootPath: path
-			}));
+			});
+			ckb.dataset.isFolder = false;
+			ckb.dataset.fileName = name;
+			ckb.dataset.filePath = path;
+			ckb.dataset.fileI = i;
+			li.append(span);
 			ul.append(li)
 		}
 		father.append(ul)
