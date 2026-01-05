@@ -37,7 +37,19 @@ Designed for quick, local file operations without leaving the editor.
 
 Zipper provides a **read-only ZIP preview** inside VS Code, allowing you to **browse archive contents without extracting**.
 
-![Demo](https://raw.githubusercontent.com/lyuwenhan/vscode-extensions/refs/heads/main/zipper/images/3.png)
+![Demo](https://raw.githubusercontent.com/lyuwenhan/vscode-extensions/refs/heads/main/zipper/images/4.png)
+
+### 4. Download a Single File or Folder
+
+You can select **one file or one folder** from the ZIP preview and download it directly.
+
+![Demo](https://raw.githubusercontent.com/lyuwenhan/vscode-extensions/refs/heads/main/zipper/images/5.png)
+
+### 5. Download Multiple Files and Folders
+
+You can select **multiple files and folders** and download them together from the ZIP preview.
+
+![Demo](https://raw.githubusercontent.com/lyuwenhan/vscode-extensions/refs/heads/main/zipper/images/6.png)
 
 ---
 
