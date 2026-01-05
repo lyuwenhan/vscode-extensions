@@ -77,8 +77,7 @@ body:not(.mult) #ddmf {
 	display: none
 }
 #main {
-	padding: 20px 0 30px 0;
-	margin: 0 -20px
+	margin: 20px -20px 30px -10px
 }
 body:not(:has(#main input[type=checkbox]:checked)) #ddmf, body:not(:has(#main input[type=checkbox]:checked)) #ddmf:active, body:not(:has(#main input[type=checkbox]:checked)) #ddmf:hover {
 	cursor: not-allowed;
