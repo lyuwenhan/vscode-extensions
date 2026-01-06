@@ -103,7 +103,7 @@ ddmfEle.addEventListener("click", () => {
 	let cur = tree;
 	while (true) {
 		const ent = Object.entries(cur.next).filter(e => e[1].isSel || e[1].sonFile);
-		if (!cur.hasFile && ent.length === 1 && !ent[0][1].isSel) {
+		if (!cur.hasFile && ent.length === 1) {
 			folderName = ent[0][0];
 			rootPath += folderName + "/";
 			cur = ent[0][1]
