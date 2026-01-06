@@ -77,7 +77,10 @@ ddmfEle.addEventListener("click", () => {
 				files.push(+e.dataset.fileI);
 				const cur = getcur(e.dataset.filePath);
 				if (cur) {
-					cur.hasFile = true
+					if (!cur.fileCnt) {
+						cur.fileCnt = 0
+					}
+					cur.fileCnt++
 				}
 			}
 		}
@@ -89,7 +92,7 @@ ddmfEle.addEventListener("click", () => {
 		if (node.isSel) {
 			node.files.forEach(f => files.push(f.i))
 		}
-		let sonSel = node.hasFile;
+		let sonSel = node.fileCnt > 0;
 		for (const [name, child] of Object.entries(node.next)) {
 			sonSel = dfs(child, node.isSel, path + name + "/") || sonSel
 		}
@@ -103,10 +106,13 @@ ddmfEle.addEventListener("click", () => {
 	let cur = tree;
 	while (true) {
 		const ent = Object.entries(cur.next).filter(e => e[1].isSel || e[1].sonFile);
-		if (!cur.hasFile && ent.length === 1) {
+		if (!cur.fileCnt && ent.length === 1) {
 			folderName = ent[0][0];
 			rootPath += folderName + "/";
 			cur = ent[0][1]
+		} else if (!ent.length && cur.fileCnt === 1) {
+			folderName = "";
+			break
 		} else {
 			break
 		}
