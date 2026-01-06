@@ -191,7 +191,7 @@ class ZipDocument {
 					throw new Error(`Zip Slip detected`)
 				}
 			});
-			vscode.window.showInformationMessage(`Zipper: Extracted "${this.exportName}/${targetFiles.rootPath}"`)
+			vscode.window.showInformationMessage(`Zipper: Extracted "${this.exportName}/${targetFiles.folderName}"`)
 		} catch (e) {
 			vscode.window.showErrorMessage(e.message || String(e));
 			console.error(e);

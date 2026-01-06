@@ -73,7 +73,7 @@ ddmfEle.addEventListener("click", () => {
 				}
 			}
 		} else {
-			if (e.dataset.fileI && e.dataset.filePath && e.dataset.fileName) {
+			if (e.dataset.fileI && e.dataset.fileName) {
 				files.push(+e.dataset.fileI);
 				const cur = getcur(e.dataset.filePath);
 				if (cur) {
