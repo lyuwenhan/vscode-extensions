@@ -21,7 +21,6 @@ function stopLoading() {
 function startLoading() {
 	stopLoading();
 	loadInter = setInterval(() => {
-		console.log("load");
 		loadCount = (loadCount + 1) % 4;
 		mainEle.innerText = "loading" + ".".repeat(loadCount)
 	}, 850)
