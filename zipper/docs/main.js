@@ -1,6 +1,7 @@
 "use strict";
 const titleEle = document.getElementById("title");
 const mainEle = document.getElementById("main");
+const relEle = document.getElementById("rel");
 const dmfEle = document.getElementById("dmf");
 const ddmfEle = document.getElementById("ddmf");
 dmfEle.addEventListener("click", () => {
@@ -8,10 +9,24 @@ dmfEle.addEventListener("click", () => {
 });
 let loadCount = 0;
 let treeNow;
-let loadInter = setInterval(() => {
-	loadCount = (loadCount + 1) % 4;
-	mainEle.innerText = "loading" + ".".repeat(loadCount)
-}, 850);
+let loadInter;
+
+function stopLoading() {
+	if (loadInter) {
+		clearInterval(loadInter);
+		loadInter = 0
+	}
+}
+
+function startLoading() {
+	stopLoading();
+	loadInter = setInterval(() => {
+		console.log("load");
+		loadCount = (loadCount + 1) % 4;
+		mainEle.innerText = "loading" + ".".repeat(loadCount)
+	}, 850)
+}
+startLoading();
 const vscode = acquireVsCodeApi();
 vscode.postMessage({
 	type: "get"
@@ -23,6 +38,11 @@ function extractFile(files) {
 		files
 	})
 }
+relEle.addEventListener("click", () => {
+	vscode.postMessage({
+		type: "reload"
+	})
+});
 ddmfEle.addEventListener("click", () => {
 	let files = [];
 	const folders = [];
@@ -339,10 +359,7 @@ function displayTree(message) {
 window.addEventListener("message", event => {
 	const message = event.data;
 	if (message.type === "setup") {
-		if (loadInter) {
-			clearInterval(loadInter);
-			loadInter = 0
-		}
+		stopLoading();
 		displayTree(message)
 	}
 });

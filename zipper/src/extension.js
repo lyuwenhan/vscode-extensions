@@ -114,6 +114,9 @@ class ZipDocument {
 		this.exportName = null
 	}
 	async readZipStructure() {
+		if (!fs.existsSync(this.filePath)) {
+			throw new Error("File not found")
+		}
 		const directory = await unzipper.Open.file(this.filePath);
 		return directory.files.map(f => ({
 			path: f.path,
@@ -129,6 +132,9 @@ class ZipDocument {
 				title: `Zipper: Extracting "${this.exportName}/${targetFiles.folderName}"`,
 				cancellable: false
 			}, async () => {
+				if (!fs.existsSync(this.filePath)) {
+					throw new Error("File not found")
+				}
 				const directory = await unzipper.Open.file(this.filePath);
 				const files = directory.files;
 				const rootPath = targetFiles.rootPath;
@@ -195,6 +201,9 @@ class ZipDocument {
 	async getStructure() {
 		return this.structure ??= await this.readZipStructure()
 	}
+	async getStructureForce() {
+		return this.structure = await this.readZipStructure()
+	}
 	async getExport() {
 		if (!this.exportDir) {
 			const baseDir = path.dirname(this.filePath);
@@ -232,23 +241,37 @@ class ZipPreviewEditor {
 	getHtml(webview) {
 		const maincss = webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, "docs", "main.css")));
 		const mainjs = webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, "docs", "main.js")));
-		return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="${maincss}"></head><body><h2 id="title">ZIP preview</h2><button id="dmf">Download multiple files</button>&nbsp;<button id="ddmf">Download</button><div id="main">loading</div><script src="${mainjs}"><\/script></body></html>`
+		return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="${maincss}"></head><body><h2 id="title">ZIP preview</h2><div id="buttons"><button id="rel">Reload</button><button id="dmf">Download multiple files</button><button id="ddmf">Download</button></div><div id="main">loading</div><script src="${mainjs}"><\/script></body></html>`
 	}
 	activateMessageListener(webview, document) {
 		webview.onDidReceiveMessage(async message => {
-			switch (message.type) {
-				case "get": {
-					webview.postMessage({
-						type: "setup",
-						name: document.fileName,
-						content: await document.getStructure()
-					});
-					break
+			try {
+				switch (message.type) {
+					case "get": {
+						webview.postMessage({
+							type: "setup",
+							name: document.fileName,
+							content: await document.getStructure()
+						});
+						break
+					}
+					case "download": {
+						await document.extractFiles(message.files);
+						break
+					}
+					case "reload": {
+						webview.postMessage({
+							type: "setup",
+							name: document.fileName,
+							content: await document.getStructureForce()
+						});
+						break
+					}
 				}
-				case "download": {
-					await document.extractFiles(message.files);
-					break
-				}
+			} catch (e) {
+				vscode.window.showErrorMessage(e.message || String(e));
+				console.error(e);
+				console.error(e.stack)
 			}
 		})
 	}

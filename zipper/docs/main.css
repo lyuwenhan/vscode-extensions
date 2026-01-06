@@ -76,13 +76,20 @@ body:not(.mult) #ddmf {
 	display: none
 }
 #main {
-	margin: 20px -10px 30px 0px;
+	margin: 20px -10px 30px 0;
 	line-height: 1.2em
 }
-#main>ul{
-	margin-left: -10px;
+#main > ul {
+	margin-left: -10px
 }
 body:not(:has(#main input[type=checkbox]:checked)) #ddmf, body:not(:has(#main input[type=checkbox]:checked)) #ddmf:active, body:not(:has(#main input[type=checkbox]:checked)) #ddmf:hover {
 	cursor: not-allowed;
 	background-color: color-mix(in srgb, var(--vscode-editor-background) 40%, var(--vscode-editor-foreground) 60%)
+}
+body:not(:has(#main>ul)) #buttons {
+	display: none
+}
+#buttons {
+	display: flex;
+	gap: 5px
 }
