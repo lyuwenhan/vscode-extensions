@@ -86,7 +86,7 @@ body:not(:has(#main input[type=checkbox]:checked)) #ddmf, body:not(:has(#main in
 	cursor: not-allowed;
 	background-color: color-mix(in srgb, var(--vscode-editor-background) 40%, var(--vscode-editor-foreground) 60%)
 }
-body:not(:has(#main>ul)) #buttons {
+body:not(:has(#main>ul)) #buttons .hid {
 	display: none
 }
 #buttons {

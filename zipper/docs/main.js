@@ -20,6 +20,7 @@ function stopLoading() {
 
 function startLoading() {
 	stopLoading();
+	mainEle.innerText = "loading" + ".".repeat(loadCount)
 	loadInter = setInterval(() => {
 		loadCount = (loadCount + 1) % 4;
 		mainEle.innerText = "loading" + ".".repeat(loadCount)
@@ -38,6 +39,8 @@ function extractFile(files) {
 	})
 }
 relEle.addEventListener("click", () => {
+	mainEle.innerHTML = "";
+	startLoading();
 	vscode.postMessage({
 		type: "reload"
 	})

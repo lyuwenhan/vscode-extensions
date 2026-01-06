@@ -241,7 +241,7 @@ class ZipPreviewEditor {
 	getHtml(webview) {
 		const maincss = webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, "docs", "main.css")));
 		const mainjs = webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, "docs", "main.js")));
-		return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="${maincss}"></head><body><h2 id="title">ZIP preview</h2><div id="buttons"><button id="rel">Reload</button><button id="dmf">Download multiple files</button><button id="ddmf">Download</button></div><div id="main">loading</div><script src="${mainjs}"><\/script></body></html>`
+		return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="${maincss}"></head><body><h2 id="title">ZIP preview</h2><div id="buttons"><button id="rel">Reload</button><button id="dmf" class="hid">Download multiple files</button><button id="ddmf" class="hid">Download</button></div><div id="main">loading</div><script src="${mainjs}"><\/script></body></html>`
 	}
 	activateMessageListener(webview, document) {
 		webview.onDidReceiveMessage(async message => {
