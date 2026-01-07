@@ -9,6 +9,7 @@ dmfEle.addEventListener("click", () => {
 });
 let loadCount = 0;
 let treeNow;
+let treeLa = {};
 let loadInter;
 
 function stopLoading() {
@@ -20,7 +21,7 @@ function stopLoading() {
 
 function startLoading() {
 	stopLoading();
-	mainEle.innerText = "loading" + ".".repeat(loadCount)
+	mainEle.innerText = "loading" + ".".repeat(loadCount);
 	loadInter = setInterval(() => {
 		loadCount = (loadCount + 1) % 4;
 		mainEle.innerText = "loading" + ".".repeat(loadCount)
@@ -231,6 +232,7 @@ function displayTree(message) {
 	titleEle.innerText = message.name;
 	mainEle.innerHTML = "";
 	const tree = getTree(message.content);
+	treeLa = treeNow;
 	treeNow = tree;
 
 	function getSpan(name, size, faCho, needChk, path, files) {
@@ -261,8 +263,10 @@ function displayTree(message) {
 			ckb
 		}
 	}
+	let dfsListRes = () => {};
+	let dfsList = new Promise(res => dfsListRes = res);
 
-	function dfs(node, father, path, faCho = []) {
+	function dfs(node, nodeForLa, father, path, faCho = []) {
 		const ul = document.createElement("ul");
 		const ent = Object.entries(node.next);
 		if (!ent.length && !node.files.length) {
@@ -276,6 +280,7 @@ function displayTree(message) {
 		}
 		let needChk = faCho.some(cho => cho[0].checked);
 		for (const [name, child] of ent) {
+			const childLa = nodeForLa?.next && nodeForLa.next[name];
 			const nPath = path + name + "/";
 			const li = document.createElement("li");
 			const det = document.createElement("details");
@@ -315,13 +320,26 @@ function displayTree(message) {
 			det.append(sum);
 			li.classList.add("lisum");
 			li.append(det);
-			det.addEventListener("toggle", () => {
-				dfs(child, det, nPath, [
-					[ckb, det], ...faCho
-				])
-			}, {
+			let opened = false;
+			const onOpen = () => {
+				if (!opened) {
+					opened = true;
+					dfs(child, childLa, det, nPath, [
+						[ckb, det], ...faCho
+					])
+				}
+			};
+			det.addEventListener("toggle", onOpen, {
 				once: true
 			});
+			det.addEventListener("toggle", () => {
+				child.isOpen = det.open
+			});
+			if (childLa?.isOpen) {
+				dfsList = dfsList.then(() => new Promise(r => setTimeout(r, 0))).then(onOpen).then(() => {
+					det.open = true
+				}).catch(console.error)
+			}
 			ul.append(li)
 		}
 		for (const {
@@ -362,7 +380,8 @@ function displayTree(message) {
 		}
 		father.append(ul)
 	}
-	dfs(tree, mainEle, "")
+	dfs(tree, treeLa, mainEle, "");
+	dfsListRes()
 }
 window.addEventListener("message", event => {
 	const message = event.data;
