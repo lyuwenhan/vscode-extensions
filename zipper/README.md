@@ -41,13 +41,15 @@ Zipper provides a **read-only archive preview** inside VS Code, allowing you to 
 
 ### 4. Download a Single File or Folder
 
-You can select **one file or one folder** from the ZIP preview and download it directly.
+From the ZIP preview, you can select **one file or one folder** and extract it locally.
+
+> "Download" refers to extracting the selected item to disk.
 
 ![Demo](https://raw.githubusercontent.com/lyuwenhan/vscode-extensions/refs/heads/main/zipper/images/5.png)
 
 ### 5. Download Multiple Files and Folders
 
-You can select **multiple files and folders** and download them together from the ZIP preview.
+You can select **multiple files and folders** in the preview and extract them together.
 
 ![Demo](https://raw.githubusercontent.com/lyuwenhan/vscode-extensions/refs/heads/main/zipper/images/6.png)
 
@@ -58,17 +60,19 @@ You can select **multiple files and folders** and download them together from th
 - Tree-based folder structure view
 - Expand / collapse directories
 - No automatic extraction
-- This was tested on
-  - Windows 11 25H2
+- Supports selective extraction (single or multiple items)
+- Tested on:
+  - Windows 11
   - Ubuntu 22.04 LTS
-  - Macos
+  - macOS
 
 ---
 
 ## Selective Extraction
-- Download individual files or folders
-- Extracted items are placed into a local `exports/` directory
-- You can select and download multiple files and folders
+
+- Extract individual files or folders from the preview
+- Extract multiple files and folders at once
+- Extracted items are placed into a local `exports/` directory next to the archive
 - Name conflicts are resolved automatically:
   - `file.txt`
   - `file (1).txt`
@@ -77,8 +81,9 @@ You can select **multiple files and folders** and download them together from th
 ---
 
 ## Safety
-- Protection against Zip Slip path traversal
-- All extracted files stay within the target directory
+
+- Protection against Zip Slip path traversal attacks
+- All extracted files are guaranteed to stay within the target directory
 
 ---
 
@@ -87,8 +92,9 @@ You can select **multiple files and folders** and download them together from th
 1. Open the **Explorer** in VS Code
 2. Select files or folders
 3. Right-click and choose:
-   - **Compress** - to create a ZIP archive
-   - **Extract** - to extract a ZIP file
+   - **Compress** - create a ZIP archive
+   - **Extract** - extract a ZIP file
+4. Open a supported archive file to preview its contents
 
 Progress and results are shown via VS Code notifications.
 
