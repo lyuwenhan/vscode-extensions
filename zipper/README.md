@@ -1,8 +1,8 @@
 # Zipper
 
-A lightweight **VS Code extension** that adds simple **ZIP compression and extraction** capabilities directly to the **Explorer context menu**.
+A lightweight **VS Code extension** that adds simple **ZIP compression, extraction, and preview** capabilities directly to the **Explorer context menu**.
 
-Designed for quick, local file operations without leaving the editor.
+Designed for quick, local archive operations without leaving the editor.
 
 ---
 
@@ -26,7 +26,7 @@ Designed for quick, local file operations without leaving the editor.
 
 - Right-click a `.zip` file in the **Explorer**
 - Select **Extract**
-- Extracts contents into a folder with the same name:
+- Extracts contents into a folder with the same name
 
 **Behavior**
   `example.zip` → `example/`
@@ -35,7 +35,7 @@ Designed for quick, local file operations without leaving the editor.
 
 ### 3. ZIP Preview
 
-Zipper provides a **read-only ZIP preview** inside VS Code, allowing you to **browse archive contents without extracting**.
+Zipper provides a **read-only archive preview** inside VS Code, allowing you to **browse archive contents without extracting**.
 
 ![Demo](https://raw.githubusercontent.com/lyuwenhan/vscode-extensions/refs/heads/main/zipper/images/4.png)
 
@@ -58,7 +58,7 @@ You can select **multiple files and folders** and download them together from th
 - Tree-based folder structure view
 - Expand / collapse directories
 - No automatic extraction
-- This was tested on 
+- This was tested on
   - Windows 11 25H2
   - Ubuntu 22.04 LTS
   - Macos
