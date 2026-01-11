@@ -307,6 +307,12 @@ class ZipPreviewEditor {
 		return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="${maincss}"></head><body><h2 id="title">ZIP preview</h2><div id="panel" class="buttons"><button id="rel">Reload</button><button id="edit" class="hid">Edit</button><button id="dmf" class="hid">Download multiple files</button><button id="ddmf" class="hid">Download</button></div><div id="main">loading</div><div id="editArea"></div><script src="${mainjs}"><\/script></body></html>`
 	}
 	activateMessageListener(webview, document) {
+		const showErr = e => {
+			vscode.window.showErrorMessage(e.message || String(e));
+			console.error(e);
+			console.error(e.stack)
+		};
+		let queue = Promise.resolve();
 		webview.onDidReceiveMessage(async message => {
 			try {
 				switch (message.type) {
@@ -339,41 +345,70 @@ class ZipPreviewEditor {
 						break
 					}
 					case "input": {
-						const result = await vscode.window.showInputBox({
-							title: message.title,
-							prompt: message.prompt,
-							placeHolder: "",
-							value: "",
-							ignoreFocusOut: true
-						});
-						webview.postMessage({
-							type: "respond",
-							requestId: message.requestId,
-							result: result || ""
+						queue = queue.then(async () => {
+							let result = await vscode.window.showInputBox({
+								title: message.title,
+								prompt: message.prompt,
+								placeHolder: "",
+								value: "",
+								ignoreFocusOut: true
+							});
+							webview.postMessage({
+								type: "respond",
+								requestId: message.requestId,
+								result: result || ""
+							})
+						}).catch(() => {
+							webview.postMessage({
+								type: "respond",
+								requestId: message.requestId,
+								result: ""
+							});
+							showErr()
 						});
 						break
 					}
 					case "choice": {
-						const result = await vscode.window.showQuickPick(message.choice, {
-							title: message.title,
-							canPickMany: false,
-							ignoreFocusOut: true
-						});
-						webview.postMessage({
-							type: "respond",
-							requestId: message.requestId,
-							result
+						queue = queue.then(async () => {
+							const result = await vscode.window.showQuickPick(message.choice || [], {
+								title: message.title,
+								canPickMany: false,
+								ignoreFocusOut: true
+							});
+							webview.postMessage({
+								type: "respond",
+								requestId: message.requestId,
+								result: result || ""
+							})
+						}).catch(() => {
+							webview.postMessage({
+								type: "respond",
+								requestId: message.requestId,
+								result: ""
+							});
+							showErr()
 						});
 						break
 					}
 					case "yesno": {
-						const result = await vscode.window.showInformationMessage("Are you sure you want to continue?", {
-							modal: true
-						}, "Yes", "No");
-						webview.postMessage({
-							type: "respond",
-							requestId: message.requestId,
-							result: result === "Yes"
+						queue = queue.then(async () => {
+							const result = await vscode.window.showQuickPick(["Yes", "No"], {
+								title: message.title,
+								canPickMany: false,
+								ignoreFocusOut: true
+							});
+							webview.postMessage({
+								type: "respond",
+								requestId: message.requestId,
+								result: result === "Yes"
+							})
+						}).catch(() => {
+							webview.postMessage({
+								type: "respond",
+								requestId: message.requestId,
+								result: false
+							});
+							showErr()
 						});
 						break
 					}
@@ -389,9 +424,7 @@ class ZipPreviewEditor {
 					}
 				}
 			} catch (e) {
-				vscode.window.showErrorMessage(e.message || String(e));
-				console.error(e);
-				console.error(e.stack)
+				showErr(e)
 			}
 		})
 	}

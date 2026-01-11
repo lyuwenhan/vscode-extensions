@@ -425,15 +425,34 @@ function showEdit(tree) {
 		span.append(spanL);
 		return span
 	}
+	let canceling = false;
+	let exited = false;
+	let edited = false;
 
 	function render() {
+		let leaved = false;
 		let cur = curr;
 		editAreaEle.innerHTML = "";
 		const buttons1 = document.createElement("div");
 		buttons1.classList.add("buttons");
 		const cancelBt = document.createElement("button");
 		cancelBt.innerText = "Cancel";
-		cancelBt.addEventListener("click", e => {
+		cancelBt.addEventListener("click", async e => {
+			if (canceling || exited || leaved) {
+				return
+			}
+			if (edited) {
+				canceling = true;
+				const canc = await sendMsg({
+					type: "yesno",
+					title: "Are you sure to cancel?"
+				});
+				canceling = false;
+				if (!canc || exited) {
+					return
+				}
+			}
+			exited = true;
 			editing = false;
 			document.body.classList.toggle("editing", editing);
 			editAreaEle.innerHTML = ""
@@ -441,6 +460,10 @@ function showEdit(tree) {
 		const saveBt = document.createElement("button");
 		saveBt.innerText = "Save";
 		saveBt.addEventListener("click", e => {
+			if (exited) {
+				return
+			}
+			exited = true;
 			repackFile(getFilesFromTree(root))
 		});
 		buttons1.append(cancelBt);
@@ -455,13 +478,14 @@ function showEdit(tree) {
 		back.innerText = "Back to parent";
 		if (editLinks !== "/") {
 			back.addEventListener("click", e => {
-				if (stack.length) {
+				if (!leaved && stack.length) {
 					const {
 						link,
 						node
 					} = stack.pop();
 					editLinks = link;
 					curr = node;
+					leaved = true;
 					render()
 				}
 			})
@@ -470,7 +494,12 @@ function showEdit(tree) {
 		}
 		const newFolder = document.createElement("button");
 		newFolder.innerText = "New folder";
+		let newing = false;
 		newFolder.addEventListener("click", async e => {
+			if (newing || exited || leaved) {
+				return
+			}
+			newing = true;
 			const {
 				result
 			} = await sendMsg({
@@ -478,6 +507,10 @@ function showEdit(tree) {
 				title: "Create New Folder",
 				prompt: "Enter the folder name"
 			});
+			newing = false;
+			if (exited || leaved) {
+				return
+			}
 			const res = result.split(/[/\\]/).filter(Boolean);
 			if (!res?.length) {
 				vscode.postMessage({
@@ -488,6 +521,7 @@ function showEdit(tree) {
 				return
 			}
 			let cur2 = cur;
+			edited = true;
 			res.forEach(e => {
 				if (!cur2.next[e]) {
 					cur2.next[e] = {
@@ -498,6 +532,7 @@ function showEdit(tree) {
 				}
 				cur2 = cur2.next[e]
 			});
+			leaved = true;
 			render()
 		});
 		buttons2.append(back);
@@ -522,18 +557,27 @@ function showEdit(tree) {
 			const enterBt = document.createElement("button");
 			enterBt.innerText = "Enter folder";
 			enterBt.addEventListener("click", e => {
+				if (leaved) {
+					return
+				}
 				stack.push({
 					link: editLinks,
 					node: cur
 				});
 				editLinks = editLinks + name + "/";
 				curr = child;
+				leaved = true;
 				render()
 			});
 			const deleteBt = document.createElement("button");
 			deleteBt.innerText = "Delete";
 			deleteBt.addEventListener("click", e => {
+				if (leaved) {
+					return
+				}
+				edited = true;
 				delete cur.next[name];
+				leaved = true;
 				render()
 			});
 			buttons.append(enterBt);
@@ -551,7 +595,12 @@ function showEdit(tree) {
 			const deleteBt = document.createElement("button");
 			deleteBt.innerText = "Delete";
 			deleteBt.addEventListener("click", e => {
+				if (leaved) {
+					return
+				}
+				edited = true;
 				cur.files.splice(i, 1);
+				leaved = true;
 				render()
 			});
 			buttons.classList.add("editButtons");

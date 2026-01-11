@@ -76,7 +76,7 @@ body:not(.mult) #ddmf {
 	display: none
 }
 #editArea, #main {
-	margin: 20px -10px 30px 0;
+	margin: 13px -10px 30px 0;
 	line-height: 1.2em
 }
 #main > ul {
