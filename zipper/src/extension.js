@@ -338,6 +338,55 @@ class ZipPreviewEditor {
 						});
 						break
 					}
+					case "input": {
+						const result = await vscode.window.showInputBox({
+							title: message.title,
+							prompt: message.prompt,
+							placeHolder: "",
+							value: "",
+							ignoreFocusOut: true
+						});
+						webview.postMessage({
+							type: "respond",
+							requestId: message.requestId,
+							result: result || ""
+						});
+						break
+					}
+					case "choice": {
+						const result = await vscode.window.showQuickPick(message.choice, {
+							title: message.title,
+							canPickMany: false,
+							ignoreFocusOut: true
+						});
+						webview.postMessage({
+							type: "respond",
+							requestId: message.requestId,
+							result
+						});
+						break
+					}
+					case "yesno": {
+						const result = await vscode.window.showInformationMessage("Are you sure you want to continue?", {
+							modal: true
+						}, "Yes", "No");
+						webview.postMessage({
+							type: "respond",
+							requestId: message.requestId,
+							result: result === "Yes"
+						});
+						break
+					}
+					case "showMsg": {
+						if (message.level === "error") {
+							vscode.window.showErrorMessage(message.message)
+						} else if (message.level == "warn") {
+							vscode.window.showWarningMessage(message.message)
+						} else {
+							vscode.window.showInformationMessage(message.message)
+						}
+						break
+					}
 				}
 			} catch (e) {
 				vscode.window.showErrorMessage(e.message || String(e));

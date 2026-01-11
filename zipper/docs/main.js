@@ -29,6 +29,19 @@ function startLoading() {
 }
 startLoading();
 const vscode = acquireVsCodeApi();
+let reqId = 0;
+const pending = new Map;
+
+function sendMsg(message) {
+	return new Promise(resolve => {
+		const id = ++reqId;
+		pending.set(id, resolve);
+		vscode.postMessage({
+			...message,
+			requestId: id
+		})
+	})
+}
 vscode.postMessage({
 	type: "get"
 });
@@ -397,7 +410,7 @@ function showEdit(tree) {
 	let editLinks = "/";
 	let stack = [];
 	let root = JSON.parse(JSON.stringify(treeNow));
-	let cur = root;
+	let curr = root;
 
 	function getSpan(name, size) {
 		const span = document.createElement("span");
@@ -414,6 +427,7 @@ function showEdit(tree) {
 	}
 
 	function render() {
+		let cur = curr;
 		editAreaEle.innerHTML = "";
 		const buttons1 = document.createElement("div");
 		buttons1.classList.add("buttons");
@@ -447,17 +461,59 @@ function showEdit(tree) {
 						node
 					} = stack.pop();
 					editLinks = link;
-					cur = node;
+					curr = node;
 					render()
 				}
 			})
 		} else {
 			back.classList.add("disable")
 		}
+		const newFolder = document.createElement("button");
+		newFolder.innerText = "New folder";
+		newFolder.addEventListener("click", async e => {
+			const {
+				result
+			} = await sendMsg({
+				type: "input",
+				title: "Create New Folder",
+				prompt: "Enter the folder name"
+			});
+			const res = result.split(/[/\\]/).filter(Boolean);
+			if (!res?.length) {
+				vscode.postMessage({
+					type: "sendMsg",
+					level: "warn",
+					message: "Operation canceled."
+				});
+				return
+			}
+			let cur2 = cur;
+			res.forEach(e => {
+				if (!cur2.next[e]) {
+					cur2.next[e] = {
+						size: 0,
+						next: {},
+						files: []
+					}
+				}
+				cur2 = cur2.next[e]
+			});
+			render()
+		});
 		buttons2.append(back);
+		buttons2.append(newFolder);
 		editAreaEle.append(buttons2);
 		const ul = document.createElement("ul");
-		for (const [name, child] of Object.entries(cur.next)) {
+		const ent = Object.entries(cur.next);
+		if (!cur.files.length && !ent.length) {
+			const li = document.createElement("li");
+			li.classList.add("editFolder");
+			const span = getSpan("This directory is empty");
+			span.classList.add("emptyDir");
+			li.append(span);
+			ul.append(li)
+		}
+		for (const [name, child] of ent) {
 			const li = document.createElement("li");
 			li.classList.add("editFolder");
 			const span = getSpan(name, child.size);
@@ -471,7 +527,7 @@ function showEdit(tree) {
 					node: cur
 				});
 				editLinks = editLinks + name + "/";
-				cur = child;
+				curr = child;
 				render()
 			});
 			const deleteBt = document.createElement("button");
@@ -519,6 +575,11 @@ editEle.addEventListener("click", () => {
 });
 window.addEventListener("message", event => {
 	const message = event.data;
+	if (message.type === "respond" && message.requestId && pending.has(message.requestId)) {
+		pending.get(message.requestId)(message);
+		pending.delete(message.requestId);
+		return
+	}
 	if (message.type === "setup") {
 		stopLoading();
 		zipName = message.name;
