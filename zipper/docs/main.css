@@ -85,7 +85,7 @@ body:not(.mult) #ddmf {
 body.editing #main, body.editing #panel, body:not(.editing) #editArea {
 	display: none
 }
-.disable, .disable:active, .disable:hover, body:not(:has(#main input[type=checkbox]:checked)) #ddmf {
+.disable, .disable:active, .disable:hover, body.mult #edit, body:not(:has(#main input[type=checkbox]:checked)) #ddmf {
 	cursor: not-allowed;
 	background-color: color-mix(in srgb, var(--vscode-editor-background) 40%, var(--vscode-editor-foreground) 60%)
 }
