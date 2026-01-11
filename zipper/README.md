@@ -53,6 +53,14 @@ You can select **multiple files and folders** in the preview and extract them to
 
 ![Demo](https://raw.githubusercontent.com/lyuwenhan/vscode-extensions/refs/heads/main/zipper/images/6.png)
 
+### 5. Editing archive
+
+You can delete selected files and folders and export them as a new archive.
+
+**This feature is still under development.**
+
+**No image available.**
+
 ---
 
 ## Capabilities

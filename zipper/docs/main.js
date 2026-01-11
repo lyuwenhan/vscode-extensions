@@ -39,6 +39,13 @@ function extractFile(files) {
 		files
 	})
 }
+
+function repackFile(files) {
+	vscode.postMessage({
+		type: "repack",
+		files
+	})
+}
 relEle.addEventListener("click", () => {
 	mainEle.innerHTML = "";
 	startLoading();
@@ -197,15 +204,14 @@ function getFilesFromTree(root) {
 		for (const f of node.files) {
 			files.push(f.i)
 		}
-		const nextKeys = Object.keys(node.next);
-		if (node.files.length === 0 && nextKeys.length === 0) {
+		const nextEnt = Object.entries(node.next);
+		if (node.files.length === 0 && nextEnt.length === 0) {
 			if (path !== "") {
 				folders.push(path)
 			}
 			return
 		}
-		for (const name of nextKeys) {
-			const child = node.next[name];
+		for (const [name, child] of nextEnt) {
 			const childPath = `${path}${name}/`;
 			dfs(child, childPath)
 		}
@@ -227,15 +233,15 @@ function formatSize(bytes, decimals = 2) {
 	}
 	return `${value.toFixed(decimals)} ${units[unitIndex]}`
 }
+let zipName = "";
 
-function displayTree(message) {
-	titleEle.innerText = message.name;
+function displayTree(tree) {
+	titleEle.innerText = zipName;
 	mainEle.innerHTML = "";
-	const tree = getTree(message.content);
 	treeLa = treeNow;
 	treeNow = tree;
 
-	function getSpan(name, size, faCho, needChk, path, files) {
+	function getSpan(name, size, needChk, path, files) {
 		const span = document.createElement("span");
 		span.classList.add("downloadFa");
 		const spanL = document.createElement("span");
@@ -288,7 +294,7 @@ function displayTree(message) {
 			const {
 				span,
 				ckb
-			} = getSpan(name, child.size, faCho, needChk, nPath, {
+			} = getSpan(name, child.size, needChk, nPath, {
 				folderName: name,
 				rootPath: nPath,
 				...getFilesFromTree(child)
@@ -352,7 +358,7 @@ function displayTree(message) {
 			const {
 				span,
 				ckb
-			} = getSpan(name, size, faCho, needChk, path + name, {
+			} = getSpan(name, size, needChk, path + name, {
 				folderName: "",
 				files: [i],
 				folders: [],
@@ -383,10 +389,141 @@ function displayTree(message) {
 	dfs(tree, treeLa, mainEle, "");
 	dfsListRes()
 }
+const editEle = document.getElementById("edit");
+const editAreaEle = document.getElementById("editArea");
+let editing = false;
+
+function showEdit(tree) {
+	let editLinks = "/";
+	let stack = [];
+	let root = JSON.parse(JSON.stringify(treeNow));
+	let cur = root;
+
+	function getSpan(name, size) {
+		const span = document.createElement("span");
+		span.classList.add("downloadFa");
+		const spanL = document.createElement("span");
+		if (size) {
+			spanL.innerText = `${name} (${formatSize(size)})`;
+			spanL.title = size + "B"
+		} else {
+			spanL.innerText = name
+		}
+		span.append(spanL);
+		return span
+	}
+
+	function render() {
+		editAreaEle.innerHTML = "";
+		const buttons1 = document.createElement("div");
+		buttons1.classList.add("buttons");
+		const cancelBt = document.createElement("button");
+		cancelBt.innerText = "Cancel";
+		cancelBt.addEventListener("click", e => {
+			editing = false;
+			document.body.classList.toggle("editing", editing);
+			editAreaEle.innerHTML = ""
+		});
+		const saveBt = document.createElement("button");
+		saveBt.innerText = "Save";
+		saveBt.addEventListener("click", e => {
+			repackFile(getFilesFromTree(root))
+		});
+		buttons1.append(cancelBt);
+		buttons1.append(saveBt);
+		editAreaEle.append(buttons1);
+		const curLink = document.createElement("h3");
+		curLink.innerText = "Current folder: " + editLinks;
+		editAreaEle.append(curLink);
+		const buttons2 = document.createElement("div");
+		buttons2.classList.add("buttons");
+		const back = document.createElement("button");
+		back.innerText = "Back to parent";
+		if (editLinks !== "/") {
+			back.addEventListener("click", e => {
+				if (stack.length) {
+					const {
+						link,
+						node
+					} = stack.pop();
+					editLinks = link;
+					cur = node;
+					render()
+				}
+			})
+		} else {
+			back.classList.add("disable")
+		}
+		buttons2.append(back);
+		editAreaEle.append(buttons2);
+		const ul = document.createElement("ul");
+		for (const [name, child] of Object.entries(cur.next)) {
+			const li = document.createElement("li");
+			li.classList.add("editFolder");
+			const span = getSpan(name, child.size);
+			const buttons = document.createElement("div");
+			buttons.classList.add("buttons");
+			const enterBt = document.createElement("button");
+			enterBt.innerText = "Enter folder";
+			enterBt.addEventListener("click", e => {
+				stack.push({
+					link: editLinks,
+					node: cur
+				});
+				editLinks = editLinks + name + "/";
+				cur = child;
+				render()
+			});
+			const deleteBt = document.createElement("button");
+			deleteBt.innerText = "Delete";
+			deleteBt.addEventListener("click", e => {
+				delete cur.next[name];
+				render()
+			});
+			buttons.append(enterBt);
+			buttons.append(deleteBt);
+			span.append(buttons);
+			li.append(span);
+			ul.append(li)
+		}
+		for (let i = 0; i < cur.files.length; i++) {
+			const file = cur.files[i];
+			const li = document.createElement("li");
+			const span = getSpan(file.name, file.size);
+			const buttons = document.createElement("div");
+			buttons.classList.add("buttons");
+			const deleteBt = document.createElement("button");
+			deleteBt.innerText = "Delete";
+			deleteBt.addEventListener("click", e => {
+				cur.files.splice(i, 1);
+				render()
+			});
+			buttons.classList.add("editButtons");
+			buttons.append(deleteBt);
+			span.append(buttons);
+			li.append(span);
+			ul.append(li)
+		}
+		editAreaEle.append(ul)
+	}
+	render()
+}
+editEle.addEventListener("click", () => {
+	if (!document.body.classList.contains("mult")) {
+		editing = true;
+		document.body.classList.toggle("editing", editing);
+		if (editing) {
+			showEdit(treeNow)
+		}
+	}
+});
 window.addEventListener("message", event => {
 	const message = event.data;
 	if (message.type === "setup") {
 		stopLoading();
-		displayTree(message)
+		zipName = message.name;
+		displayTree(getTree(message.content))
+	} else if (message.type === "setName") {
+		titleEle.innerText = zipName = message.name
 	}
 });

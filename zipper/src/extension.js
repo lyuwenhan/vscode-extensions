@@ -8,9 +8,14 @@ const {
 const unzipper = require("unzipper");
 
 function tryName(faDir, name, ext = "") {
-	let filename = name + ext;
-	let dir = path.join(faDir, filename);
 	let addition = 0;
+	const mat = name.match(/^(.*?)\s\(([1-9]\d*)\)$/);
+	if (mat) {
+		name = mat[1];
+		addition = Number(mat[2])
+	}
+	let filename = name + (addition ? " (" + addition + ")" : "") + ext;
+	let dir = path.join(faDir, filename);
 	while (fs.existsSync(dir)) {
 		addition++;
 		filename = name + " (" + addition + ")" + ext;
@@ -108,7 +113,16 @@ class ZipDocument {
 	constructor(uri) {
 		this.uri = uri;
 		this.filePath = uri.fsPath;
-		this.fileName = path.basename(this.filePath);
+		const {
+			ext,
+			name,
+			dir,
+			base
+		} = path.parse(this.filePath);
+		this.fileName = base;
+		this.fileDir = dir;
+		this.fileExt = ext;
+		this.fileNameOnly = name;
 		this.structure = null;
 		this.exportDir = null;
 		this.exportName = null
@@ -219,6 +233,55 @@ class ZipDocument {
 			exportName: this.exportName
 		}
 	}
+	async exportToNew(targetFiles) {
+		try {
+			if (!fs.existsSync(this.filePath)) {
+				throw new Error("File not found")
+			}
+			const [outputZip, newName] = tryName(this.fileDir, this.fileNameOnly, this.fileExt);
+			await vscode.window.withProgress({
+				location: vscode.ProgressLocation.Notification,
+				title: `Zipper: Exporting "${newName}"`,
+				cancellable: false
+			}, async () => {
+				const output = fs.createWriteStream(outputZip);
+				const archive = archiver("zip", {
+					zlib: {
+						level: 9
+					},
+					forceLocalTime: true
+				});
+				const completion = new Promise((resolve, reject) => {
+					output.once("close", resolve);
+					output.once("error", reject);
+					archive.once("error", reject)
+				});
+				archive.pipe(output);
+				const directory = await unzipper.Open.file(this.filePath);
+				const files = directory.files;
+				targetFiles.folders.filter(Boolean).forEach(pa => {
+					archive.append("", {
+						name: pa
+					})
+				});
+				targetFiles.files.map(i => files[i]).filter(Boolean).forEach(file => {
+					if (file.type === "File") {
+						archive.append(file.stream(), {
+							name: file.path
+						})
+					}
+				});
+				await archive.finalize();
+				await completion;
+				await vscode.commands.executeCommand("vscode.openWith", vscode.Uri.file(outputZip), "zipPreview.editor")
+			});
+			vscode.window.showInformationMessage(`Zipper: Extracted "${newName}"`)
+		} catch (e) {
+			vscode.window.showErrorMessage(e.message || String(e));
+			console.error(e);
+			console.error(e.stack)
+		}
+	}
 	dispose() {}
 }
 class ZipPreviewEditor {
@@ -241,13 +304,17 @@ class ZipPreviewEditor {
 	getHtml(webview) {
 		const maincss = webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, "docs", "main.css")));
 		const mainjs = webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, "docs", "main.js")));
-		return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="${maincss}"></head><body><h2 id="title">ZIP preview</h2><div id="buttons"><button id="rel">Reload</button><button id="dmf" class="hid">Download multiple files</button><button id="ddmf" class="hid">Download</button></div><div id="main">loading</div><script src="${mainjs}"><\/script></body></html>`
+		return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="${maincss}"></head><body><h2 id="title">ZIP preview</h2><div id="panel" class="buttons"><button id="rel">Reload</button><button id="edit" class="hid">Edit</button><button id="dmf" class="hid">Download multiple files</button><button id="ddmf" class="hid">Download</button></div><div id="main">loading</div><div id="editArea"></div><script src="${mainjs}"><\/script></body></html>`
 	}
 	activateMessageListener(webview, document) {
 		webview.onDidReceiveMessage(async message => {
 			try {
 				switch (message.type) {
 					case "get": {
+						webview.postMessage({
+							type: "setName",
+							name: document.fileName
+						});
 						webview.postMessage({
 							type: "setup",
 							name: document.fileName,
@@ -257,6 +324,10 @@ class ZipPreviewEditor {
 					}
 					case "download": {
 						await document.extractFiles(message.files);
+						break
+					}
+					case "repack": {
+						await document.exportToNew(message.files);
 						break
 					}
 					case "reload": {
