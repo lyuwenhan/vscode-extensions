@@ -55,7 +55,7 @@ You can select **multiple files and folders** in the preview and extract them to
 
 ### 5. Editing archive
 
-You can delete selected files and folders, and create new folders before exporting a new archive.
+You can delete selected files and folders, rename files and folders, and create new folders in the editing view before exporting a new archive.
 
 **This feature is still under development.**
 

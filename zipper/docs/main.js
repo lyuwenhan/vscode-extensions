@@ -412,6 +412,36 @@ function showEdit(tree) {
 	let root = JSON.parse(JSON.stringify(treeNow));
 	let curr = root;
 
+	function getFilesFromTreeV2(root) {
+		const files = [];
+		const folders = [];
+
+		function dfs(node, path) {
+			for (const f of node.files) {
+				files.push({
+					i: f.i,
+					path: path + f.name
+				})
+			}
+			const nextEnt = Object.entries(node.next);
+			if (node.files.length === 0 && nextEnt.length === 0) {
+				if (path !== "") {
+					folders.push(path)
+				}
+				return
+			}
+			for (const [name, child] of nextEnt) {
+				const childPath = `${path}${name}/`;
+				dfs(child, childPath)
+			}
+		}
+		dfs(root, "");
+		return {
+			files,
+			folders
+		}
+	}
+
 	function getSpan(name, size) {
 		const span = document.createElement("span");
 		span.classList.add("downloadFa");
@@ -453,6 +483,7 @@ function showEdit(tree) {
 				}
 			}
 			exited = true;
+			leaved = true;
 			editing = false;
 			document.body.classList.toggle("editing", editing);
 			editAreaEle.innerHTML = ""
@@ -464,7 +495,8 @@ function showEdit(tree) {
 				return
 			}
 			exited = true;
-			repackFile(getFilesFromTree(root))
+			leaved = true;
+			repackFile(getFilesFromTreeV2(root))
 		});
 		buttons1.append(cancelBt);
 		buttons1.append(saveBt);
@@ -496,7 +528,7 @@ function showEdit(tree) {
 		newFolder.innerText = "New folder";
 		let newing = false;
 		newFolder.addEventListener("click", async e => {
-			if (newing || exited || leaved) {
+			if (newing || leaved) {
 				return
 			}
 			newing = true;
@@ -508,7 +540,7 @@ function showEdit(tree) {
 				prompt: "Enter the folder name"
 			});
 			newing = false;
-			if (exited || leaved) {
+			if (leaved) {
 				return
 			}
 			const res = result.split(/[/\\]/).filter(Boolean);
@@ -569,6 +601,52 @@ function showEdit(tree) {
 				leaved = true;
 				render()
 			});
+			const renameBt = document.createElement("button");
+			renameBt.innerText = "Rename";
+			let renaming = false;
+			renameBt.addEventListener("click", async e => {
+				if (leaved || renaming) {
+					return
+				}
+				renaming = true;
+				let newName = await sendMsg({
+					type: "input",
+					title: "Rename File",
+					prompt: "Enter the new file name"
+				});
+				renaming = false;
+				if (!newName.result || leaved) {
+					return
+				}
+				edited = true;
+				delete cur.next[name];
+				const links = newName.result.split(/[/\/]/).filter(Boolean);
+				const finalLink = links.pop();
+				let cur2 = cur;
+				links.forEach(e => {
+					if (!cur2.next[e]) {
+						cur2.next[e] = {
+							size: 0,
+							next: {},
+							files: []
+						}
+					}
+					cur2 = cur2.next[e]
+				});
+				if (cur2.next[finalLink]) {
+					cur.next[name] = child;
+					vscode.postMessage({
+						type: "showMsg",
+						level: "warn",
+						message: "Target already exist"
+					});
+					return
+				}
+				edited = true;
+				cur2.next[finalLink] = child;
+				leaved = true;
+				render()
+			});
 			const deleteBt = document.createElement("button");
 			deleteBt.innerText = "Delete";
 			deleteBt.addEventListener("click", e => {
@@ -581,6 +659,7 @@ function showEdit(tree) {
 				render()
 			});
 			buttons.append(enterBt);
+			buttons.append(renameBt);
 			buttons.append(deleteBt);
 			span.append(buttons);
 			li.append(span);
@@ -592,6 +671,46 @@ function showEdit(tree) {
 			const span = getSpan(file.name, file.size);
 			const buttons = document.createElement("div");
 			buttons.classList.add("buttons");
+			const renameBt = document.createElement("button");
+			renameBt.innerText = "Rename";
+			let renaming = false;
+			renameBt.addEventListener("click", async e => {
+				if (leaved || renaming) {
+					return
+				}
+				renaming = true;
+				let newName = await sendMsg({
+					type: "input",
+					title: "Rename File",
+					prompt: "Enter the new folder name"
+				});
+				renaming = false;
+				if (!newName.result || leaved) {
+					return
+				}
+				const links = newName.result.split(/[/\/]/).filter(Boolean);
+				const finalLink = links.pop();
+				let cur2 = cur;
+				edited = true;
+				links.forEach(e => {
+					if (!cur2.next[e]) {
+						cur2.next[e] = {
+							size: 0,
+							next: {},
+							files: []
+						}
+					}
+					cur2 = cur2.next[e]
+				});
+				edited = true;
+				cur.files.splice(i, 1);
+				cur2.files.push({
+					...file,
+					name: finalLink
+				});
+				leaved = true;
+				render()
+			});
 			const deleteBt = document.createElement("button");
 			deleteBt.innerText = "Delete";
 			deleteBt.addEventListener("click", e => {
@@ -603,7 +722,7 @@ function showEdit(tree) {
 				leaved = true;
 				render()
 			});
-			buttons.classList.add("editButtons");
+			buttons.append(renameBt);
 			buttons.append(deleteBt);
 			span.append(buttons);
 			li.append(span);

@@ -264,10 +264,14 @@ class ZipDocument {
 						name: pa
 					})
 				});
-				targetFiles.files.map(i => files[i]).filter(Boolean).forEach(file => {
+				targetFiles.files.forEach(fi => {
+					const file = files[fi.i];
+					if (!file || !fi.path) {
+						return
+					}
 					if (file.type === "File") {
 						archive.append(file.stream(), {
-							name: file.path
+							name: fi.path
 						})
 					}
 				});
@@ -421,6 +425,9 @@ class ZipPreviewEditor {
 							vscode.window.showInformationMessage(message.message)
 						}
 						break
+					}
+					default: {
+						console.log(message)
 					}
 				}
 			} catch (e) {
