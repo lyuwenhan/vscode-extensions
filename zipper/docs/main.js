@@ -59,6 +59,12 @@ function repackFile(files) {
 		files
 	})
 }
+
+function comp(a, b) {
+	const a2 = a.toLowerCase(),
+		b2 = b.toLowerCase();
+	return a2 < b2 ? -1 : a2 > b2 ? 1 : a < b ? -1 : a > b ? 1 : 0
+}
 relEle.addEventListener("click", () => {
 	mainEle.innerHTML = "";
 	startLoading();
@@ -110,7 +116,7 @@ ddmfEle.addEventListener("click", () => {
 	});
 
 	function dfs(node, forceBool = false, path = "") {
-		node.next = Object.fromEntries(Object.entries(node.next).sort(([a], [b]) => a.localeCompare(b)));
+		node.next = Object.fromEntries(Object.entries(node.next).sort(([a], [b]) => comp(a, b)));
 		node.isSel ||= forceBool;
 		if (node.isSel) {
 			node.files.forEach(f => files.push(f.i))
@@ -197,8 +203,8 @@ function getTree(paths) {
 	}
 
 	function dfs(node) {
-		node.files = node.files.sort();
-		node.next = Object.fromEntries(Object.entries(node.next).sort(([a], [b]) => a.localeCompare(b)));
+		node.files = node.files.sort((a, b) => comp(a.name, b.name) || a.size - b.size || a.i - b.i);
+		node.next = Object.fromEntries(Object.entries(node.next).sort(([a], [b]) => comp(a, b)));
 		node.size = node.files.reduce((a, b) => a + b.size, 0);
 		for (const [name, child] of Object.entries(node.next)) {
 			dfs(child);
@@ -446,7 +452,7 @@ function showEdit(tree) {
 		const span = document.createElement("span");
 		span.classList.add("downloadFa");
 		const spanL = document.createElement("span");
-		if (size) {
+		if (typeof size === "number") {
 			spanL.innerText = `${name} (${formatSize(size)})`;
 			spanL.title = size + "B"
 		} else {
@@ -623,6 +629,7 @@ function showEdit(tree) {
 				const links = newName.result.split(/[/\/]/).filter(Boolean);
 				const finalLink = links.pop();
 				let cur2 = cur;
+				const nStack = [];
 				links.forEach(e => {
 					if (!cur2.next[e]) {
 						cur2.next[e] = {
@@ -631,7 +638,8 @@ function showEdit(tree) {
 							files: []
 						}
 					}
-					cur2 = cur2.next[e]
+					cur2 = cur2.next[e];
+					nStack.push(cur2)
 				});
 				if (cur2.next[finalLink]) {
 					cur.next[name] = child;
@@ -642,8 +650,12 @@ function showEdit(tree) {
 					});
 					return
 				}
+				nStack.forEach(e => {
+					e.size += child.size
+				});
 				edited = true;
 				cur2.next[finalLink] = child;
+				cur2.next = Object.fromEntries(Object.entries(cur2.next).sort(([a], [b]) => comp(a, b)));
 				leaved = true;
 				render()
 			});
@@ -692,6 +704,7 @@ function showEdit(tree) {
 				const finalLink = links.pop();
 				let cur2 = cur;
 				edited = true;
+				const nStack = [];
 				links.forEach(e => {
 					if (!cur2.next[e]) {
 						cur2.next[e] = {
@@ -700,7 +713,11 @@ function showEdit(tree) {
 							files: []
 						}
 					}
-					cur2 = cur2.next[e]
+					cur2 = cur2.next[e];
+					nStack.push(cur2)
+				});
+				nStack.forEach(e => {
+					e.size += file.size
 				});
 				edited = true;
 				cur.files.splice(i, 1);
@@ -708,6 +725,7 @@ function showEdit(tree) {
 					...file,
 					name: finalLink
 				});
+				cur2.files = cur2.files.sort((a, b) => comp(a.name, b.name) || a.size - b.size || a.i - b.i);
 				leaved = true;
 				render()
 			});

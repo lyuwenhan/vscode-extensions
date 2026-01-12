@@ -418,11 +418,14 @@ class ZipPreviewEditor {
 					}
 					case "showMsg": {
 						if (message.level === "error") {
-							vscode.window.showErrorMessage(message.message)
+							vscode.window.showErrorMessage(message.message);
+							console.error(message.message)
 						} else if (message.level == "warn") {
-							vscode.window.showWarningMessage(message.message)
+							vscode.window.showWarningMessage(message.message);
+							console.warn(message.message)
 						} else {
-							vscode.window.showInformationMessage(message.message)
+							vscode.window.showInformationMessage(message.message);
+							console.log(message.message)
 						}
 						break
 					}
