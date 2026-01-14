@@ -7,8 +7,7 @@ const {
 } = require("stream/promises");
 const unzipper = require("unzipper");
 
-function tryName(faDir, name, ext = "") {
-	let addition = 0;
+function tryName(faDir, name, ext = "", addition = 0) {
 	const mat = name.match(/^(.*?)\s\(([1-9]\d*)\)$/);
 	if (mat) {
 		name = mat[1];
@@ -21,7 +20,7 @@ function tryName(faDir, name, ext = "") {
 		filename = name + " (" + addition + ")" + ext;
 		dir = path.join(faDir, filename)
 	}
-	return [dir, filename]
+	return [dir, filename, addition]
 }
 async function getPaths(paths) {
 	let pa = paths[0][0];
@@ -125,7 +124,14 @@ class ZipDocument {
 		this.fileNameOnly = name;
 		this.structure = null;
 		this.exportDir = null;
-		this.exportName = null
+		this.exportName = null;
+		this.upload = {
+			cnt: 0,
+			files: new Map
+		};
+		this.uploadDir = "";
+		this.closed = false;
+		this.fileTill = 0
 	}
 	async readZipStructure() {
 		if (!fs.existsSync(this.filePath)) {
@@ -265,14 +271,24 @@ class ZipDocument {
 					})
 				});
 				targetFiles.files.forEach(fi => {
-					const file = files[fi.i];
-					if (!file || !fi.path) {
-						return
-					}
-					if (file.type === "File") {
-						archive.append(file.stream(), {
+					if (fi.byUpload) {
+						const uploadPath = this.upload.files.get(fi.i);
+						if (!uploadPath || !fs.existsSync(uploadPath)) {
+							return
+						}
+						archive.append(fs.createReadStream(uploadPath), {
 							name: fi.path
 						})
+					} else {
+						const file = files[fi.i];
+						if (!file || !fi.path) {
+							return
+						}
+						if (file.type === "File") {
+							archive.append(file.stream(), {
+								name: fi.path
+							})
+						}
 					}
 				});
 				await archive.finalize();
@@ -286,18 +302,119 @@ class ZipDocument {
 			console.error(e.stack)
 		}
 	}
-	dispose() {}
+	async getUpload() {
+		if (!this.uploadDir) {
+			const zipUploadDir = path.join(this.fileDir, ".zipUpload");
+			await fs.promises.mkdir(zipUploadDir, {
+				recursive: true
+			});
+			this.uploadDir = tryName(zipUploadDir, "zip")[0]
+		}
+		await fs.promises.mkdir(this.uploadDir, {
+			recursive: true
+		});
+		return this.uploadDir
+	}
+	async deleteFile(is) {
+		if (this.closed) {
+			return
+		}
+		for (const i of is) {
+			const filePath = this.upload.files.get(i);
+			if (!filePath) {
+				continue
+			}
+			try {
+				await fs.promises.unlink(filePath)
+			} catch (e) {
+				console.error(e)
+			}
+			this.upload.files.delete(i)
+		}
+	}
+	dispose() {
+		this.closed = true;
+		if (this.uploadDir && fs.existsSync(this.uploadDir)) {
+			fs.rmSync(this.uploadDir, {
+				recursive: true,
+				force: true
+			})
+		}
+		this.upload.files.clear()
+	}
+}
+async function handleUploadSelection(document, uris) {
+	const zipDir = await document.getUpload();
+	const result = {
+		files: [],
+		folder: []
+	};
+	const addFile = async (srcPath, relName) => {
+		const [outPath, _, till] = tryName(zipDir, "file", ".bin", document.fileTill);
+		document.fileTill = till;
+		const i = document.upload.cnt++;
+		await fs.promises.copyFile(srcPath, outPath);
+		const {
+			size
+		} = await fs.promises.stat(outPath);
+		document.upload.files.set(i, outPath);
+		result.files.push({
+			name: relName.replace(/\\/g, "/"),
+			i,
+			size
+		})
+	};
+	const walkDir = async (rootDir, curDir) => {
+		if (document.closed || path.basename(curDir) === ".zipUpload") {
+			return
+		}
+		const entries = await fs.promises.readdir(curDir, {
+			withFileTypes: true
+		});
+		let has = false;
+		for (const ent of entries) {
+			if (document.closed) {
+				return
+			}
+			const full = path.join(curDir, ent.name);
+			const rel = path.relative(rootDir, full).replace(/\\/g, "/");
+			if (ent.isFile()) {
+				has = true;
+				await addFile(full, rel)
+			} else if (ent.isDirectory()) {
+				if (ent.name === ".zipUpload") {
+					continue
+				}
+				has = true;
+				await walkDir(rootDir, full)
+			}
+		}
+		if (!has) {
+			const rel = path.relative(rootDir, curDir).replace(/\\/g, "/");
+			if (rel) {
+				result.folder.push(rel)
+			}
+		}
+	};
+	for (const uri of uris) {
+		const p = uri.fsPath;
+		const st = await fs.promises.lstat(p);
+		if (st.isFile()) {
+			await addFile(p, path.basename(p))
+		} else if (st.isDirectory()) {
+			await walkDir(path.dirname(p), p)
+		}
+	}
+	return result
 }
 class ZipPreviewEditor {
 	constructor(context) {
-		this.context = context;
-		this.zipPath = null
+		this.context = context
 	}
 	async openCustomDocument(uri, openContext, token) {
 		return new ZipDocument(uri)
 	}
 	async resolveCustomEditor(document, webviewPanel, token) {
-		this.zipPath = document.uri.fsPath;
 		webviewPanel.webview.options = {
 			enableScripts: true,
 			localResourceRoots: [vscode.Uri.file(path.join(this.context.extensionPath, "docs"))]
@@ -312,9 +429,9 @@ class ZipPreviewEditor {
 	}
 	activateMessageListener(webview, document) {
 		const showErr = e => {
-			vscode.window.showErrorMessage(e.message || String(e));
 			console.error(e);
-			console.error(e.stack)
+			console.error(e.stack);
+			vscode.window.showErrorMessage(e.message || String(e))
 		};
 		let queue = Promise.resolve();
 		webview.onDidReceiveMessage(async message => {
@@ -338,6 +455,10 @@ class ZipPreviewEditor {
 					}
 					case "repack": {
 						await document.exportToNew(message.files);
+						if (!message?.i?.length) {
+							return
+						}
+						await document.deleteFile(message.i);
 						break
 					}
 					case "reload": {
@@ -362,13 +483,13 @@ class ZipPreviewEditor {
 								requestId: message.requestId,
 								result: result || ""
 							})
-						}).catch(() => {
+						}).catch(e => {
 							webview.postMessage({
 								type: "respond",
 								requestId: message.requestId,
 								result: ""
 							});
-							showErr()
+							showErr(e)
 						});
 						break
 					}
@@ -384,13 +505,13 @@ class ZipPreviewEditor {
 								requestId: message.requestId,
 								result: result || ""
 							})
-						}).catch(() => {
+						}).catch(e => {
 							webview.postMessage({
 								type: "respond",
 								requestId: message.requestId,
 								result: ""
 							});
-							showErr()
+							showErr(e)
 						});
 						break
 					}
@@ -406,14 +527,68 @@ class ZipPreviewEditor {
 								requestId: message.requestId,
 								result: result === "Yes"
 							})
-						}).catch(() => {
+						}).catch(e => {
 							webview.postMessage({
 								type: "respond",
 								requestId: message.requestId,
 								result: false
 							});
-							showErr()
+							showErr(e)
 						});
+						break
+					}
+					case "uploadFile": {
+						queue = queue.then(async () => {
+							const selection = await vscode.window.showInformationMessage("Choose upload type", {
+								modal: true
+							}, "Files", "Folders");
+							let isFile;
+							if (selection === "Files") {
+								isFile = true
+							} else if (selection === "Folders") {
+								isFile = false
+							} else {
+								webview.postMessage({
+									type: "respond",
+									requestId: message.requestId,
+									result: []
+								});
+								return
+							}
+							const uris = await vscode.window.showOpenDialog({
+								canSelectFiles: isFile,
+								canSelectFolders: !isFile,
+								canSelectMany: true
+							});
+							await vscode.window.withProgress({
+								location: vscode.ProgressLocation.Notification,
+								title: "Zipper: Uploading",
+								cancellable: false
+							}, async () => {
+								webview.postMessage({
+									type: "respond",
+									requestId: message.requestId,
+									result: uris ? await handleUploadSelection(document, uris) : {
+										files: [],
+										folder: []
+									}
+								})
+							})
+						}).catch(e => {
+							webview.postMessage({
+								type: "respond",
+								requestId: message.requestId,
+								result: []
+							});
+							showErr(e)
+						});
+						break
+					}
+					case "deleteFile": {
+						if (!message.i?.length) {
+							return
+						}
+						await document.deleteFile(message.i);
 						break
 					}
 					case "showMsg": {

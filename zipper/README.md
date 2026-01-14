@@ -55,9 +55,14 @@ You can select **multiple files and folders** in the preview and extract them to
 
 ### 5. Editing archive
 
-You can delete selected files and folders, rename files and folders, and create new folders in the editing view before exporting a new archive.
+You can delete selected files and folders, rename files and folders, create new folders, and upload external files or folders in the editing view before exporting a new archive.
 
-**This feature is still under development.**
+- Uploaded files are added at the selected location.
+- Uploaded folders are imported recursively, preserving their internal structure.
+- Empty folders are preserved.
+- Existing entries with the same path are not overwritten.
+
+**This feature is still under development and is not guaranteed to be stable or fully functional.**
 
 **No image available.**
 

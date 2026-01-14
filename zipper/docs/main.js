@@ -53,10 +53,11 @@ function extractFile(files) {
 	})
 }
 
-function repackFile(files) {
+function repackFile(files, i) {
 	vscode.postMessage({
 		type: "repack",
-		files
+		files,
+		i
 	})
 }
 
@@ -426,7 +427,8 @@ function showEdit(tree) {
 			for (const f of node.files) {
 				files.push({
 					i: f.i,
-					path: path + f.name
+					path: path + f.name,
+					byUpload: f.byUpload || false
 				})
 			}
 			const nextEnt = Object.entries(node.next);
@@ -461,6 +463,21 @@ function showEdit(tree) {
 		span.append(spanL);
 		return span
 	}
+
+	function getIs(cur) {
+		const i = [];
+
+		function dfs(node) {
+			node.files.forEach(fi => {
+				if (fi.byUpload) {
+					i.push(fi.i)
+				}
+			});
+			Object.values(node.next).forEach(dfs)
+		}
+		dfs(cur);
+		return i
+	}
 	let canceling = false;
 	let exited = false;
 	let edited = false;
@@ -484,7 +501,7 @@ function showEdit(tree) {
 					title: "Are you sure to cancel?"
 				});
 				canceling = false;
-				if (!canc || exited) {
+				if (!canc.result || exited) {
 					return
 				}
 			}
@@ -502,7 +519,7 @@ function showEdit(tree) {
 			}
 			exited = true;
 			leaved = true;
-			repackFile(getFilesFromTreeV2(root))
+			repackFile(getFilesFromTreeV2(root), getIs(root))
 		});
 		buttons1.append(cancelBt);
 		buttons1.append(saveBt);
@@ -552,7 +569,7 @@ function showEdit(tree) {
 			const res = result.split(/[/\\]/).filter(Boolean);
 			if (!res?.length) {
 				vscode.postMessage({
-					type: "sendMsg",
+					type: "showMsg",
 					level: "warn",
 					message: "Operation canceled."
 				});
@@ -573,8 +590,90 @@ function showEdit(tree) {
 			leaved = true;
 			render()
 		});
+		const uploadFile = document.createElement("button");
+		uploadFile.innerText = "Upload";
+		let uploading = false;
+		uploadFile.addEventListener("click", async e => {
+			if (uploading || leaved) {
+				return
+			}
+			uploading = true;
+			const {
+				result
+			} = await sendMsg({
+				type: "uploadFile",
+				title: "Upload"
+			});
+			const oStack = [...stack];
+			const cur2 = cur;
+			uploading = false;
+			if (!result || !result.files.length && !result.folder.length) {
+				vscode.postMessage({
+					type: "showMsg",
+					level: "warn",
+					message: "Operation canceled."
+				});
+				return
+			}
+			const needUpdFolder = new Set;
+			const needUpdFile = new Set;
+			edited = true;
+			result.folder.forEach(fo => {
+				let here = cur2;
+				fo.split("/").filter(Boolean).forEach(part => {
+					if (!here.next[part]) {
+						here.next[part] = {
+							size: 0,
+							next: {},
+							files: []
+						};
+						needUpdFolder.add(here)
+					}
+					here = here.next[part]
+				})
+			});
+			let sizeAdd = 0;
+			result.files.forEach(fi => {
+				let here = cur2;
+				const pa = fi.name.split("/").filter(Boolean);
+				const name = pa.pop();
+				pa.forEach(part => {
+					if (!here.next[part]) {
+						here.next[part] = {
+							size: 0,
+							next: {},
+							files: []
+						};
+						needUpdFolder.add(here)
+					}
+					here = here.next[part];
+					here.size += fi.size
+				});
+				sizeAdd += fi.size;
+				here.files.push({
+					name,
+					size: fi.size,
+					i: fi.i,
+					byUpload: true
+				});
+				needUpdFile.add(here)
+			});
+			needUpdFile.forEach(e => {
+				e.files = e.files.sort((a, b) => comp(a.name, b.name) || a.size - b.size || (a.byUpload ? 1 : 0) - (b.byUpload ? 1 : 0) || a.i - b.i)
+			});
+			needUpdFolder.forEach(e => {
+				e.next = Object.fromEntries(Object.entries(e.next).sort(([a], [b]) => comp(a, b)))
+			});
+			oStack.forEach(e => {
+				e.node.size += sizeAdd
+			});
+			cur2.size += sizeAdd;
+			leaved = true;
+			render()
+		});
 		buttons2.append(back);
 		buttons2.append(newFolder);
+		buttons2.append(uploadFile);
 		editAreaEle.append(buttons2);
 		const ul = document.createElement("ul");
 		const ent = Object.entries(cur.next);
@@ -630,13 +729,15 @@ function showEdit(tree) {
 				const finalLink = links.pop();
 				let cur2 = cur;
 				const nStack = [];
+				const needUpdFolder = [];
 				links.forEach(e => {
 					if (!cur2.next[e]) {
 						cur2.next[e] = {
 							size: 0,
 							next: {},
 							files: []
-						}
+						};
+						needUpdFolder.push(cur2)
 					}
 					cur2 = cur2.next[e];
 					nStack.push(cur2)
@@ -655,7 +756,9 @@ function showEdit(tree) {
 				});
 				edited = true;
 				cur2.next[finalLink] = child;
-				cur2.next = Object.fromEntries(Object.entries(cur2.next).sort(([a], [b]) => comp(a, b)));
+				needUpdFolder.forEach(e => {
+					e.next = Object.fromEntries(Object.entries(e.next).sort(([a], [b]) => comp(a, b)))
+				});
 				leaved = true;
 				render()
 			});
@@ -667,6 +770,10 @@ function showEdit(tree) {
 				}
 				edited = true;
 				delete cur.next[name];
+				vscode.postMessage({
+					type: "deleteFile",
+					i: getIs(child)
+				});
 				leaved = true;
 				render()
 			});
@@ -705,13 +812,15 @@ function showEdit(tree) {
 				let cur2 = cur;
 				edited = true;
 				const nStack = [];
+				const needUpdFolder = [];
 				links.forEach(e => {
 					if (!cur2.next[e]) {
 						cur2.next[e] = {
 							size: 0,
 							next: {},
 							files: []
-						}
+						};
+						needUpdFolder.push(cur2)
 					}
 					cur2 = cur2.next[e];
 					nStack.push(cur2)
@@ -726,6 +835,9 @@ function showEdit(tree) {
 					name: finalLink
 				});
 				cur2.files = cur2.files.sort((a, b) => comp(a.name, b.name) || a.size - b.size || a.i - b.i);
+				needUpdFolder.forEach(e => {
+					e.next = Object.fromEntries(Object.entries(e.next).sort(([a], [b]) => comp(a, b)))
+				});
 				leaved = true;
 				render()
 			});
@@ -736,6 +848,12 @@ function showEdit(tree) {
 					return
 				}
 				edited = true;
+				if (file.byUpload) {
+					vscode.postMessage({
+						type: "deleteFile",
+						i: [file.i]
+					})
+				}
 				cur.files.splice(i, 1);
 				leaved = true;
 				render()
