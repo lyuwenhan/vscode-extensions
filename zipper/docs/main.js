@@ -207,7 +207,7 @@ function getTree(paths) {
 		node.files = node.files.sort((a, b) => comp(a.name, b.name) || a.size - b.size || a.i - b.i);
 		node.next = Object.fromEntries(Object.entries(node.next).sort(([a], [b]) => comp(a, b)));
 		node.size = node.files.reduce((a, b) => a + b.size, 0);
-		for (const [name, child] of Object.entries(node.next)) {
+		for (const child of Object.values(node.next)) {
 			dfs(child);
 			node.size += child.size
 		}
@@ -413,7 +413,7 @@ const editEle = document.getElementById("edit");
 const editAreaEle = document.getElementById("editArea");
 let editing = false;
 
-function showEdit(tree) {
+function showEdit() {
 	let editLinks = "/";
 	let stack = [];
 	let root = JSON.parse(JSON.stringify(treeNow));
@@ -490,7 +490,7 @@ function showEdit(tree) {
 		buttons1.classList.add("buttons");
 		const cancelBt = document.createElement("button");
 		cancelBt.innerText = "Cancel";
-		cancelBt.addEventListener("click", async e => {
+		cancelBt.addEventListener("click", async () => {
 			if (canceling || exited || leaved) {
 				return
 			}
@@ -513,7 +513,7 @@ function showEdit(tree) {
 		});
 		const saveBt = document.createElement("button");
 		saveBt.innerText = "Save";
-		saveBt.addEventListener("click", e => {
+		saveBt.addEventListener("click", () => {
 			if (exited) {
 				return
 			}
@@ -532,7 +532,7 @@ function showEdit(tree) {
 		const back = document.createElement("button");
 		back.innerText = "Back to parent";
 		if (editLinks !== "/") {
-			back.addEventListener("click", e => {
+			back.addEventListener("click", () => {
 				if (!leaved && stack.length) {
 					const {
 						link,
@@ -550,7 +550,7 @@ function showEdit(tree) {
 		const newFolder = document.createElement("button");
 		newFolder.innerText = "New folder";
 		let newing = false;
-		newFolder.addEventListener("click", async e => {
+		newFolder.addEventListener("click", async () => {
 			if (newing || leaved) {
 				return
 			}
@@ -593,7 +593,7 @@ function showEdit(tree) {
 		const uploadFile = document.createElement("button");
 		uploadFile.innerText = "Upload";
 		let uploading = false;
-		uploadFile.addEventListener("click", async e => {
+		uploadFile.addEventListener("click", async () => {
 			if (uploading || leaved) {
 				return
 			}
@@ -693,7 +693,7 @@ function showEdit(tree) {
 			buttons.classList.add("buttons");
 			const enterBt = document.createElement("button");
 			enterBt.innerText = "Enter folder";
-			enterBt.addEventListener("click", e => {
+			enterBt.addEventListener("click", () => {
 				if (leaved) {
 					return
 				}
@@ -709,7 +709,7 @@ function showEdit(tree) {
 			const renameBt = document.createElement("button");
 			renameBt.innerText = "Rename";
 			let renaming = false;
-			renameBt.addEventListener("click", async e => {
+			renameBt.addEventListener("click", async () => {
 				if (leaved || renaming) {
 					return
 				}
@@ -764,7 +764,7 @@ function showEdit(tree) {
 			});
 			const deleteBt = document.createElement("button");
 			deleteBt.innerText = "Delete";
-			deleteBt.addEventListener("click", e => {
+			deleteBt.addEventListener("click", () => {
 				if (leaved) {
 					return
 				}
@@ -793,7 +793,7 @@ function showEdit(tree) {
 			const renameBt = document.createElement("button");
 			renameBt.innerText = "Rename";
 			let renaming = false;
-			renameBt.addEventListener("click", async e => {
+			renameBt.addEventListener("click", async () => {
 				if (leaved || renaming) {
 					return
 				}
@@ -843,7 +843,7 @@ function showEdit(tree) {
 			});
 			const deleteBt = document.createElement("button");
 			deleteBt.innerText = "Delete";
-			deleteBt.addEventListener("click", e => {
+			deleteBt.addEventListener("click", () => {
 				if (leaved) {
 					return
 				}
@@ -873,7 +873,7 @@ editEle.addEventListener("click", () => {
 		editing = true;
 		document.body.classList.toggle("editing", editing);
 		if (editing) {
-			showEdit(treeNow)
+			showEdit()
 		}
 	}
 });

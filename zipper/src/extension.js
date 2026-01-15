@@ -332,15 +332,27 @@ class ZipDocument {
 			this.upload.files.delete(i)
 		}
 	}
-	dispose() {
-		this.closed = true;
+	removeFile() {
 		if (this.uploadDir && fs.existsSync(this.uploadDir)) {
 			fs.rmSync(this.uploadDir, {
 				recursive: true,
 				force: true
 			})
 		}
-		this.upload.files.clear()
+		const zipUploadDir = path.join(this.fileDir, ".zipUpload");
+		if (fs.existsSync(zipUploadDir) && fs.readdirSync(zipUploadDir).length === 0) {
+			fs.rmdirSync(zipUploadDir)
+		}
+		this.fileTill = 0;
+		this.upload.files.clear();
+		this.upload = {
+			cnt: 0,
+			files: new Map
+		}
+	}
+	dispose() {
+		this.closed = true;
+		this.removeFile()
 	}
 }
 async function handleUploadSelection(document, uris) {
@@ -353,7 +365,13 @@ async function handleUploadSelection(document, uris) {
 		const [outPath, _, till] = tryName(zipDir, "file", ".bin", document.fileTill);
 		document.fileTill = till;
 		const i = document.upload.cnt++;
+		if (document.closed) {
+			return
+		}
 		await fs.promises.copyFile(srcPath, outPath);
+		if (document.closed) {
+			return
+		}
 		const {
 			size
 		} = await fs.promises.stat(outPath);
@@ -411,16 +429,21 @@ class ZipPreviewEditor {
 	constructor(context) {
 		this.context = context
 	}
-	async openCustomDocument(uri, openContext, token) {
+	async openCustomDocument(uri) {
 		return new ZipDocument(uri)
 	}
-	async resolveCustomEditor(document, webviewPanel, token) {
+	async resolveCustomEditor(document, webviewPanel) {
 		webviewPanel.webview.options = {
 			enableScripts: true,
 			localResourceRoots: [vscode.Uri.file(path.join(this.context.extensionPath, "docs"))]
 		};
 		webviewPanel.webview.html = this.getHtml(webviewPanel.webview);
-		this.activateMessageListener(webviewPanel.webview, document)
+		this.activateMessageListener(webviewPanel.webview, document);
+		webviewPanel.onDidChangeViewState(e => {
+			if (!e.webviewPanel.visible) {
+				document.removeFile()
+			}
+		})
 	}
 	getHtml(webview) {
 		const maincss = webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, "docs", "main.css")));
@@ -442,6 +465,7 @@ class ZipPreviewEditor {
 							type: "setName",
 							name: document.fileName
 						});
+						document.removeFile();
 						webview.postMessage({
 							type: "setup",
 							name: document.fileName,
