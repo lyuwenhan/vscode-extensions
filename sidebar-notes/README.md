@@ -6,7 +6,7 @@ A lightweight **VS Code extension** that adds a simple note-taking area to the *
 
 ## Features
 
-![Demo](https://raw.githubusercontent.com/lyuwenhan/vscode-extensions/refs/heads/main/sidebar-notes/images/1.png)
+![Demo](https://lyuwenhan.github.io/vscode-extensions/sidebar-notes/images/1.png)
 
 ### 1. Sidebar Notepad
 - Opens directly inside the **VS Code sidebar**.

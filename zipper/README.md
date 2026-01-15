@@ -20,7 +20,7 @@ Designed for quick, local archive operations without leaving the editor.
 - Multiple selections:
   → `archive.zip`
 
-![Demo](https://raw.githubusercontent.com/lyuwenhan/vscode-extensions/refs/heads/main/zipper/images/1.png)
+![Demo](https://lyuwenhan.github.io/vscode-extensions/zipper/images/1.png)
 
 ### 2. Unzip Archives
 
@@ -31,13 +31,13 @@ Designed for quick, local archive operations without leaving the editor.
 **Behavior**
   `example.zip` → `example/`
 
-![Demo](https://raw.githubusercontent.com/lyuwenhan/vscode-extensions/refs/heads/main/zipper/images/2.png)
+![Demo](https://lyuwenhan.github.io/vscode-extensions/zipper/images/2.png)
 
 ### 3. ZIP Preview
 
 Zipper provides a **read-only archive preview** inside VS Code, allowing you to **browse archive contents without extracting**.
 
-![Demo](https://raw.githubusercontent.com/lyuwenhan/vscode-extensions/refs/heads/main/zipper/images/4.png)
+![Demo](https://lyuwenhan.github.io/vscode-extensions/zipper/images/4.png)
 
 ### 4. Download a Single File or Folder
 
@@ -45,13 +45,13 @@ From the ZIP preview, you can select **one file or one folder** and extract it l
 
 > "Download" refers to extracting the selected item to disk.
 
-![Demo](https://raw.githubusercontent.com/lyuwenhan/vscode-extensions/refs/heads/main/zipper/images/5.png)
+![Demo](https://lyuwenhan.github.io/vscode-extensions/zipper/images/5.png)
 
 ### 5. Download Multiple Files and Folders
 
 You can select **multiple files and folders** in the preview and extract them together.
 
-![Demo](https://raw.githubusercontent.com/lyuwenhan/vscode-extensions/refs/heads/main/zipper/images/6.png)
+![Demo](https://lyuwenhan.github.io/vscode-extensions/zipper/images/6.png)
 
 ### 5. Editing archive
 
