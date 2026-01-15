@@ -2,7 +2,7 @@
 	"name": "sidebar-notes",
 	"displayName": "Sidebar Notes",
 	"private": false,
-	"version": "1.0.15",
+	"version": "1.0.16",
 	"publisher": "lyuwenhan",
 	"description": "A VS Code extension for taking quick notes in the sidebar.",
 	"engines": {
