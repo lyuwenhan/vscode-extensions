@@ -1,9 +1,9 @@
-html, body {
+body, html {
 	margin: 0;
 	border: none
 }
 #main {
-	padding: 0 10px 30px 10px;
+	padding: 0 10px 30px;
 	width: calc(100% - 20px);
 	height: 100%;
 	overflow-wrap: anywhere;
@@ -20,4 +20,10 @@ html, body {
 }
 .lisum:not(:has(> details[open])) ~ li {
 	display: none
+}
+.imgPreview {
+	width: 100px;
+	background-color: #eee;
+	border: 1px solid #000;
+	border-radius: 5px;
 }
