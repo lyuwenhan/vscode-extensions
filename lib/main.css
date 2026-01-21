@@ -23,7 +23,10 @@ body, html {
 }
 .imgPreview {
 	width: 100px;
-	background-color: #eee;
+	background-color: #f0f0f0;
 	border: 1px solid #000;
-	border-radius: 5px;
+	border-radius: 5px
+}
+.imgPreview:hover {
+	background-color: #f7f7f7
 }
