@@ -105,9 +105,15 @@ if (fs.existsSync(versionsPath)) {
 					erro ||= await retryExec(`npx ovsx publish "${outPath}" -p ${openVsxToken}`, {}, 5, 500)
 				}
 				if (!versions[pkg.name]) {
-					versions[pkg.name] = []
+					versions[pkg.name] = {
+						versions: [],
+						displayName: "",
+						description: ""
+					}
 				}
-				versions[pkg.name].push(pkg.version);
+				versions[pkg.name].versions.push(pkg.version);
+				versions[pkg.name].displayName = pkg.displayName;
+				versions[pkg.name].description = pkg.description;
 				console.log(`${dir} published successfully.`)
 			} else {
 				console.log(`Skip ${dir}: no new content`)
