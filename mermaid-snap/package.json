@@ -2,7 +2,7 @@
 	"name": "mermaid-snap",
 	"displayName": "Mermaid Snap",
 	"private": false,
-	"version": "1.0.15",
+	"version": "1.0.16",
 	"publisher": "lyuwenhan",
 	"description": "A VS Code extension that lets you preview Mermaid diagrams.",
 	"engines": {
