@@ -30,8 +30,12 @@ async function retryExec(command, options = {}, maxRetries = 5, initialDelay = 1
 const openVsxToken = process.env.OPEN_VSX_TOKEN;
 const vsMarketToken = process.env.VS_MARKETPLACE_TOKEN;
 const root = process.cwd();
-const excluded = [".git", ".github", "extensions", "lib", "node_modules", "scripts"];
-const dirs = fs.readdirSync(root).filter(d => !excluded.includes(d) && fs.existsSync(path.join(root, d, "status.json")));
+const dataDir = path.join(root, "data");
+if (!fs.existsSync(dataDir)) {
+	fs.mkdirSync(dataDir, {
+		recursive: true
+	})
+}
 const defaultStatus = {
 	needsPublish: false,
 	majorUp: false,
@@ -39,14 +43,17 @@ const defaultStatus = {
 	useVersion: null
 };
 let versions = {};
-const versionsPath = path.join(root, "versions.json");
+const versionsPath = path.join(dataDir, "versions.json");
 if (fs.existsSync(versionsPath)) {
 	try {
 		versions = JSON.parse(fs.readFileSync(versionsPath, "utf8"))
 	} catch (e) {
 		console.error(e)
 	}
-}(async function() {
+}
+const excluded = [".git", ".github", "data", "node_modules", "scripts"];
+const dirs = fs.readdirSync(root).filter(d => !excluded.includes(d) && fs.existsSync(path.join(root, d, "status.json")));
+(async function() {
 	let erro = false;
 	for (const dir of dirs) {
 		let oldPkg = {};
@@ -86,7 +93,7 @@ if (fs.existsSync(versionsPath)) {
 					cwd: extPath,
 					stdio: "inherit"
 				});
-				const extensionsDir = path.join(root, "extensions");
+				const extensionsDir = path.join(dataDir, "extensions");
 				if (!fs.existsSync(extensionsDir)) {
 					fs.mkdirSync(extensionsDir, {
 						recursive: true
@@ -103,6 +110,35 @@ if (fs.existsSync(versionsPath)) {
 				}
 				if (openVsxToken) {
 					erro ||= await retryExec(`npx ovsx publish "${outPath}" -p ${openVsxToken}`, {}, 5, 500)
+				}
+				const iconPath = path.join(extPath, "media", "icon.png");
+				if (fs.existsSync(iconPath)) {
+					const targetPath = path.join(extensionsDir, "icon.png");
+					fs.copyFileSync(iconPath, targetPath);
+					console.log(`Icon copied: ${iconPath} -> ${targetPath}`);
+					hasIcon = true
+				} else {
+					console.warn(`Icon.png not found for ${dir}`)
+				}
+				const imagesPath = path.join(extPath, "images");
+				if (fs.existsSync(imagesPath)) {
+					const targetImagesPath = path.join(extensionsDir, "images");
+					fs.cpSync(imagesPath, targetImagesPath, {
+						recursive: true
+					});
+					console.log(`Images copied: ${imagesPath} -> ${targetImagesPath}`);
+					hasIcon = true
+				} else {
+					console.warn(`images/ not found for ${dir}`)
+				}
+				const readmePath = path.join(extPath, "README.md");
+				if (fs.existsSync(readmePath)) {
+					const targetPath = path.join(extensionsDir, "README.md");
+					fs.copyFileSync(readmePath, targetPath);
+					console.log(`README copied: ${readmePath} -> ${targetPath}`);
+					hasIcon = true
+				} else {
+					console.warn(`README.md not found for ${dir}`)
 				}
 				if (!versions[pkg.name]) {
 					versions[pkg.name] = {

@@ -6,11 +6,11 @@ A lightweight **VS Code extension** that adds a simple note-taking area to the *
 
 ## Features
 
-![Demo](https://lyuwenhan.github.io/vscode-extensions/coin-flipper/images/1.png)
+![Demo](https://lyuwenhan.github.io/extensions/vscode/data/coin-flipper/images/1.png)
 
-![Demo](https://lyuwenhan.github.io/vscode-extensions/coin-flipper/images/2.png)
+![Demo](https://lyuwenhan.github.io/extensions/vscode/data/coin-flipper/images/2.png)
 
-![Demo](https://lyuwenhan.github.io/vscode-extensions/coin-flipper/images/3.png)
+![Demo](https://lyuwenhan.github.io/extensions/vscode/data/coin-flipper/images/3.png)
 
 ### 1. Sidebar Notepad
 - Opens directly inside the **VS Code sidebar**.
