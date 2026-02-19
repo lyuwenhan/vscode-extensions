@@ -111,9 +111,13 @@ const dirs = fs.readdirSync(root).filter(d => !excluded.includes(d) && fs.exists
 				if (openVsxToken) {
 					erro ||= await retryExec(`npx ovsx publish "${outPath}" -p ${openVsxToken}`, {}, 5, 500)
 				}
+				const extDir = path.join(dataDir, dir);
+				fs.mkdirSync(extDir, {
+					recursive: true
+				});
 				const iconPath = path.join(extPath, "media", "icon.png");
 				if (fs.existsSync(iconPath)) {
-					const targetPath = path.join(extensionsDir, "icon.png");
+					const targetPath = path.join(extDir, "icon.png");
 					fs.copyFileSync(iconPath, targetPath);
 					console.log(`Icon copied: ${iconPath} -> ${targetPath}`);
 					hasIcon = true
@@ -122,7 +126,7 @@ const dirs = fs.readdirSync(root).filter(d => !excluded.includes(d) && fs.exists
 				}
 				const imagesPath = path.join(extPath, "images");
 				if (fs.existsSync(imagesPath)) {
-					const targetImagesPath = path.join(extensionsDir, "images");
+					const targetImagesPath = path.join(extDir, "images");
 					fs.cpSync(imagesPath, targetImagesPath, {
 						recursive: true
 					});
@@ -133,7 +137,7 @@ const dirs = fs.readdirSync(root).filter(d => !excluded.includes(d) && fs.exists
 				}
 				const readmePath = path.join(extPath, "README.md");
 				if (fs.existsSync(readmePath)) {
-					const targetPath = path.join(extensionsDir, "README.md");
+					const targetPath = path.join(extDir, "README.md");
 					fs.copyFileSync(readmePath, targetPath);
 					console.log(`README copied: ${readmePath} -> ${targetPath}`);
 					hasIcon = true
