@@ -28,20 +28,39 @@
 	},
 	"homepage": "https://lyuwenhan.github.io",
 	"categories": [
-		"Other",
 		"Visualization",
-		"Programming Languages"
+		"Other"
 	],
 	"keywords": [
-		"mermaid",
+		"chart",
+		"class diagram",
+		"diagram preview",
 		"diagram",
-		"preview",
-		"markdown",
+		"editor",
+		"er diagram",
+		"export",
+		"extension",
 		"flowchart",
-		"sequence diagram",
+		"gantt",
 		"graph",
-		"vscode",
-		"chart"
+		"journey",
+		"live preview",
+		"markdown preview",
+		"markdown",
+		"mermaid diagram",
+		"mermaid",
+		"open-vsx",
+		"openvsx",
+		"pie chart",
+		"png",
+		"preview",
+		"render",
+		"sequence diagram",
+		"state diagram",
+		"svg",
+		"visual studio code",
+		"visualization",
+		"vscode"
 	],
 	"dependencies": {
 		"@resvg/resvg-js": "^2.6.2"

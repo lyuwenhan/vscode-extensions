@@ -71,5 +71,38 @@
 	"bugs": {
 		"url": "https://github.com/lyuwenhan/vscode-extensions/issues"
 	},
-	"homepage": "https://lyuwenhan.github.io"
+	"homepage": "https://lyuwenhan.github.io",
+	"categories": [
+		"Other"
+	],
+	"keywords": [
+		"coin flip",
+		"coin flipper",
+		"coin",
+		"counter",
+		"decision maker",
+		"decision making",
+		"extension",
+		"flip coin",
+		"fun",
+		"game",
+		"heads",
+		"open-vsx",
+		"openvsx",
+		"picker",
+		"probability",
+		"productivity",
+		"random choice",
+		"random",
+		"randomizer",
+		"statistics",
+		"stats",
+		"tails",
+		"tool",
+		"toss",
+		"utilities",
+		"utility",
+		"visual studio code",
+		"vscode"
+	]
 }

@@ -31,12 +31,33 @@
 		"Other"
 	],
 	"keywords": [
-		"notes",
-		"sidebar",
-		"notepad",
+		"editor notes",
+		"extension",
+		"journal",
 		"memo",
+		"note taking",
+		"notepad",
+		"notes",
+		"open-vsx",
+		"openvsx",
+		"organizer",
+		"panel",
+		"productivity",
+		"quick note",
+		"quick notes",
 		"scratchpad",
-		"productivity"
+		"side panel",
+		"sidebar notes",
+		"sidebar",
+		"sticky notes",
+		"text editor",
+		"todo",
+		"tool",
+		"utilities",
+		"utility",
+		"visual studio code",
+		"vscode",
+		"workspace notes"
 	],
 	"contributes": {
 		"viewsContainers": {
