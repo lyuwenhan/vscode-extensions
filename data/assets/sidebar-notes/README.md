@@ -12,18 +12,18 @@ A lightweight **VS Code extension** that adds a simple note-taking area to the *
 - Opens directly inside the **VS Code sidebar**.
 - Provides a single, large **textarea** for typing notes.
 - Supports multiple **languages** with syntax highlighting powered by **CodeMirror**:
-  - plain text  
-  - markdown  
-  - javascript  
-  - python  
+  - plain text
+  - markdown
+  - javascript
+  - python
   - c
-  - c++  
-  - java  
-  - json  
-  - html  
-  - css  
-  - shell  
-  - sql  
+  - c++
+  - java
+  - json
+  - html
+  - css
+  - shell
+  - sql
   - yaml
 - Supports **Alt + Mouse Wheel** or toolbar buttons (`+`, `=`, `–`) to adjust font size.
 - Allows toggling **Preview** Mode for Markdown and HTML.
@@ -42,9 +42,9 @@ A lightweight **VS Code extension** that adds a simple note-taking area to the *
 - **Preview Mode** can be toggled manually by clicking the **Preview** button.
 - Not real-time - content is rendered only when entering preview mode.
 - Uses:
-  - [marked.js](https://github.com/markedjs/marked) for Markdown parsing  
-  - [Prism.js](https://prismjs.com/) for syntax highlighting  
-  - [DOMPurify](https://github.com/cure53/DOMPurify) for sanitization  
+  - [marked.js](https://github.com/markedjs/marked) for Markdown parsing
+  - [Prism.js](https://prismjs.com/) for syntax highlighting
+  - [DOMPurify](https://github.com/cure53/DOMPurify) for sanitization
   - [MathJax](https://www.mathjax.org/) for LaTeX math rendering
 - Prevents unsafe HTML and scripts for secure rendering.
 
@@ -53,7 +53,7 @@ A lightweight **VS Code extension** that adds a simple note-taking area to the *
 ### 4. Minimal UI
 - Clean layout - no menus, no toolbars.
 - Uses `Consolas, Courier, monospace` for a code-friendly look.
-- Displays placeholder text when empty:  
+- Displays placeholder text when empty:
   *Write your notes here...*
 
 ---
