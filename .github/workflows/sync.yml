@@ -52,9 +52,3 @@ jobs:
           git commit -m "Auto sync data folder"
           git pull --rebase origin main
           git push origin main
-
-          curl -X POST \
-            -H "Authorization: token ${{ secrets.SYNC_PAT }}" \
-            -H "Accept: application/vnd.github+json" \
-            https://api.github.com/repos/lyuwenhan/lyuwenhan.github.io/dispatches \
-            -d '{"event_type":"sync_display"}'
