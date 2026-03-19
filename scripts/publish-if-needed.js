@@ -143,14 +143,14 @@ const dirs = fs.readdirSync(root).filter(d => !excluded.includes(d) && fs.exists
 				const displayName = pkg.displayName || "";
 				const description = pkg.description || "";
 				const version = pkg.version || "";
-				const isNew = !versions[dir];
 				if (!versions[dir]) {
 					console.log(`New extension detected: ${dir}`);
 					versions[dir] = {
 						versions: [version],
 						hasIcon,
 						displayName,
-						description
+						description,
+						link: {}
 					}
 				} else {
 					const v = versions[dir].versions ?? [];
@@ -158,7 +158,8 @@ const dirs = fs.readdirSync(root).filter(d => !excluded.includes(d) && fs.exists
 						versions: v.at(-1) === version ? v : [...v, version],
 						hasIcon: hasIcon ?? versions[dir].hasIcon,
 						displayName: displayName ?? versions[dir].displayName,
-						description: description ?? versions[dir].description
+						description: description ?? versions[dir].description,
+						link: versions[dir].link ?? {}
 					}
 				}
 				console.log(`${dir} published successfully.`)
@@ -177,7 +178,7 @@ const dirs = fs.readdirSync(root).filter(d => !excluded.includes(d) && fs.exists
 			})
 		}
 	}
-	fs.writeFileSync(versionsPath, JSON.stringify(versions) + "\n");
+	fs.writeFileSync(versionsPath, JSON.stringify(versions, null, "\t") + "\n");
 	if (hasError) {
 		process.exit(1)
 	}
