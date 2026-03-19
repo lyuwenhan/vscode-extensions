@@ -53,8 +53,6 @@ jobs:
           git pull --rebase origin main
           git push origin main
 
-      - name: Trigger display sync
-        run: |
           curl -X POST \
             -H "Authorization: token ${{ secrets.SYNC_PAT }}" \
             -H "Accept: application/vnd.github+json" \
