@@ -42,14 +42,17 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          if [ -n "$(git status --porcelain)" ]; then
-            git add .
-            git commit -m "Auto sync data folder"
-            git push
+          git add .
 
-          else
+          if git diff --cached --quiet; then
             echo "No changes"
+            exit 0
           fi
+
+          git commit -m "Auto sync data folder"
+          git pull --rebase origin main
+          git push origin main
+
       - name: Trigger display sync
         run: |
           curl -X POST \
