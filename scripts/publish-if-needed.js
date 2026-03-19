@@ -132,13 +132,22 @@ const dirs = fs.readdirSync(root).filter(d => !excluded.includes(d) && fs.exists
 				} else {
 					console.warn(`images/ not found for ${dir}`)
 				}
-				const readmePath = path.join(extPath, "README.md");
-				if (fs.existsSync(readmePath)) {
-					const targetPath = path.join(extensionsDir, "README.md");
-					fs.copyFileSync(readmePath, targetPath);
-					console.log(`README copied: ${readmePath} -> ${targetPath}`)
+				const files = fs.readdirSync(extPath);
+				const readmeFiles = files.filter(name => /^README.*\.md$/.test(name));
+				if (readmeFiles.length > 0) {
+					const readmeDir = path.join(extensionsDir, "README");
+					fs.rmSync(readmeDir, { recursive: true, force: true });
+					fs.mkdirSync(readmeDir, {
+						recursive: true
+					});
+					for (const file of readmeFiles) {
+						const sourcePath = path.join(extPath, file);
+						const targetPath = path.join(readmeDir, file);
+						fs.copyFileSync(sourcePath, targetPath);
+						console.log(`README copied: ${sourcePath} -> ${targetPath}`);
+					}
 				} else {
-					console.warn(`README.md not found for ${dir}`)
+					console.warn(`README*.md not found for ${dir}`);
 				}
 				const displayName = pkg.displayName || "";
 				const description = pkg.description || "";
