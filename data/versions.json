@@ -61,7 +61,7 @@
 		"displayName": "Code Formatter & Minifier",
 		"description": "A VS Code extension to minify and beautify JavaScript, and sort JSON files with one click.",
 		"link": {
-			"Visual Studio Marketplace": "https://marketplace.visualstudio.com/items?itemName=lyuwenhan.code-formatter-and-minifier", 
+			"Visual Studio Marketplace": "https://marketplace.visualstudio.com/items?itemName=lyuwenhan.code-formatter-and-minifier",
 			"Open VSX": "https://open-vsx.org/extension/lyuwenhan/code-formatter-and-minifier"
 		}
 	},
