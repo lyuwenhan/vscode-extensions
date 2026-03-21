@@ -60,7 +60,10 @@
 		"hasIcon": true,
 		"displayName": "Code Formatter & Minifier",
 		"description": "A VS Code extension to minify and beautify JavaScript, and sort JSON files with one click.",
-		"link": {}
+		"link": {
+			"Visual Studio Marketplace": "https://marketplace.visualstudio.com/items?itemName=lyuwenhan.code-formatter-and-minifier", 
+			"Open VSX": "https://open-vsx.org/extension/lyuwenhan/code-formatter-and-minifier"
+		}
 	},
 	"coin-flipper": {
 		"versions": [
@@ -85,7 +88,10 @@
 		"hasIcon": true,
 		"displayName": "Coin Flipper",
 		"description": "A VS Code extension to make a coin flip with one click.",
-		"link": {}
+		"link": {
+			"Visual Studio Marketplace": "https://marketplace.visualstudio.com/items?itemName=lyuwenhan.coin-flipper",
+			"Open VSX": "https://open-vsx.org/extension/lyuwenhan/coin-flipper"
+		}
 	},
 	"mermaid-snap": {
 		"versions": [
@@ -114,7 +120,10 @@
 		"hasIcon": true,
 		"displayName": "Mermaid Snap",
 		"description": "A VS Code extension that lets you preview Mermaid diagrams.",
-		"link": {}
+		"link": {
+			"Visual Studio Marketplace": "https://marketplace.visualstudio.com/items?itemName=lyuwenhan.mermaid-snap",
+			"Open VSX": "https://open-vsx.org/extension/lyuwenhan/mermaid-snap"
+		}
 	},
 	"sidebar-notes": {
 		"versions": [
@@ -144,7 +153,10 @@
 		"hasIcon": true,
 		"displayName": "Sidebar Notes",
 		"description": "A VS Code extension for taking quick notes in the sidebar.",
-		"link": {}
+		"link": {
+			"Visual Studio Marketplace": "https://marketplace.visualstudio.com/items?itemName=lyuwenhan.sidebar-notes",
+			"Open VSX": "https://open-vsx.org/extension/lyuwenhan/sidebar-notes"
+		}
 	},
 	"zipper": {
 		"versions": [
@@ -194,6 +206,9 @@
 		"hasIcon": true,
 		"displayName": "Zipper",
 		"description": "A VS Code extension to do compression.",
-		"link": {}
+		"link": {
+			"Visual Studio Marketplace": "https://marketplace.visualstudio.com/items?itemName=lyuwenhan.zipper",
+			"Open VSX": "https://open-vsx.org/extension/lyuwenhan/zipper"
+		}
 	}
 }
