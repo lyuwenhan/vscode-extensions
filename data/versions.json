@@ -1,4 +1,7 @@
 {
+	"data": {
+		"ext": "vsix"
+	},
 	"code-formatter-and-minifier": {
 		"versions": [
 			"1.0.0",
