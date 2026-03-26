@@ -49,7 +49,8 @@ if (fs.existsSync(versionsPath)) {
 	}
 }
 const defaultStatus = {
-	needsPublish: false,
+	needsUpdate: false,
+	withPack: false,
 	majorUp: false,
 	minorUp: false,
 	useVersion: null
@@ -74,7 +75,7 @@ const dirs = fs.readdirSync(root).filter(d => !excluded.includes(d) && fs.exists
 			} catch {
 				console.warn(`${dir}: invalid or missing status.json, using default.`)
 			}
-			if (status.needsPublish) {
+			if (status.needsUpdate) {
 				console.log(`Building & publishing ${dir}...`);
 				const pkgFile = path.join(extPath, "package.json");
 				const pkg = JSON.parse(fs.readFileSync(pkgFile, "utf8"));
@@ -98,16 +99,18 @@ const dirs = fs.readdirSync(root).filter(d => !excluded.includes(d) && fs.exists
 					cwd: extPath,
 					stdio: "inherit"
 				});
-				const outPath = path.join(distDir, `${dir}-${pkg.version}.vsix`);
-				execSync(`npx vsce package --out "${outPath}"`, {
-					cwd: extPath,
-					stdio: "inherit"
-				});
-				if (vsMarketToken) {
-					hasError ||= await retryExec(`npx vsce publish --packagePath "${outPath}" -p ${vsMarketToken}`, {}, 5, 500)
-				}
-				if (openVsxToken) {
-					hasError ||= await retryExec(`npx ovsx publish "${outPath}" -p ${openVsxToken}`, {}, 5, 500)
+				if (status.withPack) {
+					const outPath = path.join(distDir, `${dir}-${pkg.version}.vsix`);
+					execSync(`npx vsce package --out "${outPath}"`, {
+						cwd: extPath,
+						stdio: "inherit"
+					});
+					if (vsMarketToken) {
+						hasError ||= await retryExec(`npx vsce publish --packagePath "${outPath}" -p ${vsMarketToken}`, {}, 5, 500)
+					}
+					if (openVsxToken) {
+						hasError ||= await retryExec(`npx ovsx publish "${outPath}" -p ${openVsxToken}`, {}, 5, 500)
+					}
 				}
 				const iconPath = path.join(extPath, "media", "icon.png");
 				if (fs.existsSync(iconPath)) {
@@ -136,7 +139,10 @@ const dirs = fs.readdirSync(root).filter(d => !excluded.includes(d) && fs.exists
 				const readmeFiles = files.filter(name => /^README.*\.md$/.test(name));
 				if (readmeFiles.length > 0) {
 					const readmeDir = path.join(extensionsDir, "README");
-					fs.rmSync(readmeDir, { recursive: true, force: true });
+					fs.rmSync(readmeDir, {
+						recursive: true,
+						force: true
+					});
 					fs.mkdirSync(readmeDir, {
 						recursive: true
 					});
@@ -144,10 +150,10 @@ const dirs = fs.readdirSync(root).filter(d => !excluded.includes(d) && fs.exists
 						const sourcePath = path.join(extPath, file);
 						const targetPath = path.join(readmeDir, file);
 						fs.copyFileSync(sourcePath, targetPath);
-						console.log(`README copied: ${sourcePath} -> ${targetPath}`);
+						console.log(`README copied: ${sourcePath} -> ${targetPath}`)
 					}
 				} else {
-					console.warn(`README*.md not found for ${dir}`);
+					console.warn(`README*.md not found for ${dir}`)
 				}
 				const displayName = pkg.displayName || "";
 				const description = pkg.description || "";
@@ -164,7 +170,7 @@ const dirs = fs.readdirSync(root).filter(d => !excluded.includes(d) && fs.exists
 				} else {
 					const v = versions[dir].versions ?? [];
 					versions[dir] = {
-						versions: v.at(-1) === version ? v : [...v, version],
+						versions: status.withPack ? v.at(-1) === version ? v : [...v, version] : v,
 						hasIcon: hasIcon ?? versions[dir].hasIcon,
 						displayName: displayName ?? versions[dir].displayName,
 						description: description ?? versions[dir].description,
