@@ -1,5 +1,6 @@
 {
-	"needsPublish": false,
+	"needsUpdate": false,
+	"withPack": false,
 	"majorUp": false,
 	"minorUp": false,
 	"useVersion": null
