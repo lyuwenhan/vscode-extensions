@@ -81,25 +81,25 @@ const dirs = fs.readdirSync(root).filter(d => !excluded.includes(d) && fs.exists
 				const pkg = JSON.parse(fs.readFileSync(pkgFile, "utf8"));
 				oldPkg = JSON.parse(JSON.stringify(pkg));
 				const [major, minor, patch] = pkg.version.split(".").map(Number);
-				if (status.useVersion && typeof status.useVersion === "string") {
-					pkg.version = status.useVersion;
-					console.log(`Version set manually to ${pkg.version}`)
-				} else if (status.majorUp) {
-					pkg.version = `${major+1}.0.0`;
-					console.log(`Major version bumped to ${pkg.version}`)
-				} else if (status.minorUp) {
-					pkg.version = `${major}.${minor+1}.0`;
-					console.log(`Minor version bumped to ${pkg.version}`)
-				} else {
-					pkg.version = `${major}.${minor}.${patch+1}`;
-					console.log(`Patch version bumped to ${pkg.version}`)
-				}
-				fs.writeFileSync(pkgFile, JSON.stringify(pkg, null, "\t") + "\n");
-				execSync(`npm install`, {
-					cwd: extPath,
-					stdio: "inherit"
-				});
 				if (status.withPack) {
+					if (status.useVersion && typeof status.useVersion === "string") {
+						pkg.version = status.useVersion;
+						console.log(`Version set manually to ${pkg.version}`)
+					} else if (status.majorUp) {
+						pkg.version = `${major+1}.0.0`;
+						console.log(`Major version bumped to ${pkg.version}`)
+					} else if (status.minorUp) {
+						pkg.version = `${major}.${minor+1}.0`;
+						console.log(`Minor version bumped to ${pkg.version}`)
+					} else {
+						pkg.version = `${major}.${minor}.${patch+1}`;
+						console.log(`Patch version bumped to ${pkg.version}`)
+					}
+					fs.writeFileSync(pkgFile, JSON.stringify(pkg, null, "\t") + "\n");
+					execSync(`npm install`, {
+						cwd: extPath,
+						stdio: "inherit"
+					});
 					const outPath = path.join(distDir, `${dir}-${pkg.version}.vsix`);
 					execSync(`npx vsce package --out "${outPath}"`, {
 						cwd: extPath,
