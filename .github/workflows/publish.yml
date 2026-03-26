@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - "data/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -33,10 +35,24 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          if [ -n "$(git status --porcelain)" ]; then
-            git add .
-            git commit -m "Auto-update after publish by github-actions[bot]"
-            git push
-          else
-            echo "No changes detected, skipping commit."
+          git add .
+
+          if git diff --cached --quiet; then
+            echo "No changes"
+            exit 0
           fi
+
+          git commit -m "Auto-update after publish by github-actions[bot]"
+
+          for i in 1 2 3 4 5; do
+            echo "Attempt $i to pull --rebase and push..."
+            git pull --rebase origin main && git push origin HEAD:main && break
+
+            if [ "$i" -eq 5 ]; then
+              echo "Push failed after 5 attempts"
+              exit 1
+            fi
+
+            echo "Retrying in 5 seconds..."
+            sleep 5
+          done
