@@ -50,5 +50,16 @@ jobs:
           fi
 
           git commit -m "Auto sync data folder"
-          git pull --rebase origin main
-          git push origin main
+
+          for i in 1 2 3 4 5; do
+            echo "Attempt $i to pull --rebase and push..."
+            git pull --rebase origin main && git push origin main && break
+
+            if [ "$i" -eq 5 ]; then
+              echo "Push failed after 5 attempts"
+              exit 1
+            fi
+
+            echo "Retrying in 5 seconds..."
+            sleep 5
+          done
