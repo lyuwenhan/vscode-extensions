@@ -22,28 +22,38 @@ For each language, the table below shows whether the action is supported.
 ## Action Descriptions
 
 ### Minify
+
 - Makes your code smaller by removing unnecessary whitespace.
 - This action only performs whitespace-related changes.
 - The actual data remains unchanged.
 - Example:
+
 Before
+
 ```javascript
 function   test( ){ console.log(  "x"  )  }
 ```
+
 After
+
 ```javascript
 function test(){console.log("x")}
 ```
 
 ### Beautify
+
 - Formats your code to a unified, readable style.
 - Makes your code look cleaner and more consistent.
 - Example:
+
 Before
+
 ```javascript
 function   test( ){ console.log(  "x"  )  }
 ```
+
 After
+
 ```javascript
 function test() {
 	console.log("x")
@@ -51,15 +61,20 @@ function test() {
 ```
 
 ### Mitify
+
 - A combination of minify and beautify.
 - Useful when your code is too messy and beautify alone is not effective.
 - Runs both minify and beautify in sequence.
 - Example:
+
 Before
+
 ```javascript
 function   test( ){ console.log(  "x"  )  }
 ```
+
 After
+
 ```javascript
 function test() {
 	console.log("x")
@@ -67,11 +82,14 @@ function test() {
 ```
 
 ### Sort
+
 - **Does not** change the actual data.
 - Only works with **JSON**, **JSONC**, and **JSON Lines**.
 - Sorts the keys of all objects alphabetically.
 - Example:
+
 Before
+
 ```json
 {
 	"banana": 5,
@@ -79,7 +97,9 @@ Before
 	"apple": 4
 }
 ```
+
 After
+
 ```json
 {
 	"apple": 4,
@@ -89,12 +109,15 @@ After
 ```
 
 ### Sort lists
+
 - **Does** change the actual data.
 - **Do not** use this unless you know exactly what you are doing.
 - This action is **irreversible**.
 - Sorts the items inside lists alphabetically.
 - Example:
+
 Before
+
 ```json
 [
 	"banana",
@@ -102,7 +125,9 @@ Before
 	"apple"
 ]
 ```
+
 After
+
 ```json
 [
 	"apple",
@@ -112,12 +137,15 @@ After
 ```
 
 ### Sort lists by keys
+
 - **Does** change the actual data.
 - **Do not** use this unless you know exactly what you are doing.
 - This action is **irreversible**.
 - Sorts the list based on a chosen key within each item, in alphabetical order.
 - Example:
+
 Before
+
 ```json
 [
 	{
@@ -134,7 +162,9 @@ Before
 	}
 ]
 ```
+
 After (sort by type)
+
 ```json
 [
 	{
@@ -151,7 +181,9 @@ After (sort by type)
 	}
 ]
 ```
+
 After (sort by price)
+
 ```json
 [
 	{
@@ -170,9 +202,11 @@ After (sort by price)
 ```
 
 ### Generate UUID
+
 - Inserts a freshly generated UUID at every selected cursor position in the active editor.
 
 ### Run [action] as [language]
+
 - Use these commands to manually choose both the **operation** and the **language processor**.
 
 - You will be prompted twice:
@@ -258,7 +292,7 @@ Minifier: Code Setting
 		},
 		"css": {
 			"minify": {
-				/* clean-css options */
+				/* cssnano options */
 			},
 			"beautify": {
 				/* js-beautify options */
@@ -433,7 +467,6 @@ These are the built-in defaults used by the extension:
 * Invalid or non-object values are ignored safely.
 * Missing sections are auto-filled using defaults.
 * Settings take effect immediately.
-* CSS minifier (CleanCSS) is rebuilt when CSS minify settings change.
 
 ---
 
@@ -446,9 +479,10 @@ The configuration system allows you to:
 * Rely on defaults for everything else
 
 ## Notes
+
 - **JavaScript** minification uses [terser](https://github.com/terser/terser).
 - **HTML** minification uses [html-minifier-terser](https://github.com/terser/html-minifier-terser).
-- **CSS** minification uses [clean-css](https://github.com/jakubpawlowicz/clean-css).
+- **CSS** minification uses [cssnano](https://github.com/cssnano/cssnano), [postcss](https://github.com/postcss/postcss), and [clean-css](https://github.com/jakubpawlowicz/clean-css).
 - **JavaScript**, **HTML**, **CSS** beautification uses [js-beautify](https://github.com/beautify-web/js-beautify).
 - **JSON** parsing uses [jsonc-parser](https://github.com/microsoft/node-jsonc-parser).
 - **JSON Lines** parsing uses [jsonparse](https://github.com/creationix/jsonparse).
@@ -457,6 +491,7 @@ The configuration system allows you to:
 - **UUID Generator** uses [crypto](https://nodejs.org/api/crypto.html)
 
 ## Extra
+
 - All edit operations automatically save the document (unless untitled).
 - Both `LF (\n)` and `CRLF (\r\n)` line endings are supported.
 - Works with multiple selections.
