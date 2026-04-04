@@ -58,7 +58,8 @@
 			"1.1.14",
 			"1.1.15",
 			"1.1.16",
-			"1.1.17"
+			"1.1.17",
+			"1.1.18"
 		],
 		"hasIcon": true,
 		"displayName": "Code Formatter & Minifier",
