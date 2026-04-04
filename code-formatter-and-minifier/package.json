@@ -4,7 +4,7 @@
 	"private": false,
 	"version": "1.1.17",
 	"publisher": "lyuwenhan",
-	"description": "A VS Code extension to minify and beautify JavaScript, and sort JSON files with one click.",
+	"description": "One-click VS Code extension to compress, format, and organize JavaScript, CSS, HTML, and JSON/JSONL files.",
 	"engines": {
 		"vscode": "^1.80.0"
 	},
@@ -24,10 +24,12 @@
 	},
 	"dependencies": {
 		"clean-css": "^5.3.3",
+		"cssnano": "^7.1.4",
 		"html-minifier-terser": "^7.2.0",
 		"js-beautify": "^1.15.4",
 		"jsonc-parser": "^3.3.1",
 		"jsonparse": "^1.3.1",
+		"postcss": "^8.5.8",
 		"terser": "^5.44.0"
 	},
 	"license": "MIT",
@@ -416,7 +418,20 @@
 						},
 						"css": {
 							"minify": {
-								"level": 2
+								"normalizeWhitespace": true,
+								"discardComments": {
+									"remove": false
+								},
+								"minifySelectors": false,
+								"mergeLonghand": false,
+								"reduceTransforms": false,
+								"convertValues": false,
+								"colormin": false,
+								"mergeRules": true,
+								"discardDuplicates": true,
+								"uniqueSelectors": false,
+								"minifyFontValues": false,
+								"normalizeCharset": true
 							},
 							"beautify": {
 								"indent_size": 4,

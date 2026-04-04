@@ -69,7 +69,20 @@
 	},
 	"css": {
 		"minify": {
-			"level": 2
+			"normalizeWhitespace": true,
+			"discardComments": {
+				"remove": false
+			},
+			"minifySelectors": false,
+			"mergeLonghand": false,
+			"reduceTransforms": false,
+			"convertValues": false,
+			"colormin": false,
+			"mergeRules": true,
+			"discardDuplicates": true,
+			"uniqueSelectors": false,
+			"minifyFontValues": false,
+			"normalizeCharset": true
 		},
 		"beautify": {
 			"indent_size": 4,

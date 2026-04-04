@@ -216,7 +216,7 @@ function addGroup(e, i, arr) {
 	ret.menus[e] = ret.menus[e].map(addGroup)
 });
 pkg.contributes = ret;
-fs.writeFileSync("package.json", JSON.stringify(pkg, null, "\t"));
+fs.writeFileSync("package.json", JSON.stringify(pkg, null, "\t") + "\n");
 fs.promises.mkdir("out", {
 	recursive: true
 }).then(() => {

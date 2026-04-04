@@ -3,13 +3,17 @@ const {
 	randomUUID
 } = require("crypto");
 const htmlMinify = require("html-minifier-terser").minify;
+const postcss = require("postcss");
+const cssnano = require("cssnano");
 const cleanCSS = require("clean-css");
 const terser = require("terser");
 const beautify = require("js-beautify");
 const JSONParse = require("jsonparse");
 const jsonc = require("./lib/jsonc-parser.js");
 const oldOpts = require("./lib/default-setting.json");
-let cleanCSSRunner = new cleanCSS(oldOpts.css.minify);
+let cleanCSSRunner = new cleanCSS({
+	level: 2
+});
 let opts = oldOpts;
 
 function toJson(input) {
@@ -34,7 +38,17 @@ function readSettings() {
 			minify: {
 				...oldOpts.html.minify,
 				...toJson(settings.html?.minify),
-				minifyCSS: minifyCss,
+				minifyCSS: async content => {
+					try {
+						return await minifyCss(content)
+					} catch (e) {
+						try {
+							return cleanCSSRunner.minify(content).styles
+						} catch {
+							throw e
+						}
+					}
+				},
 				minifyJS: minifyFile
 			},
 			beautify: {
@@ -67,9 +81,6 @@ function readSettings() {
 			}
 		}
 	};
-	if (JSON.stringify(newOpts.css.minify) !== JSON.stringify(opts.css.minify)) {
-		cleanCSSRunner = new cleanCSS(newOpts.css.minify)
-	}
 	opts = newOpts
 }
 
@@ -132,21 +143,22 @@ function beautifyHtml(content) {
 async function mitifyHtml(content) {
 	return beautifyHtml(await minifyHtml(content))
 }
-
-function minifyCss(content) {
-	return cleanCSSRunner.minify(content).styles
+async function minifyCss(content) {
+	const result = await postcss([cssnano(opts.css.minify)]).process(content, {
+		from: undefined
+	});
+	return result.css
 }
 
 function beautifyCss(content) {
 	return beautify.css(content, opts.css.beautify)
 }
-
-function mitifyCss(content) {
-	return beautifyCss(minifyCss(content))
+async function mitifyCss(content) {
+	return beautifyCss(await minifyCss(content))
 }
-
-function minifyFile(content) {
-	return terser.minify(content, opts.javascript.minify).then(e => e.code)
+async function minifyFile(content) {
+	const result = await terser.minify(content, opts.javascript.minify);
+	return result.code
 }
 
 function beautifyFile(content) {
@@ -221,21 +233,18 @@ async function getArrayKey() {
 	return key
 }
 async function getAD() {
-	const items = [{
-		label: "Ascending order",
-		dec: false
-	}, {
-		label: "Descending order",
-		dec: true
-	}];
-	const picked = await vscode.window.showQuickPick(items, {
-		placeHolder: "Choose the order",
-		ignoreFocusOut: true
-	});
+	const items = {
+		"Ascending order": 1,
+		"Descending order": 2
+	};
+	const pickedItem = await vscode.window.showInformationMessage("Choose the order", {
+		modal: true
+	}, ...Object.keys(items));
+	const picked = items[pickedItem] || 0;
 	if (!picked) {
 		throw new Error("Sorter: Operation canceled.")
 	}
-	return picked.dec
+	return picked === 2
 }
 
 function parseJsonL(text) {
