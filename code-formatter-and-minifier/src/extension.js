@@ -49,7 +49,7 @@ function readSettings() {
 						}
 					}
 				},
-				minifyJS: minifyFile
+				minifyJS: minifyJavascript
 			},
 			beautify: {
 				...oldOpts.html.beautify,
@@ -156,17 +156,17 @@ function beautifyCss(content) {
 async function mitifyCss(content) {
 	return beautifyCss(await minifyCss(content))
 }
-async function minifyFile(content) {
+async function minifyJavascript(content) {
 	const result = await terser.minify(content, opts.javascript.minify);
 	return result.code
 }
 
-function beautifyFile(content) {
+function beautifyJavascript(content) {
 	return beautify.js(content, opts.javascript.beautify)
 }
 
-function mitifyFile(content) {
-	return minifyFile(content).then(beautifyFile)
+function mitifyJavascript(content) {
+	return minifyJavascript(content).then(beautifyJavascript)
 }
 
 function sortCompare2(a, b, isD) {
@@ -348,7 +348,7 @@ const actions = {
 		sucMsg: "Minified",
 		actionName: "Minifier",
 		opers: {
-			javascript: minifyFile,
+			javascript: minifyJavascript,
 			json: minifyJson,
 			jsonl: minifyJsonL,
 			html: minifyHtml,
@@ -359,7 +359,7 @@ const actions = {
 		sucMsg: "Beautified",
 		actionName: "Beautifier",
 		opers: {
-			javascript: beautifyFile,
+			javascript: beautifyJavascript,
 			json: beautifyJson,
 			jsonl: beautifyJsonL,
 			html: beautifyHtml,
@@ -370,7 +370,7 @@ const actions = {
 		sucMsg: "Mitified",
 		actionName: "Mitifier",
 		opers: {
-			javascript: mitifyFile,
+			javascript: mitifyJavascript,
 			html: mitifyHtml,
 			css: mitifyCss,
 			json: beautifyJson,
