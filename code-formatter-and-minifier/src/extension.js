@@ -158,7 +158,7 @@ async function mitifyCss(content) {
 }
 async function minifyJavascript(content) {
 	const result = await terser.minify(content, opts.javascript.minify);
-	return result.code
+	return result.code.replace(/\x1b/g, "\\x1b")
 }
 
 function beautifyJavascript(content) {
