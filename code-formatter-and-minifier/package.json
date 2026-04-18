@@ -2,7 +2,7 @@
 	"name": "code-formatter-and-minifier",
 	"displayName": "Code Formatter & Minifier",
 	"private": false,
-	"version": "1.1.19",
+	"version": "1.1.20",
 	"publisher": "lyuwenhan",
 	"description": "One-click VS Code extension to compress, format, and organize JavaScript, CSS, HTML, and JSON/JSONL files.",
 	"engines": {
