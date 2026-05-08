@@ -58,6 +58,22 @@ A lightweight **VS Code extension** that adds a simple note-taking area to the *
 
 ---
 
+### 5. Color Themes (Light / Dim / Dark)
+- Choose between **Light**, **Dim**, and **Dark** color schemes for the notes panel, or let it follow your VS Code theme automatically.
+- Configurable via the **`sidebarNotes.theme`** setting:
+  - `auto` *(default)* - follow the active VS Code color theme.
+  - `light` - light color scheme.
+  - `dim` - muted dark scheme (easy on the eyes).
+  - `dark` - full dark scheme.
+- Applies to the editor background, line numbers, syntax highlighting, and the Markdown / HTML preview.
+- Switches live when the setting is changed - no reload required.
+
+#### Quick switching
+- **In-panel button**: a theme icon sits next to the `+ = -` font-size buttons in the bottom-right of the Notes panel. Click it to cycle `auto → light → dim → dark`.
+- **Command palette**: `Sidebar Notes: Switch Theme` opens a picker with all four options (also bindable to a keyboard shortcut).
+
+---
+
 ## License
 
 MIT License © 2025 **lyuwenhan**

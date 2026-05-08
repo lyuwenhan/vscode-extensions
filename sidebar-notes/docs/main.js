@@ -72,6 +72,26 @@ function tomode (mode) {
 		...mode
 	}
 }
+const VALID_THEMES = ["auto", "light", "dim", "dark"];
+const CYCLE_ORDER = ["auto", "dark", "dim", "light"];
+const SVG_NS = "http://www.w3.org/2000/svg";
+const THEME_ICONS = {
+	auto: '<path fill-rule="evenodd" d="M1 0L4 0L4 1L5 1L5 4L4 4L4 5L1 5L1 4L0 4L0 1L1 1Z M3 1L4 1L4 4L3 4Z"/>',
+	dark: '<path d="M1 0L4 0L4 1L5 1L5 4L4 4L4 5L1 5L1 4L0 4L0 1L1 1Z"/>',
+	dim: '<path d="M1 0L3 0L3 1L2 1L2 2L1 2L1 3L2 3L2 4L3 4L3 5L1 5L1 4L0 4L0 1L1 1Z"/>',
+	light: '<path d="M2 0L3 0L3 1L4 1L4 2L5 2L5 3L4 3L4 4L3 4L3 5L2 5L2 4L1 4L1 3L0 3L0 2L1 2L1 1L2 1Z"/>'
+};
+
+function applyTheme (theme) {
+	if (!VALID_THEMES.includes(theme)) {
+		theme = "auto"
+	}
+	const body = document.body;
+	for (const t of VALID_THEMES) {
+		body.classList.remove("sn-theme-" + t)
+	}
+	body.classList.add("sn-theme-" + theme)
+}
 let sendMessage = () => {};
 const codeEle = textarea;
 const codeLangEle = document.getElementById("lang-choose");
@@ -106,6 +126,28 @@ let fontSize = 16;
 let addEle = document.getElementById("add");
 let equalEle = document.getElementById("equal");
 let minusEle = document.getElementById("minus");
+let themeEle = document.getElementById("theme");
+let currentTheme = "auto";
+let requestThemeChange = () => {};
+
+function renderThemeButton () {
+	if (!themeEle) return;
+	const label = currentTheme[0].toUpperCase() + currentTheme.slice(1);
+	const text = `Theme: ${label} (click to switch)`;
+	const iconMarkup = THEME_ICONS[currentTheme] || THEME_ICONS.auto;
+	themeEle.innerHTML = `<title>${text}</title>${iconMarkup}`;
+	themeEle.setAttribute("aria-label", text)
+}
+if (themeEle) {
+	themeEle.addEventListener("click", () => {
+		const idx = CYCLE_ORDER.indexOf(currentTheme);
+		const next = CYCLE_ORDER[(idx === -1 ? 0 : (idx + 1) % CYCLE_ORDER.length)];
+		applyTheme(next);
+		currentTheme = next;
+		renderThemeButton();
+		requestThemeChange(next)
+	})
+}
 if (window.acquireVsCodeApi) {
 	const vscode = acquireVsCodeApi();
 	vscode.postMessage({
@@ -119,6 +161,12 @@ if (window.acquireVsCodeApi) {
 			lang
 		})
 	};
+	requestThemeChange = function (theme) {
+		vscode.postMessage({
+			type: "setTheme",
+			theme
+		})
+	};
 	window.addEventListener("message", event => {
 		const message = event.data;
 		if (message.type === "setup") {
@@ -130,10 +178,20 @@ if (window.acquireVsCodeApi) {
 			codeLangEle.value = lang;
 			edtlang = languageModes[lang];
 			fontSize = +(message.fontSize ?? "16");
+			currentTheme = VALID_THEMES.includes(message.theme) ? message.theme : "auto";
+			applyTheme(currentTheme);
+			renderThemeButton();
 			ed_init();
 			editor.getWrapperElement().style.fontSize = fontSize + "px";
 			editor.refresh();
 			editor.setValue(message.content ?? "")
+		} else if (message.type === "theme") {
+			currentTheme = VALID_THEMES.includes(message.theme) ? message.theme : "auto";
+			applyTheme(currentTheme);
+			renderThemeButton();
+			if (editor) {
+				editor.refresh()
+			}
 		}
 	})
 }
