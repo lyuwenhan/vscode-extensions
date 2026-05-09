@@ -502,10 +502,10 @@ const actions = {
 		opers: {
 			javascript: mitifyJavascript,
 			typescript: mitifyTypescript,
-			html: mitifyHtml,
-			css: mitifyCss,
 			json: beautifyJson,
-			jsonl: beautifyJsonL
+			jsonl: beautifyJsonL,
+			html: mitifyHtml,
+			css: mitifyCss
 		}
 	},
 	sort: {
