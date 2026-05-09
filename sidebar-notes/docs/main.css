@@ -238,7 +238,7 @@ body, html {
 }
 #panel > * {
 	height: 100%;
-	fill: var(--vscode-foreground, var(--sn-fg));
+	fill: var(--sn-fg);
 	cursor: pointer
 }
 #panel > :hover {
