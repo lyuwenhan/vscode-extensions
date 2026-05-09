@@ -1,6 +1,6 @@
 {
-	"needsUpdate": false,
-	"withPack": false,
+	"needsUpdate": true,
+	"withPack": true,
 	"majorUp": false,
 	"minorUp": false,
 	"useVersion": null

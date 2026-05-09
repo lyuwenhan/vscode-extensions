@@ -11,6 +11,7 @@
 	"main": "./out/extension.js",
 	"activationEvents": [
 		"onLanguage:javascript",
+		"onLanguage:typescript",
 		"onLanguage:json",
 		"onLanguage:jsonc",
 		"onLanguage:jsonl",
@@ -23,6 +24,8 @@
 		"package": "vsce package"
 	},
 	"dependencies": {
+		"@babel/generator": "^7.29.1",
+		"@babel/parser": "^7.29.3",
 		"clean-css": "^5.3.3",
 		"cssnano": "^7.1.4",
 		"html-minifier-terser": "^7.2.0",
@@ -30,7 +33,8 @@
 		"jsonc-parser": "^3.3.1",
 		"jsonparse": "^1.3.1",
 		"postcss": "^8.5.8",
-		"terser": "^5.44.0"
+		"terser": "^5.44.0",
+		"typescript": "^6.0.3"
 	},
 	"license": "MIT",
 	"repository": {
@@ -87,6 +91,8 @@
 		"sort objects",
 		"sort",
 		"terser",
+		"ts",
+		"typescript",
 		"uuid",
 		"visual studio code",
 		"vscode"
@@ -179,17 +185,17 @@
 				{
 					"group": "navigation@88",
 					"command": "minifier.minifySel",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
 				},
 				{
 					"group": "navigation@89",
 					"command": "minifier.beautifySel",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
 				},
 				{
 					"group": "navigation@90",
 					"command": "minifier.mitifySel",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (config.minifier.enableMitify && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css))"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (config.minifier.enableMitify && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript))"
 				},
 				{
 					"group": "navigation@91",
@@ -209,17 +215,17 @@
 				{
 					"group": "navigation@94",
 					"command": "minifier.minify",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
 				},
 				{
 					"group": "navigation@95",
 					"command": "minifier.beautify",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
 				},
 				{
 					"group": "navigation@96",
 					"command": "minifier.mitify",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (config.minifier.enableMitify && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css))"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (config.minifier.enableMitify && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript))"
 				},
 				{
 					"group": "navigation@97",
@@ -240,15 +246,15 @@
 			"commandPalette": [
 				{
 					"command": "minifier.minifySel",
-					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
+					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				},
 				{
 					"command": "minifier.beautifySel",
-					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
+					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				},
 				{
 					"command": "minifier.mitifySel",
-					"when": "config.minifier.enableMitify && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css)"
+					"when": "config.minifier.enableMitify && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript)"
 				},
 				{
 					"command": "minifier.sortSel",
@@ -264,15 +270,15 @@
 				},
 				{
 					"command": "minifier.minify",
-					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
+					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				},
 				{
 					"command": "minifier.beautify",
-					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
+					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				},
 				{
 					"command": "minifier.mitify",
-					"when": "config.minifier.enableMitify && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css)"
+					"when": "config.minifier.enableMitify && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript)"
 				},
 				{
 					"command": "minifier.sort",
@@ -291,17 +297,17 @@
 				{
 					"group": "navigation@96",
 					"command": "minifier.minify",
-					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
+					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				},
 				{
 					"group": "navigation@97",
 					"command": "minifier.beautify",
-					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
+					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				},
 				{
 					"group": "navigation@98",
 					"command": "minifier.mitify",
-					"when": "config.minifier.enableMitify && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css)"
+					"when": "config.minifier.enableMitify && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript)"
 				},
 				{
 					"group": "navigation@99",
@@ -313,17 +319,17 @@
 				{
 					"group": "navigation@96",
 					"command": "minifier.minify",
-					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
+					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				},
 				{
 					"group": "navigation@97",
 					"command": "minifier.beautify",
-					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
+					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				},
 				{
 					"group": "navigation@98",
 					"command": "minifier.mitify",
-					"when": "config.minifier.enableMitify && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css)"
+					"when": "config.minifier.enableMitify && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript)"
 				},
 				{
 					"group": "navigation@99",
@@ -382,6 +388,36 @@
 								"templating": [
 									"auto"
 								]
+							}
+						},
+						"typescript": {
+							"minify": {
+								"comments": false,
+								"jsescOption": {
+									"minimal": true
+								},
+								"retainLines": false
+							},
+							"beautify": {
+								"indentSize": 4,
+								"tabSize": 4,
+								"convertTabsToSpaces": false,
+								"newLineCharacter": "\n",
+								"insertSpaceAfterCommaDelimiter": true,
+								"insertSpaceAfterSemicolonInForStatements": true,
+								"insertSpaceBeforeAndAfterBinaryOperators": true,
+								"insertSpaceAfterConstructor": false,
+								"insertSpaceAfterKeywordsInControlFlowStatements": true,
+								"insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
+								"insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": false,
+								"insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": false,
+								"insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": true,
+								"insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": false,
+								"insertSpaceAfterTypeAssertion": false,
+								"insertSpaceBeforeFunctionParenthesis": false,
+								"placeOpenBraceOnNewLineForFunctions": false,
+								"placeOpenBraceOnNewLineForControlBlocks": false,
+								"semicolons": "ignore"
 							}
 						},
 						"html": {
@@ -464,6 +500,7 @@
 					"description": "Formatter and Minifier Settings.",
 					"required": [
 						"javascript",
+						"typescript",
 						"html",
 						"css"
 					],
@@ -480,6 +517,25 @@
 								"beautify": {
 									"type": "object",
 									"description": "Options for JavaScript beautify(js-beautify)"
+								}
+							},
+							"required": [
+								"minify",
+								"beautify"
+							],
+							"additionalProperties": false
+						},
+						"typescript": {
+							"type": "object",
+							"description": "Options for TypeScript beautify (babel pretty-print + typescript formatter) and minification (@babel/parser + @babel/generator).",
+							"properties": {
+								"minify": {
+									"type": "object",
+									"description": "Options for TypeScript minification(@babel/generator)"
+								},
+								"beautify": {
+									"type": "object",
+									"description": "Options for TypeScript beautify (babel pretty-print, then typescript FormatCodeSettings)"
 								}
 							},
 							"required": [

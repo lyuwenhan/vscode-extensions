@@ -35,6 +35,36 @@
 			]
 		}
 	},
+	"typescript": {
+		"minify": {
+			"comments": false,
+			"jsescOption": {
+				"minimal": true
+			},
+			"retainLines": false
+		},
+		"beautify": {
+			"indentSize": 4,
+			"tabSize": 4,
+			"convertTabsToSpaces": false,
+			"newLineCharacter": "\n",
+			"insertSpaceAfterCommaDelimiter": true,
+			"insertSpaceAfterSemicolonInForStatements": true,
+			"insertSpaceBeforeAndAfterBinaryOperators": true,
+			"insertSpaceAfterConstructor": false,
+			"insertSpaceAfterKeywordsInControlFlowStatements": true,
+			"insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
+			"insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": false,
+			"insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": false,
+			"insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": true,
+			"insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": false,
+			"insertSpaceAfterTypeAssertion": false,
+			"insertSpaceBeforeFunctionParenthesis": false,
+			"placeOpenBraceOnNewLineForFunctions": false,
+			"placeOpenBraceOnNewLineForControlBlocks": false,
+			"semicolons": "ignore"
+		}
+	},
 	"html": {
 		"minify": {
 			"collapseWhitespace": true,

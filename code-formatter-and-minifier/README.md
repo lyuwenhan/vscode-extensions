@@ -10,6 +10,7 @@ For each language, the table below shows whether the action is supported.
 |**Languages**|**Minify**|**Beautify**|**Mitify**|**Sort**|**Sort lists**|**Sort lists by keys**|
 |:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 |**JavaScript**|✔|✔|✔|✖|✖|✖|
+|**TypeScript**|✔|✔|✔|✖|✖|✖|
 |**HTML**|✔|✔|✔|✖|✖|✖|
 |**CSS**|✔|✔|✔|✖|✖|✖|
 |**JSON / JSONC**|✔|✔|✖|✔|✔|✔|
@@ -223,7 +224,7 @@ After (sort by price)
 
 1. Open any file in VS Code.
    - For formatting-related actions, the file should be one of:
-     `.js`, `.json`, `.jsonc`, `.jsonl`, `.html`, `.css`.
+     `.js`, `.ts`, `.json`, `.jsonc`, `.jsonl`, `.html`, `.css`.
 
 2. Right-click inside the editor.
 
@@ -282,6 +283,14 @@ Minifier: Code Setting
 				/* js-beautify options */
 			}
 		},
+		"typescript": {
+			"minify": {
+				/* @babel/generator options */
+			},
+			"beautify": {
+				/* babel pretty-print (indent via indentSize + convertTabsToSpaces) + typescript FormatCodeSettings */
+			}
+		},
 		"html": {
 			"minify": {
 				/* html-minifier-terser options */
@@ -334,33 +343,63 @@ These are the built-in defaults used by the extension:
 					"shorthand": true
 				}
 			},
-			"beautify": {
-				"indent_size": 4,
-				"indent_char": "\t",
-				"indent_level": 0,
-				"brace_style": "collapse",
-				"eol": "\n",
-				"end_with_newline": true,
-				"preserve_newlines": false,
-				"indent_with_tabs": true,
-				"max_preserve_newlines": 1,
-				"jslint_happy": false,
-				"space_after_named_function": false,
-				"space_after_anon_function": false,
-				"keep_array_indentation": false,
-				"keep_function_indentation": false,
-				"space_before_conditional": true,
-				"break_chained_methods": false,
-				"eval_code": false,
-				"unescape_strings": false,
-				"wrap_line_length": 0,
-				"indent_empty_lines": false,
-				"templating": [
-					"auto"
-				]
-			}
+		"beautify": {
+			"indent_size": 4,
+			"indent_char": "\t",
+			"indent_level": 0,
+			"brace_style": "collapse",
+			"eol": "\n",
+			"end_with_newline": true,
+			"preserve_newlines": false,
+			"indent_with_tabs": true,
+			"max_preserve_newlines": 1,
+			"jslint_happy": false,
+			"space_after_named_function": false,
+			"space_after_anon_function": false,
+			"keep_array_indentation": false,
+			"keep_function_indentation": false,
+			"space_before_conditional": true,
+			"break_chained_methods": false,
+			"eval_code": false,
+			"unescape_strings": false,
+			"wrap_line_length": 0,
+			"indent_empty_lines": false,
+			"templating": [
+				"auto"
+			]
+		}
+	},
+	"typescript": {
+		"minify": {
+			"comments": false,
+			"jsescOption": {
+				"minimal": true
+			},
+			"retainLines": false
 		},
-		"html": {
+		"beautify": {
+			"indentSize": 4,
+			"tabSize": 4,
+			"convertTabsToSpaces": false,
+			"newLineCharacter": "\n",
+			"insertSpaceAfterCommaDelimiter": true,
+			"insertSpaceAfterSemicolonInForStatements": true,
+			"insertSpaceBeforeAndAfterBinaryOperators": true,
+			"insertSpaceAfterConstructor": false,
+			"insertSpaceAfterKeywordsInControlFlowStatements": true,
+			"insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
+			"insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": false,
+			"insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": false,
+			"insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": true,
+			"insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": false,
+			"insertSpaceAfterTypeAssertion": false,
+			"insertSpaceBeforeFunctionParenthesis": false,
+			"placeOpenBraceOnNewLineForFunctions": false,
+			"placeOpenBraceOnNewLineForControlBlocks": false,
+			"semicolons": "ignore"
+		}
+	},
+	"html": {
 			"minify": {
 				"collapseWhitespace": true,
 				"removeComments": true,
@@ -481,9 +520,11 @@ The configuration system allows you to:
 ## Notes
 
 - **JavaScript** minification uses [terser](https://github.com/terser/terser).
+- **TypeScript** minification uses [@babel/parser](https://github.com/babel/babel/tree/main/packages/babel-parser) and [@babel/generator](https://github.com/babel/babel/tree/main/packages/babel-generator) (`compact:true, minified:true`), preserving all TypeScript syntax (generics, decorators, parameter properties, `as`, `satisfies`, `infer`, `namespace`, `enum`, etc.).
 - **HTML** minification uses [html-minifier-terser](https://github.com/terser/html-minifier-terser).
 - **CSS** minification uses [cssnano](https://github.com/cssnano/cssnano), [postcss](https://github.com/postcss/postcss), and [clean-css](https://github.com/jakubpawlowicz/clean-css).
 - **JavaScript**, **HTML**, **CSS** beautification uses [js-beautify](https://github.com/beautify-web/js-beautify).
+- **TypeScript** beautification first pretty-prints with [@babel/parser](https://github.com/babel/babel/tree/main/packages/babel-parser) + [@babel/generator](https://github.com/babel/babel/tree/main/packages/babel-generator) (`compact: false`) so minified or single-line code is split across lines, then applies the [typescript](https://github.com/microsoft/TypeScript) formatter (`LanguageService.getFormattingEditsForDocument`) for spacing — same engine as VS Code's built-in TypeScript formatter on the expanded source.
 - **JSON** parsing uses [jsonc-parser](https://github.com/microsoft/node-jsonc-parser).
 - **JSON Lines** parsing uses [jsonparse](https://github.com/creationix/jsonparse).
 - **JSON** and **JSON Lines** stringification uses native `JSON.stringify`.

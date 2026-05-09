@@ -4,7 +4,7 @@ const esbuild = require("esbuild");
 const content = fs.readFileSync("package.json", "utf8");
 const pkg = jsonc.parse(content);
 const rid = {
-	jsBeautify: "resourceLangId == javascript || resourceLangId == html || resourceLangId == css",
+	jsBeautify: "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript",
 	jsons: "resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 };
 const contr = [{
@@ -69,7 +69,7 @@ const ret = {
 				type: "object",
 				default: require("./src/lib/default-setting.json"),
 				description: "Formatter and Minifier Settings.",
-				required: ["javascript", "html", "css"],
+				required: ["javascript", "typescript", "html", "css"],
 				additionalProperties: false,
 				properties: {
 					javascript: {
@@ -83,6 +83,22 @@ const ret = {
 							beautify: {
 								type: "object",
 								description: "Options for JavaScript beautify(js-beautify)"
+							}
+						},
+						required: ["minify", "beautify"],
+						additionalProperties: false
+					},
+					typescript: {
+						type: "object",
+						description: "Options for TypeScript beautify (babel pretty-print + typescript formatter) and minification (@babel/parser + @babel/generator).",
+						properties: {
+							minify: {
+								type: "object",
+								description: "Options for TypeScript minification(@babel/generator)"
+							},
+							beautify: {
+								type: "object",
+								description: "Options for TypeScript beautify (babel pretty-print, then typescript FormatCodeSettings)"
 							}
 						},
 						required: ["minify", "beautify"],

@@ -9,6 +9,9 @@ const cleanCSS = require("clean-css");
 const terser = require("terser");
 const beautify = require("js-beautify");
 const JSONParse = require("jsonparse");
+const ts = require("typescript");
+const babelParser = require("@babel/parser");
+const babelGenerate = require("@babel/generator").default;
 const jsonc = require("./lib/jsonc-parser.js");
 const oldOpts = require("./lib/default-setting.json");
 let cleanCSSRunner = new cleanCSS({
@@ -32,6 +35,16 @@ function readSettings() {
 			beautify: {
 				...oldOpts.javascript.beautify,
 				...toJson(settings.javascript?.beautify)
+			}
+		},
+		typescript: {
+			minify: {
+				...oldOpts.typescript.minify,
+				...toJson(settings.typescript?.minify)
+			},
+			beautify: {
+				...oldOpts.typescript.beautify,
+				...toJson(settings.typescript?.beautify)
 			}
 		},
 		html: {
@@ -167,6 +180,87 @@ function beautifyJavascript(content) {
 
 function mitifyJavascript(content) {
 	return minifyJavascript(content).then(beautifyJavascript)
+}
+
+function createTsLanguageServiceHost(fileName, source) {
+	const snapshot = ts.ScriptSnapshot.fromString(source);
+	return {
+		getScriptFileNames: () => [fileName],
+		getScriptVersion: () => "0",
+		getScriptSnapshot: f => f === fileName ? snapshot : undefined,
+		getCurrentDirectory: () => "",
+		getCompilationSettings: () => ({
+			allowJs: true,
+			target: ts.ScriptTarget.Latest,
+			module: ts.ModuleKind.ESNext,
+			jsx: ts.JsxEmit.Preserve
+		}),
+		getDefaultLibFileName: ts.getDefaultLibFilePath,
+		readFile: () => undefined,
+		fileExists: f => f === fileName
+	}
+}
+
+function formatTypescriptDocument(content) {
+	const fileName = "in-memory.ts";
+	const ls = ts.createLanguageService(createTsLanguageServiceHost(fileName, content), ts.createDocumentRegistry());
+	const edits = ls.getFormattingEditsForDocument(fileName, opts.typescript.beautify);
+	edits.sort((a, b) => b.span.start - a.span.start);
+	let out = content;
+	for (const e of edits) {
+		out = out.slice(0, e.span.start) + e.newText + out.slice(e.span.start + e.span.length)
+	}
+	return out
+}
+
+function beautifyTypescript(content) {
+	const ast = babelParser.parse(content, {
+		sourceType: "module",
+		allowReturnOutsideFunction: true,
+		allowAwaitOutsideFunction: true,
+		errorRecovery: true,
+		plugins: ["typescript", ["decorators", {
+			decoratorsBeforeExport: true
+		}], "classProperties", "classPrivateProperties", "classPrivateMethods", "explicitResourceManagement"]
+	});
+	const fmt = opts.typescript.beautify;
+	const indentSize = Math.max(1, Number(fmt.indentSize) || 4);
+	const indentStyle = fmt.convertTabsToSpaces ? " ".repeat(indentSize) : "\t";
+	const pretty = babelGenerate(ast, {
+		compact: false,
+		comments: fmt.comments !== false,
+		retainLines: false,
+		jsescOption: {
+			minimal: true,
+			...toJson(fmt.jsescOption)
+		},
+		indent: {
+			style: indentStyle
+		}
+	}).code;
+	return formatTypescriptDocument(pretty)
+}
+
+function minifyTypescript(content) {
+	const ast = babelParser.parse(content, {
+		sourceType: "module",
+		allowReturnOutsideFunction: true,
+		allowAwaitOutsideFunction: true,
+		errorRecovery: true,
+		plugins: ["typescript", ["decorators", {
+			decoratorsBeforeExport: true
+		}], "classProperties", "classPrivateProperties", "classPrivateMethods", "explicitResourceManagement"]
+	});
+	const result = babelGenerate(ast, {
+		...opts.typescript.minify,
+		compact: true,
+		minified: true
+	});
+	return result.code
+}
+
+function mitifyTypescript(content) {
+	return beautifyTypescript(minifyTypescript(content))
 }
 
 function sortCompare2(a, b, isD) {
@@ -349,6 +443,7 @@ const actions = {
 		actionName: "Minifier",
 		opers: {
 			javascript: minifyJavascript,
+			typescript: minifyTypescript,
 			json: minifyJson,
 			jsonl: minifyJsonL,
 			html: minifyHtml,
@@ -360,6 +455,7 @@ const actions = {
 		actionName: "Beautifier",
 		opers: {
 			javascript: beautifyJavascript,
+			typescript: beautifyTypescript,
 			json: beautifyJson,
 			jsonl: beautifyJsonL,
 			html: beautifyHtml,
@@ -371,6 +467,7 @@ const actions = {
 		actionName: "Mitifier",
 		opers: {
 			javascript: mitifyJavascript,
+			typescript: mitifyTypescript,
 			html: mitifyHtml,
 			css: mitifyCss,
 			json: beautifyJson,
