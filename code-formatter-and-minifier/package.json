@@ -131,21 +131,6 @@
 			},
 			{
 				"category": "Minifier",
-				"command": "minifier.sortSel",
-				"title": "Sort current selection"
-			},
-			{
-				"category": "Minifier",
-				"command": "minifier.sortListSel",
-				"title": "Sort lists from current selection"
-			},
-			{
-				"category": "Minifier",
-				"command": "minifier.sortListByKeySel",
-				"title": "Sort lists by keys from current selection"
-			},
-			{
-				"category": "Minifier",
 				"command": "minifier.minify",
 				"title": "Minify current file"
 			},
@@ -158,89 +143,44 @@
 				"category": "Minifier",
 				"command": "minifier.mitify",
 				"title": "Mitify current file"
-			},
-			{
-				"category": "Minifier",
-				"command": "minifier.sort",
-				"title": "Sort current file"
-			},
-			{
-				"category": "Minifier",
-				"command": "minifier.sortList",
-				"title": "Sort lists from current file"
-			},
-			{
-				"category": "Minifier",
-				"command": "minifier.sortListByKey",
-				"title": "Sort lists by keys from current file"
 			}
 		],
 		"menus": {
 			"editor/context": [
 				{
-					"group": "navigation@87",
+					"group": "navigation@93",
 					"command": "minifier.generateUuid",
 					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled')"
 				},
 				{
-					"group": "navigation@88",
+					"group": "navigation@94",
 					"command": "minifier.minifySel",
 					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
 				},
 				{
-					"group": "navigation@89",
+					"group": "navigation@95",
 					"command": "minifier.beautifySel",
 					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
 				},
 				{
-					"group": "navigation@90",
+					"group": "navigation@96",
 					"command": "minifier.mitifySel",
 					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (config.minifier.enableMitify && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript))"
 				},
 				{
-					"group": "navigation@91",
-					"command": "minifier.sortSel",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
-				},
-				{
-					"group": "navigation@92",
-					"command": "minifier.sortListSel",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (config.minifier.enableSortList && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl))"
-				},
-				{
-					"group": "navigation@93",
-					"command": "minifier.sortListByKeySel",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (config.minifier.enableSortList && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl))"
-				},
-				{
-					"group": "navigation@94",
+					"group": "navigation@97",
 					"command": "minifier.minify",
 					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
 				},
 				{
-					"group": "navigation@95",
+					"group": "navigation@98",
 					"command": "minifier.beautify",
 					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
 				},
 				{
-					"group": "navigation@96",
+					"group": "navigation@99",
 					"command": "minifier.mitify",
 					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (config.minifier.enableMitify && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript))"
-				},
-				{
-					"group": "navigation@97",
-					"command": "minifier.sort",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
-				},
-				{
-					"group": "navigation@98",
-					"command": "minifier.sortList",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (config.minifier.enableSortList && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl))"
-				},
-				{
-					"group": "navigation@99",
-					"command": "minifier.sortListByKey",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (config.minifier.enableSortList && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl))"
 				}
 			],
 			"commandPalette": [
@@ -257,18 +197,6 @@
 					"when": "config.minifier.enableMitify && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript)"
 				},
 				{
-					"command": "minifier.sortSel",
-					"when": "resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
-				},
-				{
-					"command": "minifier.sortListSel",
-					"when": "config.minifier.enableSortList && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
-				},
-				{
-					"command": "minifier.sortListByKeySel",
-					"when": "config.minifier.enableSortList && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
-				},
-				{
 					"command": "minifier.minify",
 					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				},
@@ -279,62 +207,40 @@
 				{
 					"command": "minifier.mitify",
 					"when": "config.minifier.enableMitify && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript)"
-				},
-				{
-					"command": "minifier.sort",
-					"when": "resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
-				},
-				{
-					"command": "minifier.sortList",
-					"when": "config.minifier.enableSortList && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
-				},
-				{
-					"command": "minifier.sortListByKey",
-					"when": "config.minifier.enableSortList && (resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
 				}
 			],
 			"explorer/context": [
 				{
-					"group": "navigation@96",
-					"command": "minifier.minify",
-					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
-				},
-				{
 					"group": "navigation@97",
-					"command": "minifier.beautify",
-					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
+					"command": "minifier.minify",
+					"when": "explorerResourceIsFolder || resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				},
 				{
 					"group": "navigation@98",
-					"command": "minifier.mitify",
-					"when": "config.minifier.enableMitify && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript)"
+					"command": "minifier.beautify",
+					"when": "explorerResourceIsFolder || resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				},
 				{
 					"group": "navigation@99",
-					"command": "minifier.sort",
-					"when": "resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
+					"command": "minifier.mitify",
+					"when": "config.minifier.enableMitify && (explorerResourceIsFolder || resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript)"
 				}
 			],
 			"editor/title/context": [
 				{
-					"group": "navigation@96",
+					"group": "navigation@97",
 					"command": "minifier.minify",
 					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				},
 				{
-					"group": "navigation@97",
+					"group": "navigation@98",
 					"command": "minifier.beautify",
 					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				},
 				{
-					"group": "navigation@98",
+					"group": "navigation@99",
 					"command": "minifier.mitify",
 					"when": "config.minifier.enableMitify && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript)"
-				},
-				{
-					"group": "navigation@99",
-					"command": "minifier.sort",
-					"when": "resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
 				}
 			]
 		},

@@ -10,27 +10,15 @@ const rid = {
 const contr = [{
 	command: "minify",
 	title: "Minify",
-	when: [true, true, ["jsBeautify", "jsons"]]
+	when: [true, ["jsBeautify", "jsons"]]
 }, {
 	command: "beautify",
 	title: "Beautify",
-	when: [true, true, ["jsBeautify", "jsons"]]
+	when: [true, ["jsBeautify", "jsons"]]
 }, {
 	command: "mitify",
 	title: "Mitify",
-	when: [true, true, ["jsBeautify"], "config.minifier.enableMitify"]
-}, {
-	command: "sort",
-	title: "Sort",
-	when: [true, true, ["jsons"]]
-}, {
-	command: "sortList",
-	title: "Sort lists from",
-	when: [false, true, ["jsons"], "config.minifier.enableSortList"]
-}, {
-	command: "sortListByKey",
-	title: "Sort lists by keys from",
-	when: [false, true, ["jsons"], "config.minifier.enableSortList"]
+	when: [true, ["jsBeautify"], "config.minifier.enableMitify"]
 }];
 const ret = {
 	commands: [{
@@ -190,9 +178,11 @@ const ret = {
 [true, false].forEach(sel => {
 	contr.forEach(e => {
 		const command = "minifier." + e.command + (sel ? "Sel" : "");
-		let when = e.when[2].map(e => rid[e]).join(" || ");
-		if (e.when[3]) {
-			when = e.when[3] + " && (" + when + ")"
+		let when = e.when[1].map(e => rid[e]).join(" || ");
+		let when2 = "explorerResourceIsFolder || " + when;
+		if (e.when[2]) {
+			when = e.when[2] + " && (" + when + ")";
+			when2 = e.when[2] + " && (" + when2 + ")"
 		}
 		ret.commands.push({
 			command,
@@ -209,7 +199,7 @@ const ret = {
 		if (!sel && e.when[0]) {
 			ret.menus["explorer/context"].push({
 				command,
-				when
+				when: when2
 			});
 			ret.menus["editor/title/context"].push({
 				command,

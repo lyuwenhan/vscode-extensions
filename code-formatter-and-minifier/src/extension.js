@@ -418,6 +418,40 @@ async function getDoc(uri) {
 	}
 	return found
 }
+async function expandUriToFileUris(uri) {
+	try {
+		const stat = await vscode.workspace.fs.stat(uri);
+		if ((stat.type & vscode.FileType.File) !== 0) {
+			return [uri]
+		}
+		if ((stat.type & vscode.FileType.Directory) !== 0) {
+			const out = [];
+			const entries = await vscode.workspace.fs.readDirectory(uri);
+			for (const [name] of entries) {
+				const child = vscode.Uri.joinPath(uri, name);
+				out.push(...await expandUriToFileUris(child))
+			}
+			return out
+		}
+	} catch (e) {
+		console.error(e)
+	}
+	return []
+}
+async function uniqueFileUrisFromUris(uris) {
+	const seen = new Set;
+	const result = [];
+	for (const u of uris) {
+		for (const fileUri of await expandUriToFileUris(u)) {
+			const key = fileUri.toString();
+			if (!seen.has(key)) {
+				seen.add(key);
+				result.push(fileUri)
+			}
+		}
+	}
+	return result
+}
 
 function normEol(content) {
 	return content.replace(/\r\n/g, "\n").replace(/\r/g, "\n")
@@ -520,10 +554,15 @@ function activate(context) {
 		}
 		context.subscriptions.push(vscode.commands.registerCommand("minifier." + action, async (uri, selectedUris) => {
 			try {
-				const uris = Array.isArray(selectedUris) && selectedUris.length > 0 ? selectedUris : uri ? [uri] : [];
+				let uris = await uniqueFileUrisFromUris(Array.isArray(selectedUris) && selectedUris.length > 0 ? selectedUris : uri ? [uri] : []);
 				const docs = (await Promise.all(uris.map(getDoc))).filter(Boolean);
 				if (!docs.length) {
-					throw new Error(actionName + ": No file selected.")
+					if (selectedUris.length || uri) {
+						vscode.window.showWarningMessage(actionName + ": Nothing changed.")
+					} else {
+						vscode.window.showErrorMessage(actionName + ": No file selected.")
+					}
+					return
 				}
 				let NC = false,
 					suc = false;
@@ -549,7 +588,7 @@ function activate(context) {
 				} else if (NC) {
 					vscode.window.showWarningMessage(actionName + ": Nothing changed.")
 				} else {
-					vscode.window.showErrorMessage("Invalid file type.")
+					vscode.window.showErrorMessage(actionName + ": Invalid file type.")
 				}
 			} catch (e) {
 				vscode.window.showErrorMessage(e.message || String(e));
