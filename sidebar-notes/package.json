@@ -78,6 +78,35 @@
 					"icon": "media/icon.svg"
 				}
 			]
-		}
+		},
+		"configuration": {
+			"title": "Sidebar Notes",
+			"properties": {
+				"sidebarNotes.theme": {
+					"type": "string",
+					"enum": [
+						"auto",
+						"light",
+						"dim",
+						"dark"
+					],
+					"enumDescriptions": [
+						"Follow the current VS Code color theme.",
+						"Use the light color scheme.",
+						"Use the dim (muted dark) color scheme.",
+						"Use the dark color scheme."
+					],
+					"default": "auto",
+					"description": "Color theme for the Sidebar Notes panel."
+				}
+			}
+		},
+		"commands": [
+			{
+				"command": "sidebarNotes.switchTheme",
+				"title": "Switch Theme",
+				"category": "Sidebar Notes"
+			}
+		]
 	}
 }

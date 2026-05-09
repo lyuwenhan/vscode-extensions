@@ -1,7 +1,153 @@
+body {
+	--sn-bg: #f7f7f7;
+	--sn-fg: #000;
+	--sn-muted: #888;
+	--sn-border: #cdcdcd;
+	--sn-gutter-bg: #f7f7f7;
+	--sn-gutter-border: #ddd;
+	--sn-line-number: #999;
+	--sn-active-line: #e8f2ff;
+	--sn-selection: #d7d4f0;
+	--sn-selection-blur: #d9d9d9;
+	--sn-cursor: #000;
+	--sn-secondary-cursor: silver;
+	--sn-button-bg: #efefef;
+	--sn-button-on-bg: #afafaf;
+	--sn-scrollbar: #bfbfbf;
+	--sn-scrollbar-bg: #f0f0f0;
+	--sn-keyword: #708;
+	--sn-string: #a11;
+	--sn-string2: #f50;
+	--sn-number: #164;
+	--sn-comment: #a50;
+	--sn-def: #00f;
+	--sn-var2: #05a;
+	--sn-var3: #085;
+	--sn-tag: #170;
+	--sn-attr: #00c;
+	--sn-builtin: #30a;
+	--sn-meta: #555;
+	--sn-atom: #219;
+	--sn-link: #00c;
+	--sn-bracket: #997;
+	--sn-header: #00f;
+	--sn-quote: #090;
+	--sn-error: #d44;
+	--sn-match-bracket: #0b0;
+	--sn-nonmatch-bracket: #a22;
+	--sn-search-hi: rgba(255, 255, 0, 0.4);
+	--sn-prism-bg: #f5f2f0;
+	--sn-prism-text-shadow: 0 1px #fff;
+	--sn-prism-punctuation: #999;
+	--sn-prism-tag: #905;
+	--sn-prism-string: #690;
+	--sn-prism-keyword: #07a;
+	--sn-prism-fn: #dd4a68;
+	--sn-prism-regex: #e90;
+	--sn-prism-comment: #708090
+}
+body.sn-theme-dim {
+	--sn-bg: #22272e;
+	--sn-fg: #adbac7;
+	--sn-muted: #768390;
+	--sn-border: #444c56;
+	--sn-gutter-bg: #22272e;
+	--sn-gutter-border: #2d333b;
+	--sn-line-number: #636e7b;
+	--sn-active-line: #2d333b;
+	--sn-selection: #3b4a6b;
+	--sn-selection-blur: #2d333b;
+	--sn-cursor: #adbac7;
+	--sn-secondary-cursor: #6a737d;
+	--sn-button-bg: #2d333b;
+	--sn-button-on-bg: #444c56;
+	--sn-scrollbar: #444c56;
+	--sn-scrollbar-bg: #22272e;
+	--sn-keyword: #f47067;
+	--sn-string: #96d0ff;
+	--sn-string2: #ffab70;
+	--sn-number: #6cb6ff;
+	--sn-comment: #768390;
+	--sn-def: #dcbdfb;
+	--sn-var2: #adbac7;
+	--sn-var3: #8ddb8c;
+	--sn-tag: #8ddb8c;
+	--sn-attr: #6cb6ff;
+	--sn-builtin: #dcbdfb;
+	--sn-meta: #768390;
+	--sn-atom: #6cb6ff;
+	--sn-link: #6cb6ff;
+	--sn-bracket: #adbac7;
+	--sn-header: #f69d50;
+	--sn-quote: #768390;
+	--sn-error: #f47067;
+	--sn-match-bracket: #8ddb8c;
+	--sn-nonmatch-bracket: #f47067;
+	--sn-search-hi: rgba(187, 128, 9, 0.4);
+	--sn-prism-bg: #2d333b;
+	--sn-prism-text-shadow: none;
+	--sn-prism-punctuation: #768390;
+	--sn-prism-tag: #f47067;
+	--sn-prism-string: #96d0ff;
+	--sn-prism-keyword: #dcbdfb;
+	--sn-prism-fn: #dcbdfb;
+	--sn-prism-regex: #f69d50;
+	--sn-prism-comment: #636e7b
+}
+body.sn-theme-dark, body.sn-theme-auto.vscode-dark, body.sn-theme-auto.vscode-high-contrast {
+	--sn-bg: #1e1e1e;
+	--sn-fg: #d4d4d4;
+	--sn-muted: #6a6a6a;
+	--sn-border: #3c3c3c;
+	--sn-gutter-bg: #1e1e1e;
+	--sn-gutter-border: #2b2b2b;
+	--sn-line-number: #858585;
+	--sn-active-line: #2a2d2e;
+	--sn-selection: #264f78;
+	--sn-selection-blur: #3a3d41;
+	--sn-cursor: #d4d4d4;
+	--sn-secondary-cursor: #6a6a6a;
+	--sn-button-bg: #2d2d2d;
+	--sn-button-on-bg: #4a4a4a;
+	--sn-scrollbar: #424242;
+	--sn-scrollbar-bg: #1e1e1e;
+	--sn-keyword: #c586c0;
+	--sn-string: #ce9178;
+	--sn-string2: #d7ba7d;
+	--sn-number: #b5cea8;
+	--sn-comment: #6a9955;
+	--sn-def: #dcdcaa;
+	--sn-var2: #9cdcfe;
+	--sn-var3: #4ec9b0;
+	--sn-tag: #569cd6;
+	--sn-attr: #9cdcfe;
+	--sn-builtin: #4fc1ff;
+	--sn-meta: #d4d4d4;
+	--sn-atom: #569cd6;
+	--sn-link: #569cd6;
+	--sn-bracket: #d4d4d4;
+	--sn-header: #569cd6;
+	--sn-quote: #6a9955;
+	--sn-error: #f48771;
+	--sn-match-bracket: #b5cea8;
+	--sn-nonmatch-bracket: #f48771;
+	--sn-search-hi: rgba(234, 92, 0, 0.33);
+	--sn-prism-bg: #2d2d2d;
+	--sn-prism-text-shadow: none;
+	--sn-prism-punctuation: #808080;
+	--sn-prism-tag: #569cd6;
+	--sn-prism-string: #ce9178;
+	--sn-prism-keyword: #c586c0;
+	--sn-prism-fn: #dcdcaa;
+	--sn-prism-regex: #d16969;
+	--sn-prism-comment: #6a9955
+}
 body, html {
 	margin: 0;
 	padding: 0;
-	height: 100%
+	height: 100%;
+	background-color: var(--sn-bg);
+	color: var(--sn-fg)
 }
 *, body, html {
 	font-family: Consolas, Courier, monospace
@@ -19,14 +165,18 @@ body, html {
 }
 .choose-lang #lang-text {
 	margin-right: 8px;
-	white-space: nowrap
+	white-space: nowrap;
+	color: var(--sn-fg)
 }
 .choose-lang #lang-choose {
 	min-width: 5px;
 	width: auto !important;
 	height: 100%;
 	flex: 1;
-	border-radius: 5px
+	border-radius: 5px;
+	background-color: var(--sn-button-bg);
+	color: var(--sn-fg);
+	border: 1px solid var(--sn-border)
 }
 .well {
 	position: fixed;
@@ -39,18 +189,22 @@ body, html {
 	border: none;
 	outline: 0;
 	resize: none;
-	background-color: #f7f7f7
+	background-color: var(--sn-bg);
+	color: var(--sn-fg)
 }
 .well:focus {
-	border: 1px solid black
+	border: 1px solid var(--sn-fg)
 }
 .well::placeholder {
-	color: #888
+	color: var(--sn-muted)
 }
 #preview-button {
 	margin-left: 8px;
 	height: 100%;
-	border-radius: 5px
+	border-radius: 5px;
+	background-color: var(--sn-button-bg);
+	color: var(--sn-fg);
+	border: 1px solid var(--sn-border)
 }
 #preview-button:hover {
 	opacity: 0.7
@@ -59,14 +213,14 @@ body, html {
 	opacity: 0.8
 }
 #preview-button.on {
-	background-color: #afafaf
+	background-color: var(--sn-button-on-bg)
 }
 #preview {
 	margin-left: 20px;
 	width: calc(100% - 20px);
 	height: 100%;
 	overflow: auto;
-	color: black
+	color: var(--sn-fg)
 }
 .CodeMirror {
 	line-height: 1.3em !important;
@@ -84,7 +238,8 @@ body, html {
 }
 #panel > * {
 	height: 100%;
-	fill: var(--vscode-foreground, #000)
+	fill: var(--sn-fg);
+	cursor: pointer
 }
 #panel > :hover {
 	opacity: 0.7
@@ -92,9 +247,12 @@ body, html {
 #panel > :active {
 	opacity: 0.8
 }
+#panel > #theme {
+	margin-right: 8px
+}
 .CodeMirror-vscrollbar, .CodeMirror-hscrollbar {
-	scrollbar-color: #bfbfbf #f0f0f0 !important
+	scrollbar-color: var(--sn-scrollbar) var(--sn-scrollbar-bg) !important
 }
 .CodeMirror-empty .CodeMirror-placeholder {
-	color: #888 !important
+	color: var(--sn-muted) !important
 }
