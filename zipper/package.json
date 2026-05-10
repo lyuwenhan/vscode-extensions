@@ -101,7 +101,7 @@
 				{
 					"group": "navigation@80",
 					"command": "zipper.extract",
-					"when": "resourceExtname == .zip"
+					"when": "resourceExtname == .zip || resourceExtname == .jar || resourceExtname == .apk || resourceExtname == .vsix || resourceExtname == .mcpack || resourceExtname == .mcworld || resourceExtname == .mcaddon"
 				}
 			]
 		},

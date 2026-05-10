@@ -726,57 +726,68 @@ function activate(context) {
 			console.error(e.stack)
 		}
 	});
-	const unzipDisposable = vscode.commands.registerCommand("zipper.extract", async uri => {
+	const unzipDisposable = vscode.commands.registerCommand("zipper.extract", async (uri1, selectedUris) => {
 		try {
-			if (!uri || path.extname(uri.fsPath).toLowerCase() !== ".zip") {
-				vscode.window.showWarningMessage("Zipper: Please select a ZIP file");
+			const targets = Array.isArray(selectedUris) && selectedUris.length > 0 ? selectedUris : uri1 ? [uri1] : [];
+			if (targets.length === 0) {
+				vscode.window.showWarningMessage("Zipper: No files selected");
 				return
 			}
-			let finalDir;
+			const zipPaths = [...new Set(targets.map(u => u.fsPath).map(p => path.resolve(p)))];
+			let finalDirs;
 			await vscode.window.withProgress({
 				location: vscode.ProgressLocation.Notification,
-				title: "Extracting ZIP...",
+				title: zipPaths.length === 1 ? "Extracting ZIP..." : `Extracting ${zipPaths.length} archives...`,
 				cancellable: false
 			}, async () => {
-				const zipPath = uri.fsPath;
-				const baseDir = path.resolve(path.dirname(zipPath));
-				const targetName = path.parse(zipPath).name;
-				let targetDir;
-				[targetDir, finalDir] = tryName(baseDir, targetName);
-				await fs.promises.mkdir(targetDir, {
-					recursive: true
-				});
-				const parser = unzipper.Parse();
-				await new Promise((resolve, reject) => {
-					fs.createReadStream(zipPath).pipe(parser).on("entry", async entry => {
-						try {
-							const {
-								ok,
-								resolvedPath
-							} = testPath(targetDir, entry.path);
-							if (!ok) {
-								reject(new Error(`Zip Slip detected: "${entry.path}"`))
+				finalDirs = await Promise.all(zipPaths.map(async zipPath => {
+					let finalDir;
+					const baseDir = path.resolve(path.dirname(zipPath));
+					const targetName = path.parse(zipPath).name;
+					let targetDir;
+					[targetDir, finalDir] = tryName(baseDir, targetName);
+					await fs.promises.mkdir(targetDir, {
+						recursive: true
+					});
+					const parser = unzipper.Parse();
+					await new Promise((resolve, reject) => {
+						fs.createReadStream(zipPath).pipe(parser).on("entry", async entry => {
+							try {
+								const {
+									ok,
+									resolvedPath
+								} = testPath(targetDir, entry.path);
+								if (!ok) {
+									reject(new Error(`Zip Slip detected: "${entry.path}"`))
+								}
+								if (entry.type === "Directory") {
+									await fs.promises.mkdir(resolvedPath, {
+										recursive: true
+									});
+									entry.autodrain()
+								} else if (entry.type === "File") {
+									await fs.promises.mkdir(path.dirname(resolvedPath), {
+										recursive: true
+									});
+									await pipeline(entry, fs.createWriteStream(resolvedPath))
+								} else {
+									entry.autodrain()
+								}
+							} catch (err) {
+								reject(err)
 							}
-							if (entry.type === "Directory") {
-								await fs.promises.mkdir(resolvedPath, {
-									recursive: true
-								});
-								entry.autodrain()
-							} else if (entry.type === "File") {
-								await fs.promises.mkdir(path.dirname(resolvedPath), {
-									recursive: true
-								});
-								await pipeline(entry, fs.createWriteStream(resolvedPath))
-							} else {
-								entry.autodrain()
-							}
-						} catch (err) {
-							reject(err)
-						}
-					}).once("close", resolve).once("error", reject)
-				})
+						}).once("close", resolve).once("error", reject)
+					});
+					return finalDir
+				}))
 			});
-			vscode.window.showInformationMessage(`Zipper: Extracted to "${finalDir}"`)
+			if (finalDirs.length === 1) {
+				vscode.window.showInformationMessage(`Zipper: Extracted to "${finalDirs[0]}"`)
+			} else {
+				const listed = finalDirs.slice(0, 5).map(d => `"${d}"`).join(", ");
+				const suffix = finalDirs.length > 5 ? `, … (+${finalDirs.length - 5} more)` : "";
+				vscode.window.showInformationMessage(`Zipper: Extracted ${finalDirs.length} archives: ${listed}${suffix}`)
+			}
 		} catch (e) {
 			vscode.window.showErrorMessage(e.message || String(e));
 			console.error(e);
