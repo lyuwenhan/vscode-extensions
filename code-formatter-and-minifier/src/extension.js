@@ -566,23 +566,26 @@ function activate(context) {
 				}
 				let NC = false,
 					suc = false;
-				await Promise.all(docs.map(async doc => {
-					const {
-						lang,
-						content
-					} = getDocInfo(doc);
-					const actByLang = opers[lang];
-					if (!actByLang) {
-						return
-					}
-					let result = await runAction(actByLang, content) + "\n";
-					if (content === result) {
-						NC = true;
-						return
-					}
-					await saveDocContent(doc, result);
-					suc = true
-				}));
+				while (docs.length > 0) {
+					const batch = docs.splice(0, 100);
+					await Promise.all(batch.map(async doc => {
+						const {
+							lang,
+							content
+						} = getDocInfo(doc);
+						const actByLang = opers[lang];
+						if (!actByLang) {
+							return
+						}
+						let result = await runAction(actByLang, content) + "\n";
+						if (content === result) {
+							NC = true;
+							return
+						}
+						await saveDocContent(doc, result);
+						suc = true
+					}))
+				}
 				if (suc) {
 					vscode.window.showInformationMessage(sucMsg + " successfully.")
 				} else if (NC) {
