@@ -566,9 +566,13 @@ function activate(context) {
 				}
 				let NC = false,
 					suc = false;
-				while (docs.length > 0) {
-					const batch = docs.splice(0, 100);
-					await Promise.all(batch.map(async doc => {
+				while (uris.length > 0) {
+					const batch = uris.splice(0, 100);
+					await Promise.all(batch.map(async uri => {
+						const doc = await getDoc(uri);
+						if (!doc) {
+							return
+						}
 						const {
 							lang,
 							content
