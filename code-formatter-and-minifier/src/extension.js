@@ -419,6 +419,12 @@ async function getDoc(uri) {
 	return found
 }
 async function expandUriToFileUris(uri) {
+	if (!uri) {
+		return []
+	}
+	if (uri.scheme === "untitled") {
+		return [uri]
+	}
 	try {
 		const stat = await vscode.workspace.fs.stat(uri);
 		if ((stat.type & vscode.FileType.File) !== 0) {
@@ -557,7 +563,7 @@ function activate(context) {
 				let uris = await uniqueFileUrisFromUris(Array.isArray(selectedUris) && selectedUris.length > 0 ? selectedUris : uri ? [uri] : []);
 				const docs = (await Promise.all(uris.map(getDoc))).filter(Boolean);
 				if (!docs.length) {
-					if (selectedUris.length || uri) {
+					if (selectedUris?.length || uri) {
 						vscode.window.showWarningMessage(actionName + ": Nothing changed.")
 					} else {
 						vscode.window.showErrorMessage(actionName + ": No file selected.")
