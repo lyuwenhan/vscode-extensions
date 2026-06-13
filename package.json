@@ -12,7 +12,7 @@
 	"homepage": "https://lyuwenhan.github.io",
 	"devDependencies": {
 		"@vscode/vsce": "^3.7.0",
-		"esbuild": "^0.25.10",
+		"esbuild": "^0.28.1",
 		"ovsx": "^0.10.6"
 	}
 }

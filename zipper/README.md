@@ -39,15 +39,15 @@ Zipper provides a **read-only archive preview** inside VS Code, allowing you to 
 
 ![Demo](https://lyuwenhan.github.io/extensions/vscode/data/assets/zipper/images/4.png)
 
-### 4. Download a Single File or Folder
+### 4. Extract a Single File or Folder
 
 From the ZIP preview, you can select **one file or one folder** and extract it locally.
 
-> "Download" refers to extracting the selected item to disk.
+> "Extract" refers to extracting the selected item to disk.
 
 ![Demo](https://lyuwenhan.github.io/extensions/vscode/data/assets/zipper/images/5.png)
 
-### 5. Download Multiple Files and Folders
+### 5. Extract Multiple Files and Folders
 
 You can select **multiple files and folders** in the preview and extract them together.
 

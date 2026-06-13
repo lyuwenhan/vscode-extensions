@@ -2,6 +2,7 @@
 const titleEle = document.getElementById("title");
 const mainEle = document.getElementById("main");
 const relEle = document.getElementById("rel");
+const extrEle = document.getElementById("extr");
 const dmfEle = document.getElementById("dmf");
 const ddmfEle = document.getElementById("ddmf");
 dmfEle.addEventListener("click", () => {
@@ -48,7 +49,7 @@ vscode.postMessage({
 
 function extractFile(files) {
 	vscode.postMessage({
-		type: "download",
+		type: "extract",
 		files
 	})
 }
@@ -71,6 +72,11 @@ relEle.addEventListener("click", () => {
 	startLoading();
 	vscode.postMessage({
 		type: "reload"
+	})
+});
+extrEle.addEventListener("click", () => {
+	vscode.postMessage({
+		type: "extractAll"
 	})
 });
 ddmfEle.addEventListener("click", () => {
@@ -263,7 +269,7 @@ function displayTree(tree) {
 
 	function getSpan(name, size, needChk, path, files) {
 		const span = document.createElement("span");
-		span.classList.add("downloadFa");
+		span.classList.add("extractFa");
 		const spanL = document.createElement("span");
 		const aR = document.createElement("a");
 		const cho = document.createElement("label");
@@ -276,8 +282,8 @@ function displayTree(tree) {
 		spanL.innerText = `${name} (${formatSize(size)})`;
 		spanL.title = size + "B";
 		aR.href = "#";
-		aR.innerText = "Download";
-		aR.classList.add("download");
+		aR.innerText = "Extract";
+		aR.classList.add("extract");
 		aR.addEventListener("click", () => {
 			extractFile(files)
 		});
@@ -298,7 +304,7 @@ function displayTree(tree) {
 		if (!ent.length && !node.files.length) {
 			const li = document.createElement("li");
 			const span = document.createElement("span");
-			span.classList.add("downloadFa");
+			span.classList.add("extractFa");
 			span.classList.add("emptyDir");
 			span.innerText = "This directory is empty.";
 			li.append(span);
@@ -452,7 +458,7 @@ function showEdit() {
 
 	function getSpan(name, size) {
 		const span = document.createElement("span");
-		span.classList.add("downloadFa");
+		span.classList.add("extractFa");
 		const spanL = document.createElement("span");
 		if (typeof size === "number") {
 			spanL.innerText = `${name} (${formatSize(size)})`;

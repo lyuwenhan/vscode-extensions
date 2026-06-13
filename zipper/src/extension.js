@@ -425,6 +425,28 @@ async function handleUploadSelection(document, uris) {
 	}
 	return result
 }
+async function buildExtractAllTargetFiles(document) {
+	const structure = await document.getStructure();
+	const folders = [];
+	const files = [];
+	for (let i = 0; i < structure.length; i++) {
+		const item = structure[i];
+		if (!item || !item.path) {
+			continue
+		}
+		if (item.type === "Directory") {
+			folders.push(item.path)
+		} else if (item.type === "File") {
+			files.push(i)
+		}
+	}
+	return {
+		rootPath: "",
+		folderName: document.fileNameOnly,
+		folders,
+		files
+	}
+}
 class ZipPreviewEditor {
 	constructor(context) {
 		this.context = context
@@ -448,7 +470,7 @@ class ZipPreviewEditor {
 	getHtml(webview) {
 		const maincss = webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, "docs", "main.css")));
 		const mainjs = webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, "docs", "main.js")));
-		return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="${maincss}"></head><body><h2 id="title">ZIP preview</h2><div id="panel" class="buttons"><button id="rel">Reload</button><button id="edit" class="hid">Edit</button><button id="dmf" class="hid">Download multiple files</button><button id="ddmf" class="hid">Download</button></div><div id="main">loading</div><div id="editArea"></div><script src="${mainjs}"><\/script></body></html>`
+		return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="${maincss}"></head><body><h2 id="title">ZIP preview</h2><div id="panel" class="buttons"><button id="rel">Reload</button><button id="edit" class="hid">Edit</button><button id="extr" class="hid">Extract all files</button><button id="dmf" class="hid">Extract multiple files</button><button id="ddmf" class="hid">Extract</button></div><div id="main">loading</div><div id="editArea"></div><script src="${mainjs}"><\/script></body></html>`
 	}
 	activateMessageListener(webview, document) {
 		const showErr = e => {
@@ -473,8 +495,13 @@ class ZipPreviewEditor {
 						});
 						break
 					}
-					case "download": {
+					case "extract": {
 						await document.extractFiles(message.files);
+						break
+					}
+					case "extractAll": {
+						const targetFiles = await buildExtractAllTargetFiles(document);
+						await document.extractFiles(targetFiles);
 						break
 					}
 					case "repack": {
@@ -785,7 +812,7 @@ function activate(context) {
 				vscode.window.showInformationMessage(`Zipper: Extracted to "${finalDirs[0]}"`)
 			} else {
 				const listed = finalDirs.slice(0, 5).map(d => `"${d}"`).join(", ");
-				const suffix = finalDirs.length > 5 ? `, … (+${finalDirs.length - 5} more)` : "";
+				const suffix = finalDirs.length > 5 ? `, … (+${finalDirs.length-5} more)` : "";
 				vscode.window.showInformationMessage(`Zipper: Extracted ${finalDirs.length} archives: ${listed}${suffix}`)
 			}
 		} catch (e) {
