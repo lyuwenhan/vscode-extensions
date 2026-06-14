@@ -140,5 +140,9 @@
 		"beautify": {
 			"indent": "\t"
 		}
-	}
+	},
+	"excludedDirs": [
+		"node_modules",
+		".git"
+	]
 }

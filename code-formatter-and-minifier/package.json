@@ -401,7 +401,11 @@
 							"beautify": {
 								"indent": "\t"
 							}
-						}
+						},
+						"excludedDirs": [
+							"node_modules",
+							".git"
+						]
 					},
 					"description": "Formatter and Minifier Settings.",
 					"required": [
@@ -546,6 +550,13 @@
 								"beautify"
 							],
 							"additionalProperties": false
+						},
+						"excludedDirs": {
+							"type": "array",
+							"description": "List of directories to exclude from minification and beautification.",
+							"items": {
+								"type": "string"
+							}
 						}
 					}
 				}

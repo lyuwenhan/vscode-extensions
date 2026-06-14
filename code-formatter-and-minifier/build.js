@@ -169,6 +169,13 @@ const ret = {
 						},
 						required: ["minify", "jsonLMinify", "beautify"],
 						additionalProperties: false
+					},
+					excludedDirs: {
+						type: "array",
+						description: "List of directories to exclude from minification and beautification.",
+						items: {
+							type: "string"
+						}
 					}
 				}
 			}

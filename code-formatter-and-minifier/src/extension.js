@@ -2,6 +2,7 @@ const vscode = require("vscode");
 const {
 	randomUUID
 } = require("crypto");
+const path = require("path");
 const htmlMinify = require("html-minifier-terser").minify;
 const postcss = require("postcss");
 const cssnano = require("cssnano");
@@ -92,7 +93,8 @@ function readSettings() {
 				...oldOpts.json.beautify,
 				...toJson(settings.json?.beautify)
 			}
-		}
+		},
+		excludedDirs: Array.isArray(settings.excludedDirs) ? settings.excludedDirs.filter(e => typeof e === "string") : []
 	};
 	opts = newOpts
 }
@@ -422,15 +424,16 @@ async function expandUriToFileUris(uri) {
 	if (!uri) {
 		return []
 	}
-	if (uri.scheme === "untitled") {
-		return [uri]
-	}
+	console.log(uri.fsPath);
 	try {
 		const stat = await vscode.workspace.fs.stat(uri);
 		if ((stat.type & vscode.FileType.File) !== 0) {
 			return [uri]
 		}
 		if ((stat.type & vscode.FileType.Directory) !== 0) {
+			if (opts.excludedDirs.includes(path.basename(uri.fsPath))) {
+				return []
+			}
 			const out = [];
 			const entries = await vscode.workspace.fs.readDirectory(uri);
 			for (const [name] of entries) {
