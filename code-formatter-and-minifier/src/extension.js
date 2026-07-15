@@ -574,7 +574,8 @@ const actions = {
 			json: beautifyJson,
 			jsonl: beautifyJsonL,
 			html: mitifyHtml,
-			css: mitifyCss
+			css: mitifyCss,
+			java: beautifyJava
 		}
 	},
 	sort: {
