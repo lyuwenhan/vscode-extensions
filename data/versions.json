@@ -70,7 +70,8 @@
 			"1.1.26",
 			"1.1.27",
 			"1.1.28",
-			"1.1.29"
+			"1.1.29",
+			"1.1.30"
 		],
 		"hasIcon": true,
 		"displayName": "Code Formatter & Minifier",
