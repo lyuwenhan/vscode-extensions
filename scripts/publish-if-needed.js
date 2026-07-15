@@ -50,7 +50,7 @@ if (fs.existsSync(versionsPath)) {
 }
 const defaultStatus = {
 	needsUpdate: false,
-	withPack: false,
+	withoutPack: false,
 	majorUp: false,
 	minorUp: false,
 	useVersion: null
@@ -61,6 +61,7 @@ const dirs = fs.readdirSync(root).filter(d => !excluded.includes(d) && fs.exists
 	let hasError = false;
 	for (const dir of dirs) {
 		let oldPkg = {};
+		let hasIcon = false;
 		console.log(`Loading files in ${dir}...`);
 		const extensionsDir = path.join(assetsDir, dir);
 		fs.mkdirSync(extensionsDir, {
@@ -68,6 +69,7 @@ const dirs = fs.readdirSync(root).filter(d => !excluded.includes(d) && fs.exists
 		});
 		const extPath = path.join(root, dir);
 		const statusPath = path.join(extPath, "status.json");
+		const pkgFile = path.join(extPath, "package.json");
 		let status = {};
 		try {
 			try {
@@ -77,11 +79,10 @@ const dirs = fs.readdirSync(root).filter(d => !excluded.includes(d) && fs.exists
 			}
 			if (status.needsUpdate) {
 				console.log(`Building & publishing ${dir}...`);
-				const pkgFile = path.join(extPath, "package.json");
 				const pkg = JSON.parse(fs.readFileSync(pkgFile, "utf8"));
 				oldPkg = JSON.parse(JSON.stringify(pkg));
 				const [major, minor, patch] = pkg.version.split(".").map(Number);
-				if (status.withPack) {
+				if (!status.withoutPack) {
 					if (status.useVersion && typeof status.useVersion === "string") {
 						pkg.version = status.useVersion;
 						console.log(`Version set manually to ${pkg.version}`)
@@ -96,7 +97,7 @@ const dirs = fs.readdirSync(root).filter(d => !excluded.includes(d) && fs.exists
 						console.log(`Patch version bumped to ${pkg.version}`)
 					}
 					fs.writeFileSync(pkgFile, JSON.stringify(pkg, null, "\t") + "\n");
-					execSync(`npm install`, {
+					execSync("npm install", {
 						cwd: extPath,
 						stdio: "inherit"
 					});
@@ -161,7 +162,7 @@ const dirs = fs.readdirSync(root).filter(d => !excluded.includes(d) && fs.exists
 				if (!versions[dir]) {
 					console.log(`New extension detected: ${dir}`);
 					versions[dir] = {
-						versions: [version],
+						versions: !status.withoutPack ? [version] : [],
 						hasIcon,
 						displayName,
 						description,
@@ -170,7 +171,7 @@ const dirs = fs.readdirSync(root).filter(d => !excluded.includes(d) && fs.exists
 				} else {
 					const v = versions[dir].versions ?? [];
 					versions[dir] = {
-						versions: status.withPack ? v.at(-1) === version ? v : [...v, version] : v,
+						versions: !status.withoutPack ? v.at(-1) === version ? v : [...v, version] : v,
 						hasIcon: hasIcon ?? versions[dir].hasIcon,
 						displayName: displayName ?? versions[dir].displayName,
 						description: description ?? versions[dir].description,
@@ -187,7 +188,7 @@ const dirs = fs.readdirSync(root).filter(d => !excluded.includes(d) && fs.exists
 			console.error(`Failed to publish ${dir}: ${err.message}`);
 			console.error(err.stack);
 			fs.writeFileSync(pkgFile, JSON.stringify(oldPkg, null, "\t") + "\n");
-			execSync(`npm install`, {
+			execSync("npm install", {
 				cwd: extPath,
 				stdio: "inherit"
 			})
