@@ -546,8 +546,8 @@ These are the built-in defaults used by the extension:
 * Invalid or non-object values are ignored safely.
 * Missing sections are auto-filled using defaults.
 * Settings take effect immediately.
-* Java beautification uses the bundled `google-java-format` jar when `java.beautify.jarPath` is empty.
-* Set `java.beautify.jarPath` only when you want to force an external `google-java-format` jar.
+* Java beautification uses the bundled `google-java-format` jar when `java.beautify.overrideJarPath` is empty.
+* Set `java.beautify.overrideJarPath` only when you want to force an external `google-java-format` jar.
 
 ---
 
