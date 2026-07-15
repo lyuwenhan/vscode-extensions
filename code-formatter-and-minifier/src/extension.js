@@ -612,6 +612,14 @@ async function runAction(oper, content) {
 	return (await oper(content)).trim()
 }
 
+function withActionProgress(title, task) {
+	return vscode.window.withProgress({
+		location: vscode.ProgressLocation.Notification,
+		title,
+		cancellable: false
+	}, task)
+}
+
 function activate(context) {
 	bundledGoogleJavaFormatJarPath = context.asAbsolutePath(path.join("vendor", "google-java-format-1.35.0-all-deps.jar"));
 	Object.entries(actions).forEach(([action, {
@@ -636,30 +644,32 @@ function activate(context) {
 				}
 				let NC = false,
 					suc = false;
-				while (uris.length > 0) {
-					const batch = uris.splice(0, 100);
-					await Promise.all(batch.map(async uri => {
-						const doc = await getDoc(uri);
-						if (!doc) {
-							return
-						}
-						const {
-							lang,
-							content
-						} = getDocInfo(doc);
-						const actByLang = opers[lang];
-						if (!actByLang) {
-							return
-						}
-						let result = await runAction(actByLang, content) + "\n";
-						if (content === result) {
-							NC = true;
-							return
-						}
-						await saveDocContent(doc, result);
-						suc = true
-					}))
-				}
+				await withActionProgress(actionName + ": Processing files", async () => {
+					while (uris.length > 0) {
+						const batch = uris.splice(0, 100);
+						await Promise.all(batch.map(async uri => {
+							const doc = await getDoc(uri);
+							if (!doc) {
+								return
+							}
+							const {
+								lang,
+								content
+							} = getDocInfo(doc);
+							const actByLang = opers[lang];
+							if (!actByLang) {
+								return
+							}
+							let result = await runAction(actByLang, content) + "\n";
+							if (content === result) {
+								NC = true;
+								return
+							}
+							await saveDocContent(doc, result);
+							suc = true
+						}))
+					}
+				});
 				if (suc) {
 					vscode.window.showInformationMessage(sucMsg + " successfully.")
 				} else if (NC) {
@@ -693,16 +703,18 @@ function activate(context) {
 					vscode.window.showErrorMessage("Invalid file type.");
 					return
 				}
-				for (const sel of sels) {
-					const content = editor.document.getText(sel);
-					let result = await runAction(actByLang, content);
-					if (content !== result) {
-						replacements.push({
-							sel,
-							result
-						})
+				await withActionProgress(actionName + ": Processing selection", async () => {
+					for (const sel of sels) {
+						const content = editor.document.getText(sel);
+						let result = await runAction(actByLang, content);
+						if (content !== result) {
+							replacements.push({
+								sel,
+								result
+							})
+						}
 					}
-				}
+				});
 				if (!replacements.length) {
 					vscode.window.showWarningMessage(actionName + ": Nothing changed.");
 					return
@@ -753,16 +765,18 @@ function activate(context) {
 				return
 			}
 			const replacements = [];
-			for (const sel of sels) {
-				const content = editor.document.getText(sel);
-				let result = await runAction(actByLang, content);
-				if (content !== result) {
-					replacements.push({
-						sel,
-						result
-					})
+			await withActionProgress(actionName + ": Processing selection", async () => {
+				for (const sel of sels) {
+					const content = editor.document.getText(sel);
+					let result = await runAction(actByLang, content);
+					if (content !== result) {
+						replacements.push({
+							sel,
+							result
+						})
+					}
 				}
-			}
+			});
 			if (!replacements.length) {
 				vscode.window.showWarningMessage(actionName + ": Nothing changed.");
 				return
@@ -780,7 +794,7 @@ function activate(context) {
 			const {
 				content
 			} = getDocInfo(doc);
-			let result = await runAction(actByLang, content) + "\n";
+			let result = await withActionProgress(actionName + ": Processing file", async () => await runAction(actByLang, content) + "\n");
 			if (content === result) {
 				vscode.window.showWarningMessage(actionName + ": Nothing changed.");
 				return
