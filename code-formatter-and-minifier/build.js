@@ -5,7 +5,8 @@ const content = fs.readFileSync("package.json", "utf8");
 const pkg = jsonc.parse(content);
 const rid = {
 	jsBeautify: "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript",
-	jsons: "resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
+	jsons: "resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl",
+	java: "resourceLangId == java"
 };
 const contr = [{
 	command: "minify",
@@ -14,7 +15,7 @@ const contr = [{
 }, {
 	command: "beautify",
 	title: "Beautify",
-	when: [true, ["jsBeautify", "jsons"]]
+	when: [true, ["jsBeautify", "jsons", "java"]]
 }, {
 	command: "mitify",
 	title: "Mitify",
@@ -168,6 +169,47 @@ const ret = {
 							}
 						},
 						required: ["minify", "jsonLMinify", "beautify"],
+						additionalProperties: false
+					},
+					java: {
+						type: "object",
+						description: "Options for java beautify.",
+						properties: {
+							beautify: {
+								type: "object",
+								description: "Options for Google Java Format.",
+								properties: {
+									overrideJarPath: {
+										type: "string",
+										default: "",
+										description: "Path to google-java-format all-deps jar."
+									},
+									javaPath: {
+										type: "string",
+										default: "java",
+										description: "Path to java executable."
+									},
+									skipRemovingUnusedImports: {
+										type: "boolean",
+										default: true,
+										description: "Do not remove unused imports."
+									},
+									skipSortingImports: {
+										type: "boolean",
+										default: false,
+										description: "Do not sort imports."
+									},
+									aosp: {
+										type: "boolean",
+										default: false,
+										description: "Use AOSP style."
+									}
+								},
+								required: ["overrideJarPath", "javaPath", "skipRemovingUnusedImports", "skipSortingImports", "aosp"],
+								additionalProperties: false
+							}
+						},
+						required: ["beautify"],
 						additionalProperties: false
 					},
 					excludedDirs: {

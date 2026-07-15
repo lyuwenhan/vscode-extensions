@@ -141,8 +141,21 @@
 			"indent": "\t"
 		}
 	},
+	"java": {
+		"beautify": {
+			"overrideJarPath": "",
+			"javaPath": "java",
+			"skipRemovingUnusedImports": false,
+			"skipSortingImports": false,
+			"aosp": true
+		}
+	},
 	"excludedDirs": [
 		"node_modules",
-		".git"
+		".git",
+		"run",
+		"build",
+		"gradle",
+		".gradle"
 	]
 }

@@ -13,6 +13,7 @@ For each language, the table below shows whether the action is supported.
 |**TypeScript**|✔|✔|✔|✖|✖|✖|
 |**HTML**|✔|✔|✔|✖|✖|✖|
 |**CSS**|✔|✔|✔|✖|✖|✖|
+|**Java**|✖|✔|✖|✖|✖|✖|
 |**JSON / JSONC**|✔|✔|✖|✔|✔|✔|
 |**JSON Lines**|✔|✔|✖|✔|✔|✔|
 
@@ -213,7 +214,7 @@ After (sort by price)
 - You will be prompted twice:
 
 1. Select the **action**
-2. Select the **language** (**JavaScript**, **HTML**, **CSS**, **JSON**, **JSON Lines**)
+2. Select the **language** (**JavaScript**, **TypeScript**, **Java**, **HTML**, **CSS**, **JSON**, **JSON Lines**)
 
 - This provides full manual control, allowing any supported operation to be executed using any supported processor. Works with entire files and selected text.
 
@@ -224,7 +225,7 @@ After (sort by price)
 
 1. Open any file in VS Code.
    - For formatting-related actions, the file should be one of:
-     `.js`, `.ts`, `.json`, `.jsonc`, `.jsonl`, `.html`, `.css`.
+     `.js`, `.ts`, `.java`, `.json`, `.jsonc`, `.jsonl`, `.html`, `.css`.
 
 2. Right-click inside the editor.
 
@@ -253,7 +254,7 @@ After (sort by price)
 
 # Formatter & Minifier Settings
 
-This extension provides a **customizable configuration system** for controlling formatter and minifier behavior for **JavaScript**, **HTML**, and **CSS**.
+This extension provides a **customizable configuration system** for controlling formatter and minifier behavior for **JavaScript**, **TypeScript**, **Java**, **HTML**, **CSS**, **JSON**, and **JSON Lines**.
 All fields are optional — missing values automatically fall back to the built-in defaults.
 
 ---
@@ -317,7 +318,12 @@ Minifier: Code Setting
             "beautify": {
 				/* beautify options */
             }
-        }
+        },
+		"java": {
+			"beautify": {
+				/* Google Java Format options */
+			}
+		}
 	}
 }
 ```
@@ -461,7 +467,24 @@ These are the built-in defaults used by the extension:
 			"beautify": {
 				"indent": "\t"
 			}
-		}
+		},
+		"java": {
+			"beautify": {
+				"overrideJarPath": "",
+				"javaPath": "java",
+				"skipRemovingUnusedImports": false,
+				"skipSortingImports": false,
+				"aosp": true
+			}
+		},
+		"excludedDirs": [
+			"node_modules",
+			".git",
+			"run",
+			"build",
+			"gradle",
+			".gradle"
+		]
 	}
 }
 ```
@@ -495,7 +518,24 @@ These are the built-in defaults used by the extension:
 		"beautify": {
 			"indent": 2
 		}
-	}
+	},
+	"java": {
+		"beautify": {
+			"overrideJarPath": "",
+			"javaPath": "java",
+			"skipRemovingUnusedImports": false,
+			"skipSortingImports": false,
+			"aosp": true
+		}
+	},
+	"excludedDirs": [
+		"node_modules",
+		".git",
+		"run",
+		"build",
+		"gradle",
+		".gradle"
+	]
 }
 ```
 
@@ -506,6 +546,8 @@ These are the built-in defaults used by the extension:
 * Invalid or non-object values are ignored safely.
 * Missing sections are auto-filled using defaults.
 * Settings take effect immediately.
+* Java beautification uses the bundled `google-java-format` jar when `java.beautify.jarPath` is empty.
+* Set `java.beautify.jarPath` only when you want to force an external `google-java-format` jar.
 
 ---
 
@@ -525,6 +567,7 @@ The configuration system allows you to:
 - **CSS** minification uses [cssnano](https://github.com/cssnano/cssnano), [postcss](https://github.com/postcss/postcss), and [clean-css](https://github.com/jakubpawlowicz/clean-css).
 - **JavaScript**, **HTML**, **CSS** beautification uses [js-beautify](https://github.com/beautify-web/js-beautify).
 - **TypeScript** beautification first pretty-prints with [@babel/parser](https://github.com/babel/babel/tree/main/packages/babel-parser) + [@babel/generator](https://github.com/babel/babel/tree/main/packages/babel-generator) (`compact: false`) so minified or single-line code is split across lines, then applies the [typescript](https://github.com/microsoft/TypeScript) formatter (`LanguageService.getFormattingEditsForDocument`) for spacing — same engine as VS Code's built-in TypeScript formatter on the expanded source.
+- **Java** beautification uses the bundled `google-java-format` jar and runs it through the configured Java executable.
 - **JSON** parsing uses [jsonc-parser](https://github.com/microsoft/node-jsonc-parser).
 - **JSON Lines** parsing uses [jsonparse](https://github.com/creationix/jsonparse).
 - **JSON** and **JSON Lines** stringification uses native `JSON.stringify`.
@@ -536,4 +579,5 @@ The configuration system allows you to:
 - All edit operations automatically save the document (unless untitled).
 - Both `LF (\n)` and `CRLF (\r\n)` line endings are supported.
 - Works with multiple selections.
+- Java formatting requires a working Java runtime.
 - Displays success, warning, and error messages consistently.

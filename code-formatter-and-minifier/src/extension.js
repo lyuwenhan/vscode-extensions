@@ -2,6 +2,9 @@ const vscode = require("vscode");
 const {
 	randomUUID
 } = require("crypto");
+const {
+	spawn
+} = require("child_process");
 const path = require("path");
 const htmlMinify = require("html-minifier-terser").minify;
 const postcss = require("postcss");
@@ -19,6 +22,7 @@ let cleanCSSRunner = new cleanCSS({
 	level: 2
 });
 let opts = oldOpts;
+let bundledGoogleJavaFormatJarPath = "";
 
 function toJson(input) {
 	return Object.prototype.toString.call(input) === "[object Object]" ? input : {}
@@ -92,6 +96,12 @@ function readSettings() {
 			beautify: {
 				...oldOpts.json.beautify,
 				...toJson(settings.json?.beautify)
+			}
+		},
+		java: {
+			beautify: {
+				...oldOpts.java.beautify,
+				...toJson(settings.java?.beautify)
 			}
 		},
 		excludedDirs: Array.isArray(settings.excludedDirs) ? settings.excludedDirs.filter(e => typeof e === "string") : []
@@ -400,6 +410,53 @@ async function sortListByKeyJsonL(content) {
 	const isD = await getAD();
 	return sortArrayByKey(parseJsonL(content), key, isD).map(jsonStringify).join("\n")
 }
+
+function beautifyJava(content) {
+	return new Promise((resolve, reject) => {
+		const overrideBundledJarPath = opts.java.beautify.overrideJarPath;
+		const jarPath = overrideBundledJarPath || bundledGoogleJavaFormatJarPath;
+		const javaPath = opts.java.beautify.javaPath || "java";
+		const skipRemovingUnusedImports = opts.java.beautify.skipRemovingUnusedImports === true;
+		const skipSortingImports = opts.java.beautify.skipSortingImports === true;
+		const aosp = opts.java.beautify.aosp === true;
+		if (!jarPath) {
+			reject(new Error("jarPath is not configured."));
+			return
+		}
+		const args = ["-jar", jarPath];
+		if (skipRemovingUnusedImports) {
+			args.push("--skip-removing-unused-imports")
+		}
+		if (skipSortingImports) {
+			args.push("--skip-sorting-imports")
+		}
+		if (aosp) {
+			args.push("--aosp")
+		}
+		args.push("-");
+		const process = spawn(javaPath, args);
+		let stdout = "";
+		let stderr = "";
+		process.stdout.on("data", data => {
+			stdout += data.toString()
+		});
+		process.stderr.on("data", data => {
+			stderr += data.toString()
+		});
+		process.on("error", error => {
+			reject(error)
+		});
+		process.on("close", code => {
+			if (code !== 0) {
+				reject(new Error(stderr || "google-java-format failed."));
+				return
+			}
+			resolve(stdout)
+		});
+		process.stdin.write(content);
+		process.stdin.end()
+	})
+}
 async function getDoc(uri) {
 	if (!uri || !uri.fsPath) {
 		return vscode.window.activeTextEditor?.document
@@ -424,7 +481,9 @@ async function expandUriToFileUris(uri) {
 	if (!uri) {
 		return []
 	}
-	console.log(uri.fsPath);
+	if (uri.scheme === "untitled") {
+		return [uri]
+	}
 	try {
 		const stat = await vscode.workspace.fs.stat(uri);
 		if ((stat.type & vscode.FileType.File) !== 0) {
@@ -502,7 +561,8 @@ const actions = {
 			json: beautifyJson,
 			jsonl: beautifyJsonL,
 			html: beautifyHtml,
-			css: beautifyCss
+			css: beautifyCss,
+			java: beautifyJava
 		}
 	},
 	mitify: {
@@ -553,6 +613,7 @@ async function runAction(oper, content) {
 }
 
 function activate(context) {
+	bundledGoogleJavaFormatJarPath = context.asAbsolutePath(path.join("vendor", "google-java-format-1.35.0-all-deps.jar"));
 	Object.entries(actions).forEach(([action, {
 		sucMsg,
 		actionName,

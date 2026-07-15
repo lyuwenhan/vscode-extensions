@@ -160,7 +160,7 @@
 				{
 					"group": "navigation@95",
 					"command": "minifier.beautifySel",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && editorHasSelection && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl || resourceLangId == java)"
 				},
 				{
 					"group": "navigation@96",
@@ -175,7 +175,7 @@
 				{
 					"group": "navigation@98",
 					"command": "minifier.beautify",
-					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl)"
+					"when": "editorTextFocus && (resourceScheme == 'file' || resourceScheme == 'untitled') && !editorHasSelection && (resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl || resourceLangId == java)"
 				},
 				{
 					"group": "navigation@99",
@@ -190,7 +190,7 @@
 				},
 				{
 					"command": "minifier.beautifySel",
-					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
+					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl || resourceLangId == java"
 				},
 				{
 					"command": "minifier.mitifySel",
@@ -202,7 +202,7 @@
 				},
 				{
 					"command": "minifier.beautify",
-					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
+					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl || resourceLangId == java"
 				},
 				{
 					"command": "minifier.mitify",
@@ -218,7 +218,7 @@
 				{
 					"group": "navigation@98",
 					"command": "minifier.beautify",
-					"when": "explorerResourceIsFolder || resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
+					"when": "explorerResourceIsFolder || resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl || resourceLangId == java"
 				},
 				{
 					"group": "navigation@99",
@@ -235,7 +235,7 @@
 				{
 					"group": "navigation@98",
 					"command": "minifier.beautify",
-					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl"
+					"when": "resourceLangId == javascript || resourceLangId == html || resourceLangId == css || resourceLangId == typescript || resourceLangId == json || resourceLangId == jsonc || resourceLangId == jsonl || resourceLangId == java"
 				},
 				{
 					"group": "navigation@99",
@@ -402,9 +402,22 @@
 								"indent": "\t"
 							}
 						},
+						"java": {
+							"beautify": {
+								"overrideJarPath": "",
+								"javaPath": "java",
+								"skipRemovingUnusedImports": false,
+								"skipSortingImports": false,
+								"aosp": true
+							}
+						},
 						"excludedDirs": [
 							"node_modules",
-							".git"
+							".git",
+							"run",
+							"build",
+							"gradle",
+							".gradle"
 						]
 					},
 					"description": "Formatter and Minifier Settings.",
@@ -547,6 +560,55 @@
 							"required": [
 								"minify",
 								"jsonLMinify",
+								"beautify"
+							],
+							"additionalProperties": false
+						},
+						"java": {
+							"type": "object",
+							"description": "Options for java beautify.",
+							"properties": {
+								"beautify": {
+									"type": "object",
+									"description": "Options for Google Java Format.",
+									"properties": {
+										"overrideJarPath": {
+											"type": "string",
+											"default": "",
+											"description": "Path to google-java-format all-deps jar."
+										},
+										"javaPath": {
+											"type": "string",
+											"default": "java",
+											"description": "Path to java executable."
+										},
+										"skipRemovingUnusedImports": {
+											"type": "boolean",
+											"default": true,
+											"description": "Do not remove unused imports."
+										},
+										"skipSortingImports": {
+											"type": "boolean",
+											"default": false,
+											"description": "Do not sort imports."
+										},
+										"aosp": {
+											"type": "boolean",
+											"default": false,
+											"description": "Use AOSP style."
+										}
+									},
+									"required": [
+										"overrideJarPath",
+										"javaPath",
+										"skipRemovingUnusedImports",
+										"skipSortingImports",
+										"aosp"
+									],
+									"additionalProperties": false
+								}
+							},
+							"required": [
 								"beautify"
 							],
 							"additionalProperties": false
