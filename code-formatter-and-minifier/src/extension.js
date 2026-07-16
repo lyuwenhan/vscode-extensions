@@ -669,7 +669,10 @@ function activate(context) {
 							if (!actByLang) {
 								return
 							}
-							let result = await runAction(actByLang, content) + "\n";
+							let result = await runAction(actByLang, content);
+							if (result) {
+								result += "\n"
+							}
 							if (content === result) {
 								NC = true;
 								return
@@ -856,7 +859,38 @@ function activate(context) {
 			}
 		})
 	});
-	context.subscriptions.push(generateUuidCmd)
+	context.subscriptions.push(generateUuidCmd);
+	const supportedLanguages = [...new Set(["jsonc", ...Object.values(actions).flatMap(action => Object.keys(action.opers))])];
+	context.subscriptions.push(...supportedLanguages.map(language => vscode.languages.registerDocumentFormattingEditProvider(language, {
+		async provideDocumentFormattingEdits(doc) {
+			try {
+				return withActionProgress("Beautifier: Formatting document", async () => {
+					const {
+						lang,
+						content
+					} = getDocInfo(doc);
+					const actByLang = actions.beautify.opers[lang];
+					if (!actByLang) {
+						return []
+					}
+					let result = await runAction(actByLang, content);
+					if (result) {
+						result += "\n"
+					}
+					if (content === result) {
+						return []
+					}
+					const fullRange = new vscode.Range(doc.positionAt(0), doc.positionAt(doc.getText().length));
+					return [vscode.TextEdit.replace(fullRange, result)]
+				})
+			} catch (error) {
+				vscode.window.showErrorMessage(error.message || String(error));
+				console.error(error);
+				console.error(error.stack);
+				return []
+			}
+		}
+	})))
 }
 
 function deactivate() {}
