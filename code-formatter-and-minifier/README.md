@@ -474,7 +474,8 @@ These are the built-in defaults used by the extension:
 				"javaPath": "java",
 				"skipRemovingUnusedImports": false,
 				"skipSortingImports": false,
-				"aosp": true
+				"aosp": true,
+				"indentWithTabs": true
 			}
 		},
 		"excludedDirs": [
@@ -525,7 +526,8 @@ These are the built-in defaults used by the extension:
 			"javaPath": "java",
 			"skipRemovingUnusedImports": false,
 			"skipSortingImports": false,
-			"aosp": true
+			"aosp": true,
+			"indentWithTabs": false
 		}
 	},
 	"excludedDirs": [

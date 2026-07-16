@@ -419,6 +419,7 @@ function beautifyJava(content) {
 		const skipRemovingUnusedImports = opts.java.beautify.skipRemovingUnusedImports === true;
 		const skipSortingImports = opts.java.beautify.skipSortingImports === true;
 		const aosp = opts.java.beautify.aosp === true;
+		const indentWithTabs = opts.java.beautify.indentWithTabs === true;
 		if (!jarPath) {
 			reject(new Error("jarPath is not configured."));
 			return
@@ -450,6 +451,13 @@ function beautifyJava(content) {
 			if (code !== 0) {
 				reject(new Error(stderr || "google-java-format failed."));
 				return
+			}
+			if (indentWithTabs) {
+				if (aosp) {
+					stdout = stdout.replace(/ {4}/g, "\t")
+				} else {
+					stdout = stdout.replace(/  /g, "\t")
+				}
 			}
 			resolve(stdout)
 		});

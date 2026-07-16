@@ -147,7 +147,8 @@
 			"javaPath": "java",
 			"skipRemovingUnusedImports": false,
 			"skipSortingImports": false,
-			"aosp": true
+			"aosp": true,
+			"indentWithTabs": true
 		}
 	},
 	"excludedDirs": [

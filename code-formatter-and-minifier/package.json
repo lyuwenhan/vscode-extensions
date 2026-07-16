@@ -408,7 +408,8 @@
 								"javaPath": "java",
 								"skipRemovingUnusedImports": false,
 								"skipSortingImports": false,
-								"aosp": true
+								"aosp": true,
+								"indentWithTabs": true
 							}
 						},
 						"excludedDirs": [
@@ -596,6 +597,11 @@
 											"type": "boolean",
 											"default": false,
 											"description": "Use AOSP style."
+										},
+										"indentWithTabs": {
+											"type": "boolean",
+											"default": true,
+											"description": "Indent with tabs."
 										}
 									},
 									"required": [
@@ -603,7 +609,8 @@
 										"javaPath",
 										"skipRemovingUnusedImports",
 										"skipSortingImports",
-										"aosp"
+										"aosp",
+										"indentWithTabs"
 									],
 									"additionalProperties": false
 								}

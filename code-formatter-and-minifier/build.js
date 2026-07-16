@@ -203,9 +203,14 @@ const ret = {
 										type: "boolean",
 										default: false,
 										description: "Use AOSP style."
+									},
+									indentWithTabs: {
+										type: "boolean",
+										default: true,
+										description: "Indent with tabs."
 									}
 								},
-								required: ["overrideJarPath", "javaPath", "skipRemovingUnusedImports", "skipSortingImports", "aosp"],
+								required: ["overrideJarPath", "javaPath", "skipRemovingUnusedImports", "skipSortingImports", "aosp", "indentWithTabs"],
 								additionalProperties: false
 							}
 						},
