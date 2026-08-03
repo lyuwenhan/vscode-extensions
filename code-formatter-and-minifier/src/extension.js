@@ -28,6 +28,24 @@ function toJson(input) {
 	return Object.prototype.toString.call(input) === "[object Object]" ? input : {}
 }
 
+function wildcardMatch(value, pattern) {
+	let source = "^";
+	for (const char of pattern) {
+		if (char === "*") {
+			source += ".*"
+		} else if (char === "?") {
+			source += "."
+		} else {
+			source += char.replace(/[\\^$.*+?()[\]{}|]/g, "\\$&")
+		}
+	}
+	return new RegExp(source + "$").test(value)
+}
+
+function matchesExcludedName(name, patterns) {
+	return patterns.some(pattern => wildcardMatch(name, pattern))
+}
+
 function readSettings() {
 	const config = vscode.workspace.getConfiguration("minifier");
 	const settings = toJson(config.get("codeSetting"));
@@ -104,7 +122,8 @@ function readSettings() {
 				...toJson(settings.java?.beautify)
 			}
 		},
-		excludedDirs: Array.isArray(settings.excludedDirs) ? settings.excludedDirs.filter(e => typeof e === "string") : []
+		excludedDirs: Array.isArray(settings.excludedDirs) ? settings.excludedDirs.filter(e => typeof e === "string") : [],
+		excludedFiles: Array.isArray(settings.excludedFiles) ? settings.excludedFiles.filter(e => typeof e === "string") : []
 	};
 	opts = newOpts
 }
@@ -495,10 +514,13 @@ async function expandUriToFileUris(uri) {
 	try {
 		const stat = await vscode.workspace.fs.stat(uri);
 		if ((stat.type & vscode.FileType.File) !== 0) {
+			if (matchesExcludedName(path.basename(uri.fsPath), opts.excludedFiles)) {
+				return []
+			}
 			return [uri]
 		}
 		if ((stat.type & vscode.FileType.Directory) !== 0) {
-			if (opts.excludedDirs.includes(path.basename(uri.fsPath))) {
+			if (matchesExcludedName(path.basename(uri.fsPath), opts.excludedDirs)) {
 				return []
 			}
 			const out = [];

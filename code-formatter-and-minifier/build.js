@@ -58,7 +58,7 @@ const ret = {
 				type: "object",
 				default: require("./src/lib/default-setting.json"),
 				description: "Formatter and Minifier Settings.",
-				required: ["javascript", "typescript", "html", "css"],
+				required: ["javascript", "typescript", "html", "css", "json", "java", "excludedDirs", "excludedFiles"],
 				additionalProperties: false,
 				properties: {
 					javascript: {
@@ -219,7 +219,14 @@ const ret = {
 					},
 					excludedDirs: {
 						type: "array",
-						description: "List of directories to exclude from minification and beautification.",
+						description: "List of directory names to exclude from minification and beautification during folder traversal. Supports wildcards: * matches zero or more characters, and ? matches exactly one character.",
+						items: {
+							type: "string"
+						}
+					},
+					excludedFiles: {
+						type: "array",
+						description: "List of file names to exclude from minification and beautification during folder traversal. Supports wildcards: * matches zero or more characters, and ? matches exactly one character.",
 						items: {
 							type: "string"
 						}

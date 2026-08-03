@@ -419,7 +419,8 @@
 							"build",
 							"gradle",
 							".gradle"
-						]
+						],
+						"excludedFiles": []
 					},
 					"description": "Formatter and Minifier Settings.",
 					"required": [
@@ -622,7 +623,14 @@
 						},
 						"excludedDirs": {
 							"type": "array",
-							"description": "List of directories to exclude from minification and beautification.",
+							"description": "List of directory names to exclude from minification and beautification during folder traversal. Supports wildcards: * matches zero or more characters, and ? matches exactly one character.",
+							"items": {
+								"type": "string"
+							}
+						},
+						"excludedFiles": {
+							"type": "array",
+							"description": "List of file names to exclude from minification and beautification during folder traversal. Supports wildcards: * matches zero or more characters, and ? matches exactly one character.",
 							"items": {
 								"type": "string"
 							}
