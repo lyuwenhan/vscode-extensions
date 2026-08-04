@@ -58,7 +58,7 @@ const ret = {
 				type: "object",
 				default: require("./src/lib/default-setting.json"),
 				description: "Formatter and Minifier Settings.",
-				required: ["javascript", "typescript", "html", "css", "json", "java", "excludedDirs", "excludedFiles"],
+				required: ["javascript", "typescript", "html", "css", "json", "java", "excludedDirs", "excludedFiles", "disable"],
 				additionalProperties: false,
 				properties: {
 					javascript: {
@@ -229,6 +229,15 @@ const ret = {
 						description: "List of file names to exclude from minification and beautification during folder traversal. Supports wildcards: * matches zero or more characters, and ? matches exactly one character.",
 						items: {
 							type: "string"
+						}
+					},
+					disable: {
+						type: "array",
+						description: "Disable operations with exact entries or supported wildcard forms: \"language.operation\", \"*.operation\", \"language.*\", \"*.*\", or \"*\". JSONC uses the json language setting. For mitify: disabling beautify also disables mitify; disabling minify makes mitify run beautify only.",
+						uniqueItems: true,
+						items: {
+							type: "string",
+							enum: ["*", "*.*", "minify", "beautify", "mitify", "sort", "sortList", "sortListByKey", "javascript", "typescript", "json", "jsonl", "html.*", "css.*", "java.*", "javascript.minify", "javascript.beautify", "javascript.mitify", "javascript.sort", "javascript.sortList", "javascript.sortListByKey", "typescript.minify", "typescript.beautify", "typescript.mitify", "typescript.sort", "typescript.sortList", "typescript.sortListByKey", "json.minify", "json.beautify", "json.mitify", "json.sort", "json.sortList", "json.sortListByKey", "jsonl.minify", "jsonl.beautify", "jsonl.mitify", "jsonl.sort", "jsonl.sortList", "jsonl.sortListByKey", "html.minify", "html.beautify", "html.mitify", "html.sort", "html.sortList", "html.sortListByKey", "css.minify", "css.beautify", "css.mitify", "css.sort", "css.sortList", "css.sortListByKey", "java.minify", "java.beautify", "java.mitify", "java.sort", "java.sortList", "java.sortListByKey"]
 						}
 					}
 				}

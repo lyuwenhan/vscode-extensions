@@ -16,7 +16,7 @@ const JSONParse = require("jsonparse");
 const ts = require("typescript");
 const babelParser = require("@babel/parser");
 const babelGenerate = require("@babel/generator").default;
-const jsonc = require("./lib/jsonc-parser.js");
+const jsonc = require("./lib/jsonc-parser.min.js");
 const oldOpts = require("./lib/default-setting.json");
 let cleanCSSRunner = new cleanCSS({
 	level: 2
@@ -123,9 +123,26 @@ function readSettings() {
 			}
 		},
 		excludedDirs: Array.isArray(settings.excludedDirs) ? settings.excludedDirs.filter(e => typeof e === "string") : [],
-		excludedFiles: Array.isArray(settings.excludedFiles) ? settings.excludedFiles.filter(e => typeof e === "string") : []
+		excludedFiles: Array.isArray(settings.excludedFiles) ? settings.excludedFiles.filter(e => typeof e === "string") : [],
+		disable: Array.isArray(settings.disable) ? settings.disable.filter(entry => typeof entry === "string") : []
 	};
 	opts = newOpts
+}
+
+function isOperationExplicitlyDisabled(language, operation) {
+	const exact = language + "." + operation;
+	return opts.disable.includes("*")
+		|| opts.disable.includes("*.*")
+		|| opts.disable.includes("*." + operation)
+		|| opts.disable.includes(language + ".*")
+		|| opts.disable.includes(exact)
+}
+
+function isOperationDisabled(language, operation) {
+	if (operation === "mitify") {
+		return isOperationExplicitlyDisabled(language, "mitify") || isOperationExplicitlyDisabled(language, "beautify")
+	}
+	return isOperationExplicitlyDisabled(language, operation)
 }
 
 function jsonStringify1L(data, usingSpace) {
@@ -633,6 +650,17 @@ const actions = {
 		}
 	}
 };
+
+function getOperationForLanguage(action, language) {
+	if (isOperationDisabled(language, action)) {
+		return
+	}
+	if (action === "mitify" && isOperationExplicitlyDisabled(language, "minify")) {
+		return actions.beautify.opers[language]
+	}
+	return actions[action]?.opers?.[language]
+}
+
 async function runAction(oper, content) {
 	content = content.trim();
 	if (content === "") {
@@ -663,6 +691,7 @@ function activate(context) {
 		}
 		context.subscriptions.push(vscode.commands.registerCommand("minifier." + action, async (uri, selectedUris) => {
 			try {
+				readSettings();
 				let uris = await uniqueFileUrisFromUris(Array.isArray(selectedUris) && selectedUris.length > 0 ? selectedUris : uri ? [uri] : []);
 				const docs = (await Promise.all(uris.map(getDoc))).filter(Boolean);
 				if (!docs.length) {
@@ -674,7 +703,8 @@ function activate(context) {
 					return
 				}
 				let NC = false,
-					suc = false;
+					suc = false,
+					disabled = false;
 				await withActionProgress(actionName + ": Processing files", async () => {
 					while (uris.length > 0) {
 						const batch = uris.splice(0, 100);
@@ -687,7 +717,11 @@ function activate(context) {
 								lang,
 								content
 							} = getDocInfo(doc);
-							const actByLang = opers[lang];
+							const actByLang = getOperationForLanguage(action, lang);
+							if (isOperationDisabled(lang, action)) {
+								disabled = true;
+								return
+							}
 							if (!actByLang) {
 								return
 							}
@@ -708,6 +742,8 @@ function activate(context) {
 					vscode.window.showInformationMessage(sucMsg + " successfully.")
 				} else if (NC) {
 					vscode.window.showWarningMessage(actionName + ": Nothing changed.")
+				} else if (disabled) {
+					vscode.window.showWarningMessage(actionName + ": Operation disabled for the selected language.")
 				} else {
 					vscode.window.showErrorMessage(actionName + ": Invalid file type.")
 				}
@@ -718,6 +754,7 @@ function activate(context) {
 			}
 		}), vscode.commands.registerCommand("minifier." + action + "Sel", async () => {
 			try {
+				readSettings();
 				const editor = vscode.window.activeTextEditor;
 				if (!editor) {
 					vscode.window.showErrorMessage(actionName + ": No file selected.");
@@ -732,7 +769,11 @@ function activate(context) {
 				const {
 					lang
 				} = getDocInfo(editor.document);
-				const actByLang = opers[lang];
+				const actByLang = getOperationForLanguage(action, lang);
+				if (isOperationDisabled(lang, action)) {
+					vscode.window.showWarningMessage(actionName + ": Operation disabled for " + lang + ".");
+					return
+				}
 				if (!actByLang) {
 					vscode.window.showErrorMessage("Invalid file type.");
 					return
@@ -841,6 +882,7 @@ function activate(context) {
 	}) => {
 		vscode.commands.registerCommand("minifier.runAs" + addText, async () => {
 			try {
+				readSettings();
 				const items = Object.keys(actions).map(action => ({
 					label: action
 				}));
@@ -854,15 +896,15 @@ function activate(context) {
 					vscode.window.showWarningMessage("Operation canceled.");
 					return
 				}
-				const items2 = Object.keys(action.opers).map(action => ({
-					label: action
+				const items2 = Object.keys(action.opers).filter(language => getOperationForLanguage(actionName, language)).map(language => ({
+					label: language
 				}));
 				const picked2 = await vscode.window.showQuickPick(items2, {
 					placeHolder: "Choose the language for " + actionName,
 					ignoreFocusOut: true
 				});
 				const lang = picked2?.label;
-				const actByLang = action.opers[lang];
+				const actByLang = getOperationForLanguage(actionName, lang);
 				if (!picked2 || !lang || !actByLang) {
 					vscode.window.showWarningMessage("Operation canceled.");
 					return
@@ -886,13 +928,14 @@ function activate(context) {
 	context.subscriptions.push(...supportedLanguages.map(language => vscode.languages.registerDocumentFormattingEditProvider(language, {
 		async provideDocumentFormattingEdits(doc) {
 			try {
+				readSettings();
 				return withActionProgress("Beautifier: Formatting document", async () => {
 					const {
 						lang,
 						content
 					} = getDocInfo(doc);
 					const actByLang = actions.beautify.opers[lang];
-					if (!actByLang) {
+					if (isOperationDisabled(lang, "beautify") || !actByLang) {
 						return []
 					}
 					let result = await runAction(actByLang, content);
