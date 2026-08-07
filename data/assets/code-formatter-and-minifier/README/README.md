@@ -66,7 +66,9 @@ function test() {
 
 - A combination of minify and beautify.
 - Useful when your code is too messy and beautify alone is not effective.
-- Runs both minify and beautify in sequence.
+- Normally runs minify and beautify in sequence.
+- When minify is disabled for the selected language, Mitify runs beautify only.
+- When beautify or Mitify is disabled for the selected language, Mitify is unavailable.
 - Example:
 
 Before
@@ -323,12 +325,127 @@ Minifier: Code Setting
 			"beautify": {
 				/* Google Java Format options */
 			}
-		}
+		},
+		"excludedDirs": [
+		],
+		"excludedFiles": [
+		],
+		"disable": [
+		]
 	}
 }
 ```
 
 Only specified fields override defaults.
+
+---
+
+## Excluding Files and Directories
+
+Use `excludedDirs` and `excludedFiles` to prevent matching paths from being processed.
+Matching is performed against the file or directory **basename**, not the full path, and is case-sensitive.
+
+Both settings support these wildcard characters:
+
+| Wildcard | Meaning |
+|:--:|---|
+| `*` | Matches zero or more arbitrary characters |
+| `?` | Matches exactly one arbitrary character |
+
+All other characters are treated literally.
+
+```jsonc
+"minifier.codeSetting": {
+	"excludedDirs": [
+		"node_modules",
+		"build*",
+		"temp?"
+	],
+	"excludedFiles": [
+		"*.min.js",
+		"package-lock.*",
+		"test?.json"
+	]
+}
+```
+
+Examples:
+
+- `build*` matches `build`, `build-prod`, and `builder`.
+- `temp?` matches `temp1`, but not `temp10`.
+- `*.min.js` matches `app.min.js`.
+- `test?.json` matches `test1.json`, but not `test10.json`.
+
+Excluded files and directories are skipped when a file or directory URI is expanded for an operation, including folder traversal and directly selected file resources.
+
+---
+
+## Disabling Operations
+
+Use the `disable` array to disable operations by language and action.
+Each entry must use one of the supported forms below; entries are matched exactly against these forms rather than being interpreted as general glob patterns.
+
+| Form | Effect |
+|---|---|
+| `language.action` | Disables one action for one language |
+| `*.action` | Disables one action for every language |
+| `language.*` | Disables every action for one language |
+| `*.*` | Disables every action for every language |
+| `*` | Disables every action for every language |
+
+Supported language identifiers:
+
+```text
+javascript
+typescript
+json
+jsonl
+html
+css
+java
+```
+
+`jsonc` uses the `json` identifier.
+
+Supported action identifiers:
+
+```text
+minify
+beautify
+mitify
+sort
+sortList
+sortListByKey
+```
+
+Example:
+
+```jsonc
+"minifier.codeSetting": {
+	"disable": [
+		"javascript.minify",
+		"json.sortList",
+		"*.sortListByKey",
+		"java.*"
+	]
+}
+```
+
+Disabled operations are blocked consistently for current-file commands, selection commands, folder processing, **Run [action] as [language]**, and document formatting. Languages whose selected operation is disabled are omitted from the corresponding **Run As** language list.
+
+### Mitify interaction
+
+Mitify uses these additional rules:
+
+| Disabled entry affecting a language | Mitify behavior |
+|---|---|
+| No related disable entry | Runs minify, then beautify |
+| `minify` only | Runs beautify only |
+| `beautify` | Mitify is disabled |
+| `mitify` | Mitify is disabled |
+| Both `minify` and `beautify` | Mitify is disabled |
+
+Wildcard entries participate in the same rules. For example, `*.minify` makes Mitify run beautify only for all languages that support Mitify, while `*.beautify` disables Mitify for all languages.
 
 ---
 
@@ -439,7 +556,20 @@ These are the built-in defaults used by the extension:
 		},
 		"css": {
 			"minify": {
-				"level": 2
+				"normalizeWhitespace": true,
+				"discardComments": {
+					"remove": false
+				},
+				"minifySelectors": false,
+				"mergeLonghand": false,
+				"reduceTransforms": false,
+				"convertValues": false,
+				"colormin": false,
+				"mergeRules": true,
+				"discardDuplicates": true,
+				"uniqueSelectors": false,
+				"minifyFontValues": false,
+				"normalizeCharset": true
 			},
 			"beautify": {
 				"indent_size": 4,
@@ -485,7 +615,9 @@ These are the built-in defaults used by the extension:
 			"build",
 			"gradle",
 			".gradle"
-		]
+		],
+		"excludedFiles": [],
+		"disable": []
 	}
 }
 ```
@@ -537,6 +669,16 @@ These are the built-in defaults used by the extension:
 		"build",
 		"gradle",
 		".gradle"
+	],
+	"excludedFiles": [
+		"*.min.js",
+		"package-lock.*",
+		"generated?.json"
+	],
+	"disable": [
+		"javascript.minify",
+		"json.sortList",
+		"*.sortListByKey"
 	]
 }
 ```
@@ -548,6 +690,9 @@ These are the built-in defaults used by the extension:
 * Invalid or non-object values are ignored safely.
 * Missing sections are auto-filled using defaults.
 * Settings take effect immediately.
+* Exclusion patterns match basenames and are case-sensitive.
+* `disable` entries use only the documented exact and wildcard forms.
+* `jsonc` uses the `json` disable rules.
 * Java beautification uses the bundled `google-java-format` jar when `java.beautify.overrideJarPath` is empty.
 * Set `java.beautify.overrideJarPath` only when you want to force an external `google-java-format` jar.
 
@@ -558,6 +703,9 @@ These are the built-in defaults used by the extension:
 The configuration system allows you to:
 
 * Customize formatting and minification per language
+* Exclude files and directories with `*` and `?` patterns
+* Disable actions globally or per language
+* Control Mitify fallback behavior through disabled Minify and Beautify actions
 * Override only what you need
 * Rely on defaults for everything else
 
